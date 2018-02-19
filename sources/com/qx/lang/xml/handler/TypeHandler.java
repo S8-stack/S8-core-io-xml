@@ -1,0 +1,191 @@
+package com.qx.lang.xml.handler;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.qx.lang.xml.annotation.XML_GetAttribute;
+import com.qx.lang.xml.annotation.XML_GetElement;
+import com.qx.lang.xml.annotation.XML_GetValue;
+import com.qx.lang.xml.annotation.XML_SetAttribute;
+import com.qx.lang.xml.annotation.XML_SetElement;
+import com.qx.lang.xml.annotation.XML_SetValue;
+import com.qx.lang.xml.annotation.XML_Type;
+
+/**
+ * 
+ * @author pc
+ *
+ */
+public class TypeHandler {
+	
+	
+	/**
+	 * declared name
+	 */
+	private String name;
+	
+	
+	private Constructor<?> constructor;
+	
+	private FieldGetter valueGetter;
+	
+	private FieldSetter valueSetter;
+	
+	private Map<String, FieldGetter> attributeGetters = new HashMap<>();
+	
+	private Map<String, FieldSetter> attributeSetters = new HashMap<>();
+
+	private Map<String, Method> elementGetters = new HashMap<>();
+
+	private Map<String, Method> elementSetters = new HashMap<>();
+
+	/**
+	 * 
+	 */
+	public TypeHandler(XML_Context context, Class<?> type){
+		super();
+		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
+		if(typeAnnotation==null){
+			throw new RuntimeException("Missing type declaration for type: "+type.getName());
+		}
+		
+		// retrieve name
+		name = typeAnnotation.name();
+		
+		// save to context
+		context.add(name, this);
+		
+		
+		XML_GetAttribute getAttributeAnnotation;
+		XML_SetAttribute setAttributeAnnotation;
+		XML_GetValue getValueAnnotation;
+		XML_SetValue setValueAnnotation;
+		XML_GetElement getElementAnnotation;
+		XML_SetElement setElementAnnotation;
+		
+		for(Method method : type.getMethods()){
+			getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
+			setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
+			getValueAnnotation = method.getAnnotation(XML_GetValue.class);
+			setValueAnnotation = method.getAnnotation(XML_SetValue.class);
+			getElementAnnotation = method.getAnnotation(XML_GetElement.class);
+			setElementAnnotation = method.getAnnotation(XML_SetElement.class);
+			
+			if(getAttributeAnnotation!=null){
+				attributeGetters.put(getAttributeAnnotation.name(), FieldGetter.create(method));	
+			}
+			else if(setAttributeAnnotation!=null){
+				attributeSetters.put(setAttributeAnnotation.name(), FieldSetter.create(method));	
+			}
+			if(getValueAnnotation!=null){
+				valueGetter = FieldGetter.create(method);
+			}
+			else if(setValueAnnotation!=null){
+				valueSetter = FieldSetter.create(method);
+			}
+			else if(getElementAnnotation!=null){
+				elementGetters.put(getElementAnnotation.name(), method);	
+			}
+			else if(setElementAnnotation!=null){
+				elementSetters.put(setElementAnnotation.name(), method);	
+			}
+		}
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	
+	public Object create()
+			throws
+			InstantiationException,
+			IllegalAccessException,
+			IllegalArgumentException,
+			InvocationTargetException {
+		return constructor.newInstance(new Object[]{});
+	}
+	
+	/**
+	 * 
+	 * @param object
+	 * @param name
+	 * @param value
+	 * @throws Exception 
+	 */
+	public void setAttribute(Object object, String name, String value) throws Exception{
+		FieldSetter setter = attributeSetters.get(name);
+		if(setter==null){
+			throw new Exception("No field with name "+name+" in type "+this.name);
+		}
+		setter.set(object, value);
+	}
+
+	
+	/**
+	 * 
+	 * @param object
+	 * @param name
+	 * @return
+	 * @throws Exception 
+	 */
+	public String getAttribute(Object object, String name)
+			throws Exception{
+		FieldGetter getter = attributeGetters.get(name);
+		if(getter==null){
+			throw new Exception("No field with name "+name+" in type "+this.name);
+		}
+		return getter.get(object);
+	}
+	
+	public void setValue(Object object, String value)
+			throws Exception{
+		if(valueSetter==null){
+			throw new Exception("No value can be set in type "+this.name);
+		}
+		valueSetter.set(object, value);
+	}
+	
+	public String getValue(Object object)
+			throws Exception{
+		if(valueGetter==null){
+			throw new Exception("No value can be get in type "+this.name);
+		}
+		return valueGetter.get(object);
+	}
+	
+	/**
+	 * 
+	 * @param object
+	 * @param name
+	 * @param value
+	 * @throws Exception 
+	 */
+	public void setElement(Object object, String name, Object value) throws Exception{
+		Method setter = elementSetters.get(name);
+		if(setter==null){
+			throw new Exception("No field with name "+name+" in type "+this.name);
+		}
+		setter.invoke(object, value);
+	}
+
+	
+	/**
+	 * 
+	 * @param object
+	 * @param name
+	 * @return
+	 * @throws Exception 
+	 */
+	public Object getElement(Object object, String name)
+			throws Exception{
+		Method getter = elementGetters.get(name);
+		if(getter==null){
+			throw new Exception("No field with name "+name+" in type "+this.name);
+		}
+		return getter.invoke(object);
+	}
+}
