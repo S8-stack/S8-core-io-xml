@@ -15,6 +15,10 @@ public class XML_Context {
 	
 	private Map<String, TypeHandler> typeHandlers = new HashMap<>();
 	
+	/**
+	 * 
+	 * @param types
+	 */
 	public XML_Context(Class<?>... types) {
 		super();
 		for(Class<?> type : types){

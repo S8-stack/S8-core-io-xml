@@ -109,7 +109,7 @@ public class Parsing {
 	};
 	
 	
-	private State readHeaderFieldValue = new State() {
+	private State readAttributesValue = new State() {
 
 		@Override
 		public void parse(Parsing parsing) {

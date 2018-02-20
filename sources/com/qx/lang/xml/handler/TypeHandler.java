@@ -54,8 +54,10 @@ public class TypeHandler {
 
 	/**
 	 * @param context
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
 	 */
-	public void initialize(XML_Context context){
+	public void initialize(XML_Context context) throws NoSuchMethodException, SecurityException{
 		
 		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
 		if(typeAnnotation==null){
@@ -66,6 +68,8 @@ public class TypeHandler {
 
 		// retrieve name
 		this.name = name;
+		
+		constructor = type.getConstructor(new Class<?>[]{});
 		
 		// read subTypes
 		if(typeAnnotation.sub()!=null){

@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<object re="56"  te="34s">
-</object>
+<test factor="5">
+	<field:ee2 toto="76"/>
+</test>
