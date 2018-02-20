@@ -16,13 +16,12 @@ public class XML_StreamReader {
 	 */
 	private int c;
 
-
-	public XML_StreamReader(Reader reader) throws IOException {
+	public XML_StreamReader(Reader reader) throws Exception {
 		super();
 		this.reader = reader;
 
 		// start reading
-		readNext();
+		readNext(null, null);
 	}
 	
 
@@ -70,27 +69,7 @@ public class XML_StreamReader {
 	}
 
 
-	/**
-	 * read next char until reading end char
-	 * @param b
-	 * @return
-	 * @throws Exception
-	 */
-	public String readUntil(char b) throws Exception {
-		StringBuilder builder = new StringBuilder();
-		while(true) {
-			readNext();
-			if(c==b){
-				return builder.toString();
-			}
-			else if(c==-1){
-				throw new Exception("Unexpected end of stream");
-			}
-			else{
-				builder.append((char) c);
-			}
-		}
-	}
+	
 
 	/**
 	 * 
@@ -100,11 +79,11 @@ public class XML_StreamReader {
 	 * @return
 	 * @throws Exception
 	 */
-	public String read(char stopping, char[] ignored, char[] forbidden) throws Exception{
+	public String read(char[] stopping, char[] ignored, char[] forbidden) throws Exception{
 		StringBuilder builder = new StringBuilder();
 		while(true) {
-			readNext();
-			if(c==stopping){
+			c = reader.read();
+			if(stopping!=null && isOneOf(stopping)){
 				return builder.toString();
 			}
 			else if(isOneOf(forbidden)){
@@ -113,7 +92,7 @@ public class XML_StreamReader {
 			else if(c==-1){
 				throw new Exception("Unexpected end of stream");
 			}
-			else if(isOneOf(ignored)){
+			else if(isOneOf(ignored) || isOneOf(XML_Syntax.BASE_IGNORED_CHARS)){
 				// skipped
 			}
 			else{
@@ -121,6 +100,60 @@ public class XML_StreamReader {
 			}
 		}
 	}
+	
+	public void readNext(char[] ignored, char[] forbidden) throws Exception{
+		boolean isNext = false;
+		while(!isNext) {
+			c = reader.read();
+			if(isOneOf(forbidden)){
+				throw new Exception("Forbidden char has been found");
+			}
+			else if(c==-1){
+				throw new Exception("Unexpected end of stream");
+			}
+			else if(isOneOf(ignored) || isOneOf(XML_Syntax.BASE_IGNORED_CHARS)){
+				// skipped
+			}
+			else{
+				isNext = true;
+			}
+		}
+	}
+	
+	public void readNext(char[] ignored) throws Exception {
+		boolean isNext = false;
+		while(!isNext) {
+			c = reader.read();
+			if(c==-1){
+				throw new Exception("Unexpected end of stream");
+			}
+			else if(isOneOf(ignored) || isOneOf(XML_Syntax.BASE_IGNORED_CHARS)){
+				// skipped
+			}
+			else{
+				isNext = true;
+			}
+		}
+	}
+	
+	public void readNext() throws Exception {
+		boolean isNext = false;
+		while(!isNext) {
+			c = reader.read();
+			if(c==-1){
+				throw new Exception("Unexpected end of stream");
+			}
+			else if(isOneOf(XML_Syntax.BASE_IGNORED_CHARS)){
+				// skipped
+			}
+			else{
+				isNext = true;
+			}
+		}
+	}
+	
+	
+	
 	
 
 	/**
@@ -153,25 +186,34 @@ public class XML_StreamReader {
 	 * @return
 	 */
 	public boolean isOneOf(char... values){
-		for(char value : values){
-			if(c==value){
-				return true;
+		if(values!=null){
+			for(char value : values){
+				if(c==value){
+					return true;
+				}
 			}
+			return false;	
 		}
-		return false;
+		else{
+			return false;
+		}
 	}
 
 
-	/**
-	 * @throws IOException 
-	 * @throws Exception 
-	 * 
-	 */
-	public void readNext() throws IOException {
-		c = reader.read();
-		while(isOneOf(XML_Syntax.IGNORED_CHARS)){
-			c = reader.read();
-		}
+	
+	public XML_StreamReader ignore(char... ignoredChars){
+		ignored = ignoredChars;
+		return this;
+	}
+	
+	public XML_StreamReader forbid(char... forbiddenChars){
+		forbidden = forbiddenChars;
+		return this;
+	}
+	
+	public XML_StreamReader stopAt(char... stoppingChars){
+		stopping = stoppingChars;
+		return this;
 	}
 	
 	public void readNextWhileIgnoring(char... ignoredChars) throws IOException {
@@ -210,6 +252,10 @@ public class XML_StreamReader {
 
 	public char getCurrentChar() {
 		return (char) c;
+	}
+	
+	public boolean isCurrent(char comparedChar){
+		return ((char) c)==comparedChar;
 	}
 
 

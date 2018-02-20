@@ -20,22 +20,23 @@ import com.qx.lang.xml.annotation.XML_Type;
  *
  */
 public class TypeHandler {
-	
-	
+
+	private Class<?> type;
+
 	/**
 	 * declared name
 	 */
 	private String name;
-	
-	
+
+
 	private Constructor<?> constructor;
-	
+
 	private FieldGetter valueGetter;
-	
+
 	private FieldSetter valueSetter;
-	
+
 	private Map<String, FieldGetter> attributeGetters = new HashMap<>();
-	
+
 	private Map<String, FieldSetter> attributeSetters = new HashMap<>();
 
 	private Map<String, Method> elementGetters = new HashMap<>();
@@ -45,27 +46,41 @@ public class TypeHandler {
 	/**
 	 * 
 	 */
-	public TypeHandler(XML_Context context, Class<?> type){
+	public TypeHandler(Class<?> type){
 		super();
+		this.type = type;
+	}
+
+
+	/**
+	 * @param context
+	 */
+	public void initialize(XML_Context context){
+		
 		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
 		if(typeAnnotation==null){
 			throw new RuntimeException("Missing type declaration for type: "+type.getName());
 		}
-		
+
+		String name = typeAnnotation.name();
+
 		// retrieve name
-		name = typeAnnotation.name();
+		this.name = name;
 		
-		// save to context
-		context.add(name, this);
-		
-		
+		// read subTypes
+		if(typeAnnotation.sub()!=null){
+			for(Class<?> subType : typeAnnotation.sub()){
+				context.discover(subType);
+			}
+		}
+
 		XML_GetAttribute getAttributeAnnotation;
 		XML_SetAttribute setAttributeAnnotation;
 		XML_GetValue getValueAnnotation;
 		XML_SetValue setValueAnnotation;
 		XML_GetElement getElementAnnotation;
 		XML_SetElement setElementAnnotation;
-		
+
 		for(Method method : type.getMethods()){
 			getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
 			setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
@@ -73,7 +88,7 @@ public class TypeHandler {
 			setValueAnnotation = method.getAnnotation(XML_SetValue.class);
 			getElementAnnotation = method.getAnnotation(XML_GetElement.class);
 			setElementAnnotation = method.getAnnotation(XML_SetElement.class);
-			
+
 			if(getAttributeAnnotation!=null){
 				attributeGetters.put(getAttributeAnnotation.name(), FieldGetter.create(method));	
 			}
@@ -87,19 +102,31 @@ public class TypeHandler {
 				valueSetter = FieldSetter.create(method);
 			}
 			else if(getElementAnnotation!=null){
+				Class<?>[] parameters = method.getParameterTypes();
+				if(parameters.length!=0){
+					throw new RuntimeException("Illegal number of parameters for a setter");
+				}
 				elementGetters.put(getElementAnnotation.name(), method);	
 			}
 			else if(setElementAnnotation!=null){
+				Class<?>[] parameters = method.getParameterTypes();
+				if(parameters.length!=1){
+					throw new RuntimeException("Illegal number of parameters for a setter");
+				}
 				elementSetters.put(setElementAnnotation.name(), method);	
 			}
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getName() {
 		return name;
 	}
-	
-	
+
+
 	public Object create()
 			throws
 			InstantiationException,
@@ -108,7 +135,7 @@ public class TypeHandler {
 			InvocationTargetException {
 		return constructor.newInstance(new Object[]{});
 	}
-	
+
 	/**
 	 * 
 	 * @param object
@@ -124,7 +151,7 @@ public class TypeHandler {
 		setter.set(object, value);
 	}
 
-	
+
 	/**
 	 * 
 	 * @param object
@@ -140,7 +167,7 @@ public class TypeHandler {
 		}
 		return getter.get(object);
 	}
-	
+
 	public void setValue(Object object, String value)
 			throws Exception{
 		if(valueSetter==null){
@@ -148,7 +175,7 @@ public class TypeHandler {
 		}
 		valueSetter.set(object, value);
 	}
-	
+
 	public String getValue(Object object)
 			throws Exception{
 		if(valueGetter==null){
@@ -156,7 +183,7 @@ public class TypeHandler {
 		}
 		return valueGetter.get(object);
 	}
-	
+
 	/**
 	 * 
 	 * @param object
@@ -172,7 +199,7 @@ public class TypeHandler {
 		setter.invoke(object, value);
 	}
 
-	
+
 	/**
 	 * 
 	 * @param object
