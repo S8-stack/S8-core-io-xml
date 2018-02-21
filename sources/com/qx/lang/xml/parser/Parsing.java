@@ -1,12 +1,8 @@
 package com.qx.lang.xml.parser;
 
-import java.io.IOException;
 import java.util.Stack;
 
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
-
 import com.qx.lang.xml.XML_Syntax;
-import com.qx.lang.xml.handler.ObjectHandler;
 import com.qx.lang.xml.handler.XML_Context;
 import com.qx.lang.xml.reader.XML_StreamReader;
 
@@ -18,7 +14,7 @@ public class Parsing {
 
 	protected XML_StreamReader reader;
 
-	protected Stack<ObjectHandler> stack;
+	protected Stack<ObjectBuilder> stack;
 
 	/**
 	 * 
@@ -89,35 +85,50 @@ public class Parsing {
 		@Override
 		public void parse(Parsing parsing) throws Exception {
 			reader.skipWhiteSpace();
-			if(reader.getCurrentChar()==XML_Syntax.END_OF_TAG){
-				state = readElement;
+			if(reader.isCurrent('>')){
+				state = readTag;
 			}
-			else if(reader.getCurrentChar()==XML_Syntax.TAG_END_MARKER){
+			else if(reader.isCurrent('/')){
 				reader.readNext();
-				if(reader.getCurrentChar()!=XML_Syntax.END_OF_TAG){
+				if(!reader.isCurrent('>')){
 					throw new Exception("Expecting end of tag");
 				}
 				stack.pop();
-				state = readElement;
+				state = readTag;
 			}
 			else{
-				attributeName = reader.read('=', new char[]{' '}, new char[]{});
-				reader.check(XML_Syntax.ATTRIBUTE_DEFINITION);
-				state = readHeaderFieldValue;	
+				attributeName = reader.read(new char[]{'='}, new char[]{' '}, new char[]{});
+				state = readAttributeValue;	
 			}
 		}
 	};
 	
 	
-	private State readAttributesValue = new State() {
+	private State readAttributeValue = new State() {
 
 		@Override
-		public void parse(Parsing parsing) {
-			reader.readNextWhileIgnoring(XML_Syntax.WHITE_SPACE);
-			reader.check(XML_Syntax.ATTRIBUTE_DEFINITION);
-			reader.readUntil(XML_Syntax.ATTRIBUTE_DEFINITION);
-			// TODO set field value here
-			state = readObjectHeaderFields;
+		public void parse(Parsing parsing) throws Exception {
+			reader.read(new char[]{'"', '>', '/'}, new char[]{' '}, new char[]{'>', '<'});
+			if(reader.isCurrent('"')){
+				String value = reader.read(new char[]{'"'}, new char[]{' '}, new char[]{'>', '<'});
+				stack.peek().setAttribute(attributeName, value);
+				state = readAttributeName;
+			}
+			else if(reader.isCurrent('>')){
+				state = readTag;
+			}
+			else if(reader.isCurrent('/')){
+				reader.readNext();
+				if(!reader.isCurrent('>')){
+					throw new Exception("Expecting end of tag");
+				}
+				stack.pop();
+				state = readTag;
+			}
+			else {
+				throw new Exception("Missing end of tag");
+			}
 		}
 	};
+	
 }

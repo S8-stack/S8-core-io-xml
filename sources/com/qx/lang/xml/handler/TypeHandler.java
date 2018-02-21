@@ -54,10 +54,9 @@ public class TypeHandler {
 
 	/**
 	 * @param context
-	 * @throws SecurityException 
-	 * @throws NoSuchMethodException 
+	 * @throws Exception 
 	 */
-	public void initialize(XML_Context context) throws NoSuchMethodException, SecurityException{
+	public void initialize(XML_Context context) throws Exception{
 		
 		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
 		if(typeAnnotation==null){

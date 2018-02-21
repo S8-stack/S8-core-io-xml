@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.qx.lang.xml.annotation.XML_Type;
+import com.qx.lang.xml.parser.ObjectBuilder;
 
 /**
  * 
@@ -18,15 +19,25 @@ public class XML_Context {
 	/**
 	 * 
 	 * @param types
+	 * @throws Exception 
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
 	 */
-	public XML_Context(Class<?>... types) {
+	public XML_Context(Class<?>... types) throws Exception {
 		super();
 		for(Class<?> type : types){
 			discover(type);
 		}
 	}
 	
-	protected void discover(Class<?> type){
+	/**
+	 * 
+	 * @param type
+	 * @throws Exception 
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 */
+	protected void discover(Class<?> type) throws Exception {
 		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
 		if(typeAnnotation==null){
 			throw new RuntimeException("Missing type declaration for type: "+type.getName());
@@ -35,7 +46,11 @@ public class XML_Context {
 		if(!typeHandlers.containsKey(name)){
 			TypeHandler typeHandler = new TypeHandler(type);
 			typeHandlers.put(name, typeHandler);
-			typeHandler.initialize(this);
+			try {
+				typeHandler.initialize(this);
+			} catch (NoSuchMethodException | SecurityException e) {
+				throw new Exception("Failed to initialize "+type.getName()+" due to "+e.getMessage());
+			}
 		}
 	}
 	
@@ -49,12 +64,12 @@ public class XML_Context {
 	 * @return
 	 * @throws Exception
 	 */
-	public ObjectHandler create(String name) throws Exception{
+	public ObjectBuilder create(String name) throws Exception{
 		TypeHandler typeHandler = typeHandlers.get(name);
 		if(typeHandler==null){
 			throw new Exception("Unknown type: "+name);
 		}
-		return new ObjectHandler(typeHandler);
+		return new ObjectBuilder(typeHandler);
 	}
 	
 }
