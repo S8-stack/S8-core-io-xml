@@ -14,7 +14,7 @@ public class Parsing {
 
 	protected XML_StreamReader reader;
 
-	protected Stack<ObjectBuilder> stack;
+	protected Stack<ObjectElementBuilder> stack;
 
 	/**
 	 * 
@@ -33,48 +33,82 @@ public class Parsing {
 	 */
 	private String tag;
 	
-	private State readTag = new State() {
+	private State tagStartFound = new State() {
 
 		@Override
 		public void parse(Parsing parsing) throws Exception {
-			reader.readNext(null, null);
-			reader.check(XML_Syntax.START_OF_TAG);
-			reader.readNext(null, null);
-			if(reader.isCurrent(XML_Syntax.TAG_END_MARKER)){
-				tag = reader.read(new char[]{'>'}, new char[]{' '}, new char[]{',', '=', '"', '/'});
-				String openingTag = stack.peek().typeHandler.getName();
-				if(stack.peek().typeHandler.getName().equals(tag)){
-					stack.pop();
-					state = readTag;
-				}
-				else{
-					throw new Exception("Closing tag "+tag+" is not matching opening tag "+openingTag);
-				}
+			reader.check('<');
+			reader.next();
+			// closing tag
+			if(reader.isCurrent('/')){
+				state = readClosingTag;
+			}
+			else if(reader.isCurrent('-')){
+				state = readComment;
 			}
 			else{
-				// no white spaces allowed between '<' and tag word start
-				tag = reader.getCurrentChar()+reader.read(new char[]{' ','/','>'}, null, new char[]{',', '=', '"'});
-				if(reader.isCurrent(XML_Syntax.WHITE_SPACE)){
-					stack.push(context.create(tag));
-					// update stack
-					state = readAttributeName;
-				}
-				else if(reader.isCurrent('>')){
-					stack.push(context.create(tag));
-					state = readTag;
-				}
-				else if(reader.isCurrent('/')){
-					reader.readNext();
-					reader.check('>');
-					stack.pop();
-					state = readTag;
-				}
-				else{
-					throw new RuntimeException("Uncontrolled read stop");
-				}
+				state = readOpeningTag;
 			}
 		}
 	};
+	
+	
+	private State readOpeningTag = new State() {
+
+		@Override
+		public void parse(Parsing parsing) throws Exception {
+			String word;
+			
+			word = reader.until(
+					/* stop at */ new char[]{'>', ' ', ':'},
+					/* ignore */ new char[]{' '},
+					/* forbid */ new char[]{',', '=', '"', '/'},
+					/**/true);
+			
+			// prefix is detected -> field name
+			if(reader.isCurrent(':')){
+				if(word.isEmpty()){
+					throw new Exception("Empty field name");
+				}
+				String fieldName = word;
+				String elementTypeName = reader.until(
+						/* stop at */ new char[]{'>', ' ', '/'},
+						/* ignore */ new char[]{' '},
+						/* forbid */ new char[]{',', '=', '"', '/', ':'},
+						/**/true);
+				
+				ObjectElementBuilder element = context.create(elementTypeName);
+				stack.peek().appendElement(fieldName, element.object);
+				stack.push(element);
+				state = readAttributeName;
+			}
+			else if(reader.isCurrent(' ')){
+				
+			}
+		}
+	};
+	
+	
+	private State readClosingTag = new State() {
+
+		@Override
+		public void parse(Parsing parsing) throws Exception {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	};
+	
+	private State readComment = new State() {
+
+		@Override
+		public void parse(Parsing parsing) throws Exception {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	};
+	
 
 	
 	
@@ -89,7 +123,7 @@ public class Parsing {
 				state = readTag;
 			}
 			else if(reader.isCurrent('/')){
-				reader.readNext();
+				reader.next();
 				if(!reader.isCurrent('>')){
 					throw new Exception("Expecting end of tag");
 				}
@@ -118,7 +152,7 @@ public class Parsing {
 				state = readTag;
 			}
 			else if(reader.isCurrent('/')){
-				reader.readNext();
+				reader.next();
 				if(!reader.isCurrent('>')){
 					throw new Exception("Expecting end of tag");
 				}

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.qx.lang.xml.annotation.XML_Type;
-import com.qx.lang.xml.parser.ObjectBuilder;
 
 /**
  * 
@@ -58,18 +57,9 @@ public class XML_Context {
 		return typeHandlers.containsKey(name);
 	}
 	
-	/**
-	 * 
-	 * @param name
-	 * @return
-	 * @throws Exception
-	 */
-	public ObjectBuilder create(String name) throws Exception{
-		TypeHandler typeHandler = typeHandlers.get(name);
-		if(typeHandler==null){
-			throw new Exception("Unknown type: "+name);
-		}
-		return new ObjectBuilder(typeHandler);
+	
+	public TypeHandler get(String name){
+		return typeHandlers.get(name);
 	}
 	
 }

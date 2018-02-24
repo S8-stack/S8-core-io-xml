@@ -31,17 +31,17 @@ public class TypeHandler {
 
 	private Constructor<?> constructor;
 
-	private FieldGetter valueGetter;
+	private AttributeGetter valueGetter;
 
-	private FieldSetter valueSetter;
+	private AttributeSetter valueSetter;
 
-	private Map<String, FieldGetter> attributeGetters = new HashMap<>();
+	private Map<String, AttributeGetter> attributeGetters = new HashMap<>();
 
-	private Map<String, FieldSetter> attributeSetters = new HashMap<>();
+	private Map<String, AttributeSetter> attributeSetters = new HashMap<>();
 
 	private Map<String, Method> elementGetters = new HashMap<>();
 
-	private Map<String, Method> elementSetters = new HashMap<>();
+	private Map<String, ElementSetter> elementSetters = new HashMap<>();
 
 	/**
 	 * 
@@ -93,16 +93,16 @@ public class TypeHandler {
 			setElementAnnotation = method.getAnnotation(XML_SetElement.class);
 
 			if(getAttributeAnnotation!=null){
-				attributeGetters.put(getAttributeAnnotation.name(), FieldGetter.create(method));	
+				attributeGetters.put(getAttributeAnnotation.name(), AttributeGetter.create(method));	
 			}
 			else if(setAttributeAnnotation!=null){
-				attributeSetters.put(setAttributeAnnotation.name(), FieldSetter.create(method));	
+				attributeSetters.put(setAttributeAnnotation.name(), AttributeSetter.create(method));	
 			}
 			if(getValueAnnotation!=null){
-				valueGetter = FieldGetter.create(method);
+				valueGetter = AttributeGetter.create(method);
 			}
 			else if(setValueAnnotation!=null){
-				valueSetter = FieldSetter.create(method);
+				valueSetter = AttributeSetter.create(method);
 			}
 			else if(getElementAnnotation!=null){
 				Class<?>[] parameters = method.getParameterTypes();
@@ -112,11 +112,8 @@ public class TypeHandler {
 				elementGetters.put(getElementAnnotation.name(), method);	
 			}
 			else if(setElementAnnotation!=null){
-				Class<?>[] parameters = method.getParameterTypes();
-				if(parameters.length!=1){
-					throw new RuntimeException("Illegal number of parameters for a setter");
-				}
-				elementSetters.put(setElementAnnotation.name(), method);	
+				
+				elementSetters.put(setElementAnnotation.name(), ElementSetter.create(method));	
 			}
 		}
 	}
@@ -147,7 +144,7 @@ public class TypeHandler {
 	 * @throws Exception 
 	 */
 	public void setAttribute(Object object, String name, String value) throws Exception{
-		FieldSetter setter = attributeSetters.get(name);
+		AttributeSetter setter = attributeSetters.get(name);
 		if(setter==null){
 			throw new Exception("No field with name "+name+" in type "+this.name);
 		}
@@ -164,7 +161,7 @@ public class TypeHandler {
 	 */
 	public String getAttribute(Object object, String name)
 			throws Exception{
-		FieldGetter getter = attributeGetters.get(name);
+		AttributeGetter getter = attributeGetters.get(name);
 		if(getter==null){
 			throw new Exception("No field with name "+name+" in type "+this.name);
 		}
@@ -195,11 +192,25 @@ public class TypeHandler {
 	 * @throws Exception 
 	 */
 	public void setElement(Object object, String name, Object value) throws Exception{
-		Method setter = elementSetters.get(name);
+		ElementSetter setter = elementSetters.get(name);
 		if(setter==null){
 			throw new Exception("No field with name "+name+" in type "+this.name);
 		}
-		setter.invoke(object, value);
+		setter.set(object, value);
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 * @throws Exception
+	 */
+	public ElementSetter getElementSetter(String name) throws Exception{
+		ElementSetter setter = elementSetters.get(name);
+		if(setter==null){
+			throw new Exception("No field with name "+name+" in type "+this.name);
+		}
+		return setter;
 	}
 
 

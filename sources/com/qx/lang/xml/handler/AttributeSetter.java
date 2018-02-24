@@ -3,14 +3,14 @@ package com.qx.lang.xml.handler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public abstract class FieldSetter {
+public abstract class AttributeSetter {
 	
 	/**
 	 * 
 	 * @param method
 	 * @return
 	 */
-	public static FieldSetter create(Method method){
+	public static AttributeSetter create(Method method){
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=1){
 			throw new RuntimeException("Illegal number of parameters for a setter");
@@ -43,9 +43,9 @@ public abstract class FieldSetter {
 		}
 	}
 
-	public Method method;
+	protected Method method;
 	
-	public FieldSetter(Method method) {
+	public AttributeSetter(Method method) {
 		super();
 		this.method = method;
 	}
@@ -53,7 +53,7 @@ public abstract class FieldSetter {
 	public abstract void set(Object object, String value)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
 	
-	private static class BooleanFieldSetter extends FieldSetter {
+	private static class BooleanFieldSetter extends AttributeSetter {
 
 		public BooleanFieldSetter(Method method) {
 			super(method);
@@ -67,7 +67,7 @@ public abstract class FieldSetter {
 		
 	}
 	
-	private static class ShortFieldSetter extends FieldSetter {
+	private static class ShortFieldSetter extends AttributeSetter {
 
 		public ShortFieldSetter(Method method) {
 			super(method);
@@ -81,7 +81,7 @@ public abstract class FieldSetter {
 		
 	}
 	
-	private static class IntegerFieldSetter extends FieldSetter {
+	private static class IntegerFieldSetter extends AttributeSetter {
 
 		public IntegerFieldSetter(Method method) {
 			super(method);
@@ -95,7 +95,7 @@ public abstract class FieldSetter {
 		
 	}
 	
-	private static class LongFieldSetter extends FieldSetter {
+	private static class LongFieldSetter extends AttributeSetter {
 
 		public LongFieldSetter(Method method) {
 			super(method);
@@ -109,7 +109,7 @@ public abstract class FieldSetter {
 		
 	}
 	
-	private static class FloatFieldSetter extends FieldSetter {
+	private static class FloatFieldSetter extends AttributeSetter {
 
 		public FloatFieldSetter(Method method) {
 			super(method);
@@ -123,7 +123,7 @@ public abstract class FieldSetter {
 		
 	}
 	
-	private static class DoubleFieldSetter extends FieldSetter {
+	private static class DoubleFieldSetter extends AttributeSetter {
 
 		public DoubleFieldSetter(Method method) {
 			super(method);
@@ -137,7 +137,7 @@ public abstract class FieldSetter {
 		
 	}
 	
-	private static class StringFieldSetter extends FieldSetter {
+	private static class StringFieldSetter extends AttributeSetter {
 
 		public StringFieldSetter(Method method) {
 			super(method);

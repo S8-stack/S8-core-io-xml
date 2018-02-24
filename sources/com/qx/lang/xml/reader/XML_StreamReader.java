@@ -21,7 +21,7 @@ public class XML_StreamReader {
 		this.reader = reader;
 
 		// start reading
-		readNext(null, null);
+		next(null, null);
 	}
 	
 
@@ -38,7 +38,7 @@ public class XML_StreamReader {
 				throw new Exception("Unexpected sequence encountered while deserializing");
 			}
 			if(i<n-1){
-				readNext();	
+				next();	
 			}
 		}
 	}
@@ -79,8 +79,11 @@ public class XML_StreamReader {
 	 * @return
 	 * @throws Exception
 	 */
-	public String read(char[] stopping, char[] ignored, char[] forbidden) throws Exception{
+	public String until(char[] stopping, char[] ignored, char[] forbidden, boolean includeCurrent) throws Exception{
 		StringBuilder builder = new StringBuilder();
+		if(includeCurrent){
+			builder.append(c);	
+		}
 		while(true) {
 			c = reader.read();
 			if(stopping!=null && isOneOf(stopping)){
@@ -101,7 +104,14 @@ public class XML_StreamReader {
 		}
 	}
 	
-	public void readNext(char[] ignored, char[] forbidden) throws Exception{
+	
+	/**
+	 * 
+	 * @param ignored
+	 * @param forbidden
+	 * @throws Exception
+	 */
+	public void next(char[] ignored, char[] forbidden) throws Exception{
 		boolean isNext = false;
 		while(!isNext) {
 			c = reader.read();
@@ -120,7 +130,7 @@ public class XML_StreamReader {
 		}
 	}
 	
-	public void readNext(char[] ignored) throws Exception {
+	public void next(char[] ignored) throws Exception {
 		boolean isNext = false;
 		while(!isNext) {
 			c = reader.read();
@@ -136,7 +146,7 @@ public class XML_StreamReader {
 		}
 	}
 	
-	public void readNext() throws Exception {
+	public void next() throws Exception {
 		boolean isNext = false;
 		while(!isNext) {
 			c = reader.read();
@@ -166,7 +176,7 @@ public class XML_StreamReader {
 	public String readUntilOneOf(char... stoppingChars) throws Exception{
 		StringBuilder builder = new StringBuilder();
 		while(true){
-			readNext();
+			next();
 			if(isOneOf(stoppingChars)){
 				return builder.toString();	
 			}
@@ -199,22 +209,6 @@ public class XML_StreamReader {
 		}
 	}
 
-
-	
-	public XML_StreamReader ignore(char... ignoredChars){
-		ignored = ignoredChars;
-		return this;
-	}
-	
-	public XML_StreamReader forbid(char... forbiddenChars){
-		forbidden = forbiddenChars;
-		return this;
-	}
-	
-	public XML_StreamReader stopAt(char... stoppingChars){
-		stopping = stoppingChars;
-		return this;
-	}
 	
 	public void readNextWhileIgnoring(char... ignoredChars) throws IOException {
 		c = reader.read();
@@ -230,25 +224,6 @@ public class XML_StreamReader {
 		}
 	}
 	
-
-	
-	
-	/**
-	 * read next char for <code>length</code>.
-	 * 
-	 * @param length
-	 * @return
-	 * @throws IOException
-	 */
-	public String readString(int length) throws IOException{
-		char[] buffer = new char[length];
-		reader.read(buffer, 0, length);
-		
-		readNext();
-		
-		return new String(buffer);
-	}
-
 
 	public char getCurrentChar() {
 		return (char) c;

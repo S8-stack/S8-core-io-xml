@@ -3,14 +3,14 @@ package com.qx.lang.xml.handler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public abstract class FieldGetter {
+public abstract class AttributeGetter {
 	
 	/**
 	 * 
 	 * @param method
 	 * @return
 	 */
-	public static FieldGetter create(Method method){
+	public static AttributeGetter create(Method method){
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=0){
 			throw new RuntimeException("Illegal number of parameters for a setter");
@@ -45,7 +45,7 @@ public abstract class FieldGetter {
 
 	public Method method;
 	
-	public FieldGetter(Method method) {
+	public AttributeGetter(Method method) {
 		super();
 		this.method = method;
 	}
@@ -53,7 +53,7 @@ public abstract class FieldGetter {
 	public abstract String get(Object object)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
 	
-	private static class BooleanFieldGetter extends FieldGetter {
+	private static class BooleanFieldGetter extends AttributeGetter {
 
 		public BooleanFieldGetter(Method method) {
 			super(method);
@@ -67,7 +67,7 @@ public abstract class FieldGetter {
 		
 	}
 	
-	private static class ShortFieldGetter extends FieldGetter {
+	private static class ShortFieldGetter extends AttributeGetter {
 
 		public ShortFieldGetter(Method method) {
 			super(method);
@@ -83,7 +83,7 @@ public abstract class FieldGetter {
 	
 
 	
-	private static class IntegerFieldGetter extends FieldGetter {
+	private static class IntegerFieldGetter extends AttributeGetter {
 
 		public IntegerFieldGetter(Method method) {
 			super(method);
@@ -98,7 +98,7 @@ public abstract class FieldGetter {
 	}
 	
 
-	private static class LongFieldGetter extends FieldGetter {
+	private static class LongFieldGetter extends AttributeGetter {
 
 		public LongFieldGetter(Method method) {
 			super(method);
@@ -114,7 +114,7 @@ public abstract class FieldGetter {
 	
 
 
-	private static class FloatFieldGetter extends FieldGetter {
+	private static class FloatFieldGetter extends AttributeGetter {
 
 		public FloatFieldGetter(Method method) {
 			super(method);
@@ -129,7 +129,7 @@ public abstract class FieldGetter {
 	}
 	
 
-	private static class DoubleFieldGetter extends FieldGetter {
+	private static class DoubleFieldGetter extends AttributeGetter {
 
 		public DoubleFieldGetter(Method method) {
 			super(method);
@@ -144,7 +144,7 @@ public abstract class FieldGetter {
 	}
 	
 
-	private static class StringFieldGetter extends FieldGetter {
+	private static class StringFieldGetter extends AttributeGetter {
 
 		public StringFieldGetter(Method method) {
 			super(method);
