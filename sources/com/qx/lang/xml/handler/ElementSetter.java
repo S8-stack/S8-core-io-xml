@@ -2,12 +2,13 @@ package com.qx.lang.xml.handler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
 public abstract class ElementSetter {
 	
 	
-	public static ElementSetter create(Method method){
+	public static ElementSetter create(XML_Context context, Method method) throws Exception{
 		
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=1){
@@ -16,18 +17,23 @@ public abstract class ElementSetter {
 		
 		Class<?> type = parameters[0];
 		if(type.isArray()){
+			context.discover(type.getComponentType());
 			return new ArrayElementSetter(method, type);
 		}
 		else if(Map.class.isAssignableFrom(type)){
+			
+			Class<?> valueType =
+					(Class<?>) ((ParameterizedType) type.getGenericSuperclass()).getActualTypeArguments()[0];
+			context.discover(valueType);
 			return new MapElementSetter(method);
 		}
 		else{
-			return new ObjectElementSetter(method);
+			context.discover(type);
+			return new ObjectElementSetter(method, type);
 		}
 	}
 
 	protected Method method;
-	
 	
 	public ElementSetter(Method method) {
 		super();
@@ -35,7 +41,7 @@ public abstract class ElementSetter {
 	}
 
 	
-	public abstract ElementType getType();
+	public abstract ElementType getElementType();
 	
 	public void set(Object parent, Object value)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
@@ -44,12 +50,20 @@ public abstract class ElementSetter {
 	
 	public static class ObjectElementSetter extends ElementSetter {
 
-		public ObjectElementSetter(Method method) {
+		private Class<?> type;
+		
+		public ObjectElementSetter(Method method, Class<?> type) {
 			super(method);
+			this.type = type;
 		}
 
+		
+		public Class<?> getType(){
+			return type;
+		}
+		
 		@Override
-		public ElementType getType() {
+		public ElementType getElementType() {
 			return ElementType.OBJECT;
 		}
 		
@@ -65,7 +79,7 @@ public abstract class ElementSetter {
 		}
 
 		@Override
-		public ElementType getType() {
+		public ElementType getElementType() {
 			return ElementType.ARRAY;
 		}
 
@@ -82,7 +96,7 @@ public abstract class ElementSetter {
 		}
 
 		@Override
-		public ElementType getType() {
+		public ElementType getElementType() {
 			return ElementType.MAP;
 		}
 	}

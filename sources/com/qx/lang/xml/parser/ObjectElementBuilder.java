@@ -34,9 +34,9 @@ public class ObjectElementBuilder extends ElementBuilder {
 	 * @param object
 	 * @throws Exception 
 	 */
-	public ObjectElementBuilder(XML_Context context, ElementBuilder parent, String fieldName, String typeName)
+	public ObjectElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName, String typeName)
 			throws Exception {
-		super(context, parent, fieldName);
+		super(context, parent, parentFieldName);
 		this.typeHandler = context.get(typeName);
 
 		if(typeHandler==null){
@@ -54,8 +54,9 @@ public class ObjectElementBuilder extends ElementBuilder {
 	 * @param value
 	 * @throws Exception 
 	 */
+	@Override
 	public void setAttribute(String name, String value) throws Exception{
-		typeHandler.setAttribute(value, name, value);
+		typeHandler.setAttribute(object, name, value);
 	}
 
 
@@ -66,15 +67,16 @@ public class ObjectElementBuilder extends ElementBuilder {
 	 * @return
 	 * @throws Exception 
 	 */
-	public String getAttribute(Object object, String name) throws Exception{
+	public String getAttribute(String name) throws Exception{
 		return typeHandler.getAttribute(object, name);
 	}
 
-	public void setValue(Object object, String value) throws Exception{
+	@Override
+	public void setValue(String value) throws Exception{
 		typeHandler.setValue(object, value);
 	}
 
-	public String getValue(Object object) throws Exception {
+	public String getValue() throws Exception {
 		return typeHandler.getValue(object);
 	}
 
@@ -86,7 +88,7 @@ public class ObjectElementBuilder extends ElementBuilder {
 	 * @throws Exception 
 	 */
 	@Override
-	public void appendElement(String name, Object value) throws Exception{
+	public void setElement(String name, Object value) throws Exception{
 		typeHandler.setElement(object, name, value);
 	}
 
@@ -111,7 +113,7 @@ public class ObjectElementBuilder extends ElementBuilder {
 		String fieldName = fragments[0];
 		
 		ElementSetter setter = typeHandler.getElementSetter(fieldName);
-		switch (setter.getType()) {
+		switch (setter.getElementType()) {
 		
 		case OBJECT:
 			if(fragments.length!=2){
@@ -140,8 +142,15 @@ public class ObjectElementBuilder extends ElementBuilder {
 
 	@Override
 	public void close() throws Exception {
-		parent.appendElement(fieldName, object);
+		parent.setElement(fieldNameInParent, object);
 	}
+
+
+	@Override
+	public String getTag() {
+		return fieldNameInParent+':'+typeHandler.getName();
+	}
+
 	
 
 }

@@ -1,4 +1,4 @@
-package com.qx.lang.xml.tests;
+package com.qx.lang.xml.example;
 
 
 import com.qx.lang.xml.annotation.XML_GetAttribute;

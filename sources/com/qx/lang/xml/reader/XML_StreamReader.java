@@ -20,8 +20,6 @@ public class XML_StreamReader {
 		super();
 		this.reader = reader;
 
-		// start reading
-		next(null, null);
 	}
 	
 
@@ -82,7 +80,7 @@ public class XML_StreamReader {
 	public String until(char[] stopping, char[] ignored, char[] forbidden, boolean includeCurrent) throws Exception{
 		StringBuilder builder = new StringBuilder();
 		if(includeCurrent){
-			builder.append(c);	
+			builder.append((char) c);	
 		}
 		while(true) {
 			c = reader.read();

@@ -1,0 +1,3 @@
+<root:test factor="5"  >
+	<field:ee2 toto="76"/>
+</root:test>

@@ -28,7 +28,9 @@ public class TypeHandler {
 	 */
 	private String name;
 
-
+	/**
+	 * 
+	 */
 	private Constructor<?> constructor;
 
 	private AttributeGetter valueGetter;
@@ -112,15 +114,14 @@ public class TypeHandler {
 				elementGetters.put(getElementAnnotation.name(), method);	
 			}
 			else if(setElementAnnotation!=null){
-				
-				elementSetters.put(setElementAnnotation.name(), ElementSetter.create(method));	
+				elementSetters.put(setElementAnnotation.name(), ElementSetter.create(context, method));	
 			}
 		}
 	}
 	
 	/**
 	 * 
-	 * @return
+	 * @return tag displayed in XML
 	 */
 	public String getName() {
 		return name;

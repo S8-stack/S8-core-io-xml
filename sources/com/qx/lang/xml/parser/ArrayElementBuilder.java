@@ -29,8 +29,18 @@ public class ArrayElementBuilder extends ElementBuilder {
 	@SuppressWarnings("unchecked")
 	// TODO type safety could be done externally...
 	@Override
-	public void appendElement(String fieldName, Object object) throws Exception {
+	public void setElement(String fieldName, Object object) throws Exception {
 		list.add(object);
+	}
+	
+	@Override
+	public void setValue(String value) throws Exception {
+		throw new Exception("Cannot set inner value in array");	
+	}
+	
+	@Override
+	public void setAttribute(String name, String value) throws Exception {
+		throw new Exception("Cannot set attribute in array");	
 	}
 
 	@Override
@@ -40,7 +50,12 @@ public class ArrayElementBuilder extends ElementBuilder {
 		for(int i=0; i<length; i++){
 			Array.set(array, i, list.get(i));	
 		}
-		parent.appendElement(fieldName, array);
+		parent.setElement(fieldNameInParent, array);
+	}
+
+	@Override
+	public String getTag() {
+		return fieldNameInParent;
 	}
 
 }
