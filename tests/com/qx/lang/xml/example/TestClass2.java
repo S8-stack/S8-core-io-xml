@@ -6,7 +6,7 @@ import com.qx.lang.xml.annotation.XML_SetAttribute;
 import com.qx.lang.xml.annotation.XML_Type;
 
 @XML_Type(name="test2", sub={})
-public class TestClass2 extends TestClass {
+public class TestClass2 extends Wrapper {
 
 	public int hiddenValue;
 	

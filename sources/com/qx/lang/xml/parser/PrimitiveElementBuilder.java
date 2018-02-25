@@ -12,37 +12,18 @@ import com.qx.lang.xml.handler.XML_Context;
  * @author pc
  *
  */
-public class ObjectElementBuilder extends ElementBuilder {
+public class PrimitiveElementBuilder extends ElementBuilder {
 
-
-	/**
-	 * 
-	 */
-	private TypeHandler typeHandler;
-
-
-	/**
-	 * 
-	 */
-	private Object object;
-
-
-
+	
 	/**
 	 * 
 	 * @param typeHandler
 	 * @param object
 	 * @throws Exception 
 	 */
-	public ObjectElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName, String typeName)
+	public PrimitiveElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName, String typeName)
 			throws Exception {
 		super(context, parent, parentFieldName);
-		this.typeHandler = context.get(typeName);
-
-		if(typeHandler==null){
-			throw new Exception("Unknown type: "+typeName);
-		}
-		this.object = typeHandler.create();
 	}
 
 
@@ -119,7 +100,7 @@ public class ObjectElementBuilder extends ElementBuilder {
 			if(fragments.length!=2){
 				throw new Exception("Missing type name for field "+fieldName);
 			}
-			return new ObjectElementBuilder(context, this, fieldName, fragments[1]);
+			return new PrimitiveElementBuilder(context, this, fieldName, fragments[1]);
 			
 		case ARRAY:
 			if(fragments.length!=1){

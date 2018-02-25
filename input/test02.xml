@@ -1,3 +1,17 @@
-<root:test factor="5"  >
-	<field:ee2 toto="76"/>
+<root:test factor="5">
+	<field:ee2 toto="76" />
+	<items>
+		<ee toto="45" />
+		<ee toto="46" />
+		<ee2 toto="47" />
+		<ee2 toto="48" b="3">
+			<users>
+				<user name="ojo" password="rekhejj" />
+				<user name="ojo1" password="rekhejj" />
+				<user name="ojo2" password="rekhejj" />
+				<user name="ojo3" password="rekhejj" />
+				<user name="ojo4" password="rekhejj" />
+			</users>
+		</ee2>
+	</items>
 </root:test>

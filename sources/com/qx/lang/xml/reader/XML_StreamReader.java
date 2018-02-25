@@ -7,6 +7,8 @@ import com.qx.lang.xml.XML_Syntax;
 
 
 public class XML_StreamReader {
+	
+	public static final boolean IS_DEBUG_ENABLED = true;
 
 
 	private Reader reader;
@@ -84,6 +86,9 @@ public class XML_StreamReader {
 		}
 		while(true) {
 			c = reader.read();
+			if(IS_DEBUG_ENABLED){
+				System.out.print((char) c);
+			}
 			if(stopping!=null && isOneOf(stopping)){
 				return builder.toString();
 			}
@@ -113,6 +118,9 @@ public class XML_StreamReader {
 		boolean isNext = false;
 		while(!isNext) {
 			c = reader.read();
+			if(IS_DEBUG_ENABLED){
+				System.out.print((char) c);
+			}
 			if(isOneOf(forbidden)){
 				throw new Exception("Forbidden char has been found");
 			}
@@ -132,6 +140,9 @@ public class XML_StreamReader {
 		boolean isNext = false;
 		while(!isNext) {
 			c = reader.read();
+			if(IS_DEBUG_ENABLED){
+				System.out.print((char) c);
+			}
 			if(c==-1){
 				throw new Exception("Unexpected end of stream");
 			}
@@ -148,6 +159,9 @@ public class XML_StreamReader {
 		boolean isNext = false;
 		while(!isNext) {
 			c = reader.read();
+			if(IS_DEBUG_ENABLED){
+				System.out.print((char) c);
+			}
 			if(c==-1){
 				throw new Exception("Unexpected end of stream");
 			}
@@ -210,6 +224,9 @@ public class XML_StreamReader {
 	
 	public void readNextWhileIgnoring(char... ignoredChars) throws IOException {
 		c = reader.read();
+		if(IS_DEBUG_ENABLED){
+			System.out.print((char) c);
+		}
 		while(isOneOf(ignoredChars)){
 			c = reader.read();
 		}
@@ -217,8 +234,14 @@ public class XML_StreamReader {
 	
 	public void skipWhiteSpace() throws IOException {
 		c = reader.read();
+		if(IS_DEBUG_ENABLED){
+			System.out.print((char) c);
+		}
 		while(c==XML_Syntax.WHITE_SPACE){
 			c = reader.read();
+			if(IS_DEBUG_ENABLED){
+				System.out.print((char) c);
+			}
 		}
 	}
 	

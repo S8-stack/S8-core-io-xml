@@ -8,11 +8,13 @@ import com.qx.lang.xml.annotation.XML_SetElement;
 import com.qx.lang.xml.annotation.XML_Type;
 
 @XML_Type(name="test", sub={TestClass2.class})
-public class TestClass {
+public class Wrapper {
 
 	private double a = 5.0;
 	
 	private TestClass3 field;
+	
+	public TestClass3[] array;
 	
 	@XML_SetAttribute(name="factor")
 	public void setFactor(double a){
@@ -32,6 +34,11 @@ public class TestClass {
 	@XML_GetElement(name="field")
 	public TestClass3 getField(){
 		return field;
+	}
+	
+	@XML_SetElement(name="items")
+	public void setArray(TestClass3[] array){
+		this.array = array;
 	}
 	
 }

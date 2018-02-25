@@ -23,7 +23,7 @@ public class MapElementBuilder extends ElementBuilder {
 		String fieldName = fragments[0];
 		String typeName = fragments[1];
 
-		return new ObjectElementBuilder(context, parent, fieldName, typeName);
+		return new ObjectElementBuilder(context, this, fieldName, typeName);
 	}
 
 

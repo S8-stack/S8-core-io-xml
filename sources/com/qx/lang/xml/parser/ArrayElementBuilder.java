@@ -22,7 +22,7 @@ public class ArrayElementBuilder extends ElementBuilder {
 	@Override
 	public ElementBuilder createField(String tag) throws Exception {
 		String typeName = tag;
-		return new ObjectElementBuilder(context, parent, null, typeName);
+		return new ObjectElementBuilder(context, this, null, typeName);
 	}
 	
 

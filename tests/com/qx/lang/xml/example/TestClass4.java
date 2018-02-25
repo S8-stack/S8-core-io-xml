@@ -3,20 +3,29 @@ package com.qx.lang.xml.example;
 
 import com.qx.lang.xml.annotation.XML_GetAttribute;
 import com.qx.lang.xml.annotation.XML_SetAttribute;
+import com.qx.lang.xml.annotation.XML_SetElement;
 import com.qx.lang.xml.annotation.XML_Type;
 
 @XML_Type(name="ee2", sub={})
 public class TestClass4 extends TestClass3 {
 
-	private int toto2 = 1;
+	private int b = 1;
 	
-	@XML_SetAttribute(name="toto2")
+	public User[] users;
+	
+	@XML_SetAttribute(name="b")
 	public void setToto2(int b){
-		this.toto2 = b;
+		this.b = b;
 	}
 	
-	@XML_GetAttribute(name="toto2")
+	@XML_GetAttribute(name="b")
 	public int getToto2(){
-		return toto2;
+		return b;
 	}
+	
+	@XML_SetElement(name="users")
+	public void setUsers(User[] users){
+		this.users = users;
+	}
+	
 }

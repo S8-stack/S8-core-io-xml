@@ -123,7 +123,7 @@ public class Parsing {
 		public void parse() throws Exception {
 			String tag = reader.until(
 					/* stop at */ new char[]{'>', ' ', '/'},
-					/* ignore */ new char[]{' '},
+					/* ignore */ null,
 					/* forbid */ new char[]{',', '=', '"'},
 					/* include current? */ true);
 
@@ -134,6 +134,7 @@ public class Parsing {
 			}
 			else if(reader.isCurrent(' ')){
 				push(tag);
+				reader.skipWhiteSpace();
 				state = readAttribute;
 			}
 			else if(reader.isCurrent('/')){
@@ -180,11 +181,12 @@ public class Parsing {
 
 		@Override
 		public void parse() throws Exception {
+			
 			String name = reader.until(
 					/* stop at */ new char[]{'='},
 					/* ignore */ new char[]{' '},
 					/* forbid */ new char[]{',', '<', '>', '"'},
-					/* include current? */ false);
+					/* include current? */ true);
 
 			reader.skipWhiteSpace();
 			reader.check('"');
@@ -203,6 +205,7 @@ public class Parsing {
 				reader.check('>');
 				pop();
 			}
+			// else: state = readAttribute
 		}
 	};
 
