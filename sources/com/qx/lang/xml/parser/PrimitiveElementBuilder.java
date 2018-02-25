@@ -1,9 +1,6 @@
 package com.qx.lang.xml.parser;
 
 
-import com.qx.lang.xml.handler.ElementSetter;
-import com.qx.lang.xml.handler.ElementSetter.ArrayElementSetter;
-import com.qx.lang.xml.handler.TypeHandler;
 import com.qx.lang.xml.handler.XML_Context;
 
 
@@ -12,7 +9,7 @@ import com.qx.lang.xml.handler.XML_Context;
  * @author pc
  *
  */
-public class PrimitiveElementBuilder extends ElementBuilder {
+public abstract class PrimitiveElementBuilder extends ElementBuilder {
 
 	
 	/**
@@ -21,122 +18,170 @@ public class PrimitiveElementBuilder extends ElementBuilder {
 	 * @param object
 	 * @throws Exception 
 	 */
-	public PrimitiveElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName, String typeName)
+	public PrimitiveElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
 			throws Exception {
 		super(context, parent, parentFieldName);
 	}
-
-
-
-	/**
-	 * 
-	 * @param object
-	 * @param name
-	 * @param value
-	 * @throws Exception 
-	 */
+	
 	@Override
-	public void setAttribute(String name, String value) throws Exception{
-		typeHandler.setAttribute(object, name, value);
+	public String getTag() {
+		return fieldNameInParent;
 	}
 
 
-	/**
-	 * 
-	 * @param object
-	 * @param name
-	 * @return
-	 * @throws Exception 
-	 */
-	public String getAttribute(String name) throws Exception{
-		return typeHandler.getAttribute(object, name);
+	@Override
+	public void setAttribute(String name, String value) throws Exception {
+		throw new Exception("Cannot set attribute in primitive element");
 	}
 
 	@Override
-	public void setValue(String value) throws Exception{
-		typeHandler.setValue(object, value);
+	public void setElement(String fieldName, Object object) throws Exception {
+		throw new Exception("Cannot set element in primitive element");
 	}
-
-	public String getValue() throws Exception {
-		return typeHandler.getValue(object);
-	}
-
-	/**
-	 * 
-	 * @param object
-	 * @param name
-	 * @param value
-	 * @throws Exception 
-	 */
-	@Override
-	public void setElement(String name, Object value) throws Exception{
-		typeHandler.setElement(object, name, value);
-	}
-
-
-	/**
-	 * 
-	 * @param object
-	 * @param name
-	 * @return
-	 * @throws Exception 
-	 */
-	public Object getElement(Object object, String name) throws Exception{
-		return typeHandler.getElement(object, name);
-	}
-
-
 
 	@Override
 	public ElementBuilder createField(String tag) throws Exception {
-
-		String[] fragments = tag.split(":");
-		String fieldName = fragments[0];
-		
-		ElementSetter setter = typeHandler.getElementSetter(fieldName);
-		switch (setter.getElementType()) {
-		
-		case OBJECT:
-			if(fragments.length!=2){
-				throw new Exception("Missing type name for field "+fieldName);
-			}
-			return new PrimitiveElementBuilder(context, this, fieldName, fragments[1]);
-			
-		case ARRAY:
-			if(fragments.length!=1){
-				throw new Exception("Unexpected type name for array field "+fieldName);
-			}
-			return new ArrayElementBuilder(context, this, fieldName, ((ArrayElementSetter) setter).getComponentType());
-			
-		case MAP:
-			if(fragments.length!=1){
-				throw new Exception("Unexpected type name for map field "+fieldName);
-			}
-			return new MapElementBuilder(context, this, fieldName);
-
-		default: throw new Exception("Unexpected type");
-		}
-		
-	}
-
-
-
-	@Override
-	public void close() throws Exception {
-		parent.setElement(fieldNameInParent, object);
-	}
-
-
-	@Override
-	public String getTag() {
-		if(fieldNameInParent!=null){
-			return fieldNameInParent+':'+typeHandler.getName();	
-		}
-		else{
-			return typeHandler.getName();
-		}
+		throw new Exception("Cannot create field based on primitive element");
 	}
 
 	
+	public static class BooleanElementBuilder extends PrimitiveElementBuilder {
 
+		private boolean value;
+		
+		public BooleanElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
+				throws Exception {
+			super(context, parent, parentFieldName);
+		}
+
+		@Override
+		public void close() throws Exception {
+			parent.setElement(fieldNameInParent, value);
+		}
+
+		@Override
+		public void setValue(String value) throws Exception {
+			this.value = Boolean.valueOf(value);
+		}
+	}
+	
+	public static class ShortElementBuilder extends PrimitiveElementBuilder {
+
+		private short value;
+		
+		public ShortElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
+				throws Exception {
+			super(context, parent, parentFieldName);
+		}
+
+		@Override
+		public void close() throws Exception {
+			parent.setElement(fieldNameInParent, value);
+		}
+
+		@Override
+		public void setValue(String value) throws Exception {
+			this.value = Short.valueOf(value);
+		}
+	}
+	
+	public static class IntegerElementBuilder extends PrimitiveElementBuilder {
+
+		private int value;
+		
+		public IntegerElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
+				throws Exception {
+			super(context, parent, parentFieldName);
+		}
+
+		@Override
+		public void close() throws Exception {
+			parent.setElement(fieldNameInParent, value);
+		}
+
+		@Override
+		public void setValue(String value) throws Exception {
+			this.value = Integer.valueOf(value);
+		}
+	}
+	
+	public static class LongElementBuilder extends PrimitiveElementBuilder {
+
+		private long value;
+		
+		public LongElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
+				throws Exception {
+			super(context, parent, parentFieldName);
+		}
+
+		@Override
+		public void close() throws Exception {
+			parent.setElement(fieldNameInParent, value);
+		}
+
+		@Override
+		public void setValue(String value) throws Exception {
+			this.value = Long.valueOf(value);
+		}
+	}
+	
+	public static class FloatElementBuilder extends PrimitiveElementBuilder {
+
+		private float value;
+		
+		public FloatElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
+				throws Exception {
+			super(context, parent, parentFieldName);
+		}
+
+		@Override
+		public void close() throws Exception {
+			parent.setElement(fieldNameInParent, value);
+		}
+
+		@Override
+		public void setValue(String value) throws Exception {
+			this.value = Float.valueOf(value);
+		}
+	}
+	
+	public static class DoubleElementBuilder extends PrimitiveElementBuilder {
+
+		private double value;
+		
+		public DoubleElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
+				throws Exception {
+			super(context, parent, parentFieldName);
+		}
+
+		@Override
+		public void close() throws Exception {
+			parent.setElement(fieldNameInParent, value);
+		}
+
+		@Override
+		public void setValue(String value) throws Exception {
+			this.value = Double.valueOf(value);
+		}
+	}
+	
+	public static class StringElementBuilder extends PrimitiveElementBuilder {
+
+		private String value;
+		
+		public StringElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName)
+				throws Exception {
+			super(context, parent, parentFieldName);
+		}
+
+		@Override
+		public void close() throws Exception {
+			parent.setElement(fieldNameInParent, value);
+		}
+
+		@Override
+		public void setValue(String value) throws Exception {
+			this.value = value;
+		}
+	}
 }

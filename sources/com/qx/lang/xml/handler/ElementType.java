@@ -7,5 +7,15 @@ package com.qx.lang.xml.handler;
  */
 public enum ElementType {
 
-	OBJECT, ARRAY, MAP;
+	BOOLEAN,
+	SHORT,
+	INTEGER,
+	LONG,
+	FLOAT,
+	DOUBLE,
+	STRING,
+	
+	OBJECT,
+	ARRAY,
+	MAP;
 }

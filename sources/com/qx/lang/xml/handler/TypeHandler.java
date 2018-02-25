@@ -114,7 +114,8 @@ public class TypeHandler {
 				elementGetters.put(getElementAnnotation.name(), method);	
 			}
 			else if(setElementAnnotation!=null){
-				elementSetters.put(setElementAnnotation.name(), ElementSetter.create(context, method));	
+				name =setElementAnnotation.name();
+				elementSetters.put(name, ElementSetter.create(context, method, name));	
 			}
 		}
 	}

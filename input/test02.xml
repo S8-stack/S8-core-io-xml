@@ -9,7 +9,9 @@
 				<user name="ojo" password="rekhejj" />
 				<user name="ojo1" password="rekhejj" />
 				<user name="ojo2" password="rekhejj" />
-				<user name="ojo3" password="rekhejj" />
+				<user name="ojo3" password="rekhejj">
+					<note>this user is special</note>
+				</user>
 				<user name="ojo4" password="rekhejj" />
 			</users>
 		</ee2>

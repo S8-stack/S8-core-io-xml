@@ -2,7 +2,6 @@ package com.qx.lang.xml.parser;
 
 
 import com.qx.lang.xml.handler.ElementSetter;
-import com.qx.lang.xml.handler.ElementSetter.ArrayElementSetter;
 import com.qx.lang.xml.handler.TypeHandler;
 import com.qx.lang.xml.handler.XML_Context;
 
@@ -105,39 +104,14 @@ public class ObjectElementBuilder extends ElementBuilder {
 	}
 
 
-
 	@Override
 	public ElementBuilder createField(String tag) throws Exception {
-
 		String[] fragments = tag.split(":");
 		String fieldName = fragments[0];
-		
+		String typeName = fragments.length>1?fragments[1]:null;
 		ElementSetter setter = typeHandler.getElementSetter(fieldName);
-		switch (setter.getElementType()) {
-		
-		case OBJECT:
-			if(fragments.length!=2){
-				throw new Exception("Missing type name for field "+fieldName);
-			}
-			return new ObjectElementBuilder(context, this, fieldName, fragments[1]);
-			
-		case ARRAY:
-			if(fragments.length!=1){
-				throw new Exception("Unexpected type name for array field "+fieldName);
-			}
-			return new ArrayElementBuilder(context, this, fieldName, ((ArrayElementSetter) setter).getComponentType());
-			
-		case MAP:
-			if(fragments.length!=1){
-				throw new Exception("Unexpected type name for map field "+fieldName);
-			}
-			return new MapElementBuilder(context, this, fieldName);
-
-		default: throw new Exception("Unexpected type");
-		}
-		
+		return setter.createElementBuilder(context, this, typeName);
 	}
-
 
 
 	@Override
