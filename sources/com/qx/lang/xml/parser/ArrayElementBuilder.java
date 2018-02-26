@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.qx.lang.xml.handler.XML_Context;
+import com.qx.lang.xml.context.XML_Context;
 
 public class ArrayElementBuilder extends ElementBuilder {
 

@@ -3,7 +3,7 @@ package com.qx.lang.xml.parser;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qx.lang.xml.handler.XML_Context;
+import com.qx.lang.xml.context.XML_Context;
 
 public class MapElementBuilder extends ElementBuilder {
 

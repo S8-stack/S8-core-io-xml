@@ -1,9 +1,9 @@
 package com.qx.lang.xml.parser;
 
 
+import com.qx.lang.xml.context.XML_Context;
 import com.qx.lang.xml.handler.ElementSetter;
 import com.qx.lang.xml.handler.TypeHandler;
-import com.qx.lang.xml.handler.XML_Context;
 
 
 /**
@@ -29,14 +29,16 @@ public class ObjectElementBuilder extends ElementBuilder {
 
 	/**
 	 * 
-	 * @param typeHandler
-	 * @param object
-	 * @throws Exception 
+	 * @param context
+	 * @param parent
+	 * @param parentFieldName
+	 * @param typeName : serialName
+	 * @throws Exception
 	 */
 	public ObjectElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName, String typeName)
 			throws Exception {
 		super(context, parent, parentFieldName);
-		this.typeHandler = context.get(typeName);
+		this.typeHandler = context.getBySerialName(typeName);
 
 		if(typeHandler==null){
 			throw new Exception("Unknown type: "+typeName);
@@ -123,10 +125,10 @@ public class ObjectElementBuilder extends ElementBuilder {
 	@Override
 	public String getTag() {
 		if(fieldNameInParent!=null){
-			return fieldNameInParent+':'+typeHandler.getName();	
+			return fieldNameInParent+':'+typeHandler.getSerialName();	
 		}
 		else{
-			return typeHandler.getName();
+			return typeHandler.getSerialName();
 		}
 	}
 

@@ -13,6 +13,7 @@ import com.qx.lang.xml.annotation.XML_SetAttribute;
 import com.qx.lang.xml.annotation.XML_SetElement;
 import com.qx.lang.xml.annotation.XML_SetValue;
 import com.qx.lang.xml.annotation.XML_Type;
+import com.qx.lang.xml.context.XML_Context;
 
 /**
  * 
@@ -23,11 +24,19 @@ public class TypeHandler {
 
 	private Class<?> type;
 
+	
+	
 	/**
-	 * declared name
+	 * declared name in XML. Go in tag. (XML side)
 	 */
-	private String name;
+	private String serialName;
 
+	/**
+	 * declared name in Class<?> (JAVA side)
+	 */
+	private String deserialName;
+
+	
 	/**
 	 * 
 	 */
@@ -51,6 +60,15 @@ public class TypeHandler {
 	public TypeHandler(Class<?> type){
 		super();
 		this.type = type;
+		
+		
+		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
+		if(typeAnnotation==null){
+			throw new RuntimeException("Missing type declaration for type: "+type.getName());
+		}
+		this.serialName = typeAnnotation.name();
+		
+		this.deserialName = type.getName();
 	}
 
 
@@ -65,10 +83,6 @@ public class TypeHandler {
 			throw new RuntimeException("Missing type declaration for type: "+type.getName());
 		}
 
-		String name = typeAnnotation.name();
-
-		// retrieve name
-		this.name = name;
 		
 		constructor = type.getConstructor(new Class<?>[]{});
 		
@@ -86,6 +100,7 @@ public class TypeHandler {
 		XML_GetElement getElementAnnotation;
 		XML_SetElement setElementAnnotation;
 
+		String name;
 		for(Method method : type.getMethods()){
 			getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
 			setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
@@ -124,8 +139,12 @@ public class TypeHandler {
 	 * 
 	 * @return tag displayed in XML
 	 */
-	public String getName() {
-		return name;
+	public String getSerialName() {
+		return serialName;
+	}
+	
+	public String getDeserialName(){
+		return deserialName;
 	}
 
 
@@ -148,7 +167,7 @@ public class TypeHandler {
 	public void setAttribute(Object object, String name, String value) throws Exception{
 		AttributeSetter setter = attributeSetters.get(name);
 		if(setter==null){
-			throw new Exception("No field with name "+name+" in type "+this.name);
+			throw new Exception("No field with name "+name+" in type "+this.serialName);
 		}
 		setter.set(object, value);
 	}
@@ -165,7 +184,7 @@ public class TypeHandler {
 			throws Exception{
 		AttributeGetter getter = attributeGetters.get(name);
 		if(getter==null){
-			throw new Exception("No field with name "+name+" in type "+this.name);
+			throw new Exception("No field with name "+name+" in type "+this.serialName);
 		}
 		return getter.get(object);
 	}
@@ -173,7 +192,7 @@ public class TypeHandler {
 	public void setValue(Object object, String value)
 			throws Exception{
 		if(valueSetter==null){
-			throw new Exception("No value can be set in type "+this.name);
+			throw new Exception("No value can be set in type "+this.serialName);
 		}
 		valueSetter.set(object, value);
 	}
@@ -181,7 +200,7 @@ public class TypeHandler {
 	public String getValue(Object object)
 			throws Exception{
 		if(valueGetter==null){
-			throw new Exception("No value can be get in type "+this.name);
+			throw new Exception("No value can be get in type "+this.serialName);
 		}
 		return valueGetter.get(object);
 	}
@@ -196,7 +215,7 @@ public class TypeHandler {
 	public void setElement(Object object, String name, Object value) throws Exception{
 		ElementSetter setter = elementSetters.get(name);
 		if(setter==null){
-			throw new Exception("No field with name "+name+" in type "+this.name);
+			throw new Exception("No field with name "+name+" in type "+this.serialName);
 		}
 		setter.set(object, value);
 	}
@@ -210,7 +229,7 @@ public class TypeHandler {
 	public ElementSetter getElementSetter(String name) throws Exception{
 		ElementSetter setter = elementSetters.get(name);
 		if(setter==null){
-			throw new Exception("No field with name "+name+" in type "+this.name);
+			throw new Exception("No field with name "+name+" in type "+this.serialName);
 		}
 		return setter;
 	}
@@ -227,7 +246,7 @@ public class TypeHandler {
 			throws Exception{
 		Method getter = elementGetters.get(name);
 		if(getter==null){
-			throw new Exception("No field with name "+name+" in type "+this.name);
+			throw new Exception("No field with name "+name+" in type "+this.serialName);
 		}
 		return getter.invoke(object);
 	}

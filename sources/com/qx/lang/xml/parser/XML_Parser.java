@@ -2,10 +2,9 @@ package com.qx.lang.xml.parser;
 
 import java.util.Stack;
 
-import com.qx.lang.xml.handler.XML_Context;
-import com.qx.lang.xml.reader.XML_StreamReader;
+import com.qx.lang.xml.context.XML_Context;
 
-public class Parsing {
+public class XML_Parser {
 
 	private XML_StreamReader reader;
 	
@@ -15,7 +14,7 @@ public class Parsing {
 
 	private RootElementBuilder rootBuilder;
 
-	public Parsing(XML_Context context, XML_StreamReader reader) {
+	public XML_Parser(XML_Context context, XML_StreamReader reader) {
 		super();
 		this.reader = reader;
 		rootBuilder = new RootElementBuilder(context);
@@ -110,6 +109,9 @@ public class Parsing {
 			else if(reader.isCurrent('-')){
 				state = readComment;
 			}
+			else if(reader.isCurrent('?')){
+				state = readHeader;
+			}
 			else{
 				state = readOpeningTag;
 			}
@@ -170,6 +172,21 @@ public class Parsing {
 					/* forbid */ null,
 					/* include current? */ false);
 			System.out.println("XML COmment: "+comment);
+			state = readContent;
+		}
+
+	};
+	
+	private State readHeader = new State() {
+
+		@Override
+		public void parse() throws Exception {
+			String header = reader.until(
+					/* stop at */ new char[]{'>'},
+					/* ignore */ null,
+					/* forbid */ null,
+					/* include current? */ false);
+			System.out.println("XML Header: "+header);
 			state = readContent;
 		}
 
