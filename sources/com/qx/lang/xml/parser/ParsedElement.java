@@ -2,12 +2,12 @@ package com.qx.lang.xml.parser;
 
 import com.qx.lang.xml.context.XML_Context;
 
-public abstract class ElementBuilder {
+public abstract class ParsedElement {
 	
 
 	protected String fieldNameInParent;
 	
-	protected ElementBuilder parent;
+	protected ParsedElement parent;
 	
 	/**
 	 * 
@@ -15,7 +15,7 @@ public abstract class ElementBuilder {
 	public XML_Context context;
 	
 	
-	public ElementBuilder(XML_Context context, ElementBuilder parent, String fieldNameInParent) {
+	public ParsedElement(XML_Context context, ParsedElement parent, String fieldNameInParent) {
 		super();
 		this.context = context;
 		this.parent = parent;
@@ -23,7 +23,7 @@ public abstract class ElementBuilder {
 	}
 
 
-	public abstract ElementBuilder createField(String tag) throws Exception;
+	public abstract ParsedElement createField(String tag) throws Exception;
 	
 	
 	

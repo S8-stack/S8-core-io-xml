@@ -2,18 +2,18 @@ package com.qx.lang.xml.parser;
 
 import com.qx.lang.xml.context.XML_Context;
 
-public class RootElementBuilder extends ElementBuilder {
+public class RootParsedElement extends ParsedElement {
 
 	public static final String ROOT_FIELD_NAME = "root";
 	
 	private Object object;
 	
-	public RootElementBuilder(XML_Context context) {
+	public RootParsedElement(XML_Context context) {
 		super(context, null, null);
 	}
 
 	@Override
-	public ElementBuilder createField(String tag) throws Exception {
+	public ParsedElement createField(String tag) throws Exception {
 		String[] fragments = tag.split(":");
 		if(fragments.length!=2){
 			throw new Exception("Illegal tag formatting for root element");
@@ -24,7 +24,7 @@ public class RootElementBuilder extends ElementBuilder {
 		}
 		String typeName = fragments[1];
 		
-		return new ObjectElementBuilder(context, this, "root", typeName);
+		return new ObjectParsedElement(context, this, "root", typeName);
 	}
 
 

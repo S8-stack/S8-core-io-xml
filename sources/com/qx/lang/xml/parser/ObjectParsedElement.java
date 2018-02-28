@@ -11,7 +11,7 @@ import com.qx.lang.xml.handler.TypeHandler;
  * @author pc
  *
  */
-public class ObjectElementBuilder extends ElementBuilder {
+public class ObjectParsedElement extends ParsedElement {
 
 
 	/**
@@ -35,7 +35,7 @@ public class ObjectElementBuilder extends ElementBuilder {
 	 * @param typeName : serialName
 	 * @throws Exception
 	 */
-	public ObjectElementBuilder(XML_Context context, ElementBuilder parent, String parentFieldName, String typeName)
+	public ObjectParsedElement(XML_Context context, ParsedElement parent, String parentFieldName, String typeName)
 			throws Exception {
 		super(context, parent, parentFieldName);
 		this.typeHandler = context.getBySerialName(typeName);
@@ -61,16 +61,6 @@ public class ObjectElementBuilder extends ElementBuilder {
 	}
 
 
-	/**
-	 * 
-	 * @param object
-	 * @param name
-	 * @return
-	 * @throws Exception 
-	 */
-	public String getAttribute(String name) throws Exception{
-		return typeHandler.getAttribute(object, name);
-	}
 
 	@Override
 	public void setValue(String value) throws Exception{
@@ -94,25 +84,15 @@ public class ObjectElementBuilder extends ElementBuilder {
 	}
 
 
-	/**
-	 * 
-	 * @param object
-	 * @param name
-	 * @return
-	 * @throws Exception 
-	 */
-	public Object getElement(Object object, String name) throws Exception{
-		return typeHandler.getElement(object, name);
-	}
 
 
 	@Override
-	public ElementBuilder createField(String tag) throws Exception {
+	public ParsedElement createField(String tag) throws Exception {
 		String[] fragments = tag.split(":");
 		String fieldName = fragments[0];
 		String typeName = fragments.length>1?fragments[1]:null;
 		ElementSetter setter = typeHandler.getElementSetter(fieldName);
-		return setter.createElementBuilder(context, this, typeName);
+		return setter.createParsedElement(context, this, typeName);
 	}
 
 

@@ -6,23 +6,23 @@ import java.util.List;
 
 import com.qx.lang.xml.context.XML_Context;
 
-public class ArrayElementBuilder extends ElementBuilder {
+public class ArrayParsedElement extends ParsedElement {
 
 	private Class<?> componentType;
 	
 	@SuppressWarnings("rawtypes")
 	private List list;
 	
-	public ArrayElementBuilder(XML_Context context, ObjectElementBuilder parent, String fieldName, Class<?> componentType) {
+	public ArrayParsedElement(XML_Context context, ObjectParsedElement parent, String fieldName, Class<?> componentType) {
 		super(context, parent, fieldName);
 		this.componentType = componentType;
 		list = new ArrayList<>();
 	}
 
 	@Override
-	public ElementBuilder createField(String tag) throws Exception {
+	public ParsedElement createField(String tag) throws Exception {
 		String typeName = tag;
-		return new ObjectElementBuilder(context, this, null, typeName);
+		return new ObjectParsedElement(context, this, null, typeName);
 	}
 	
 

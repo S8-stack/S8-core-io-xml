@@ -5,25 +5,25 @@ import java.util.Map;
 
 import com.qx.lang.xml.context.XML_Context;
 
-public class MapElementBuilder extends ElementBuilder {
+public class MapParsedElement extends ParsedElement {
 
 
 	@SuppressWarnings("rawtypes")
 	private Map map;
 
-	public MapElementBuilder(XML_Context context, ObjectElementBuilder parent, String fieldName) {
+	public MapParsedElement(XML_Context context, ObjectParsedElement parent, String fieldName) {
 		super(context, parent, fieldName);
 		map = new HashMap<>();
 	}
 
 	@Override
-	public ElementBuilder createField(String tag) throws Exception {
+	public ParsedElement createField(String tag) throws Exception {
 
 		String[] fragments = tag.split(":");
 		String fieldName = fragments[0];
 		String typeName = fragments[1];
 
-		return new ObjectElementBuilder(context, this, fieldName, typeName);
+		return new ObjectParsedElement(context, this, fieldName, typeName);
 	}
 
 

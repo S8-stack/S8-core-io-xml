@@ -21,6 +21,7 @@ public class XML_StreamWriter {
 	 * @throws IOException
 	 */
 	public void writeAttribute(String name, String value) throws IOException{
+		writer.write(' ');
 		writer.write(name);
 		writer.write('=');
 		writer.write('"');
@@ -28,4 +29,26 @@ public class XML_StreamWriter {
 		writer.write('"');
 	}
 	
+	public void startTag(String tag) throws IOException{
+		writer.write('<'+tag);
+	}
+	
+	public void endTag() throws IOException{
+		writer.write(">");
+	}
+	
+	
+	public void appendOpeningTag(String tag) throws IOException{
+		writer.write("</"+tag+">");
+	}
+	
+	public void appendClosingTag(String tag) throws IOException{
+		writer.write("</"+tag+">");
+	}
+	
+	public void writeValueElement(String tag, String value) throws IOException{
+		writer.write('<'+tag+'>');
+		writer.write(value);
+		writer.write("</"+tag+">");		
+	}
 }

@@ -6,11 +6,11 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
 import com.qx.lang.xml.context.XML_Context;
-import com.qx.lang.xml.parser.ArrayElementBuilder;
-import com.qx.lang.xml.parser.ElementBuilder;
-import com.qx.lang.xml.parser.MapElementBuilder;
-import com.qx.lang.xml.parser.ObjectElementBuilder;
-import com.qx.lang.xml.parser.PrimitiveElementBuilder;
+import com.qx.lang.xml.parser.ArrayParsedElement;
+import com.qx.lang.xml.parser.ParsedElement;
+import com.qx.lang.xml.parser.MapParsedElement;
+import com.qx.lang.xml.parser.ObjectParsedElement;
+import com.qx.lang.xml.parser.PrimitiveParsedElement;
 
 public abstract class ElementSetter {
 
@@ -90,7 +90,7 @@ public abstract class ElementSetter {
 	 * @return
 	 * @throws Exception 
 	 */
-	public abstract ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+	public abstract ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 			throws Exception;
 
 
@@ -98,9 +98,9 @@ public abstract class ElementSetter {
 		public BooleanElementSetter(Method method, String name) { super(method, name); }
 		public Class<?> getType(){ return boolean.class; }
 		public @Override ElementType getElementType() { return ElementType.BOOLEAN; }
-		public @Override ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public @Override ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new PrimitiveElementBuilder.BooleanElementBuilder(context, parent, name);
+			return new PrimitiveParsedElement.BooleanElementBuilder(context, parent, name);
 		}
 	}
 	
@@ -108,9 +108,9 @@ public abstract class ElementSetter {
 		public ShortElementSetter(Method method, String name) { super(method, name); }
 		public Class<?> getType(){ return short.class; }
 		public @Override ElementType getElementType() { return ElementType.SHORT; }
-		public @Override ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public @Override ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new PrimitiveElementBuilder.ShortElementBuilder(context, parent, name);
+			return new PrimitiveParsedElement.ShortElementBuilder(context, parent, name);
 		}
 	}
 	
@@ -118,9 +118,9 @@ public abstract class ElementSetter {
 		public IntegerElementSetter(Method method, String name) { super(method, name); }
 		public Class<?> getType(){ return int.class; }
 		public @Override ElementType getElementType() { return ElementType.INTEGER; }
-		public @Override ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public @Override ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new PrimitiveElementBuilder.IntegerElementBuilder(context, parent, name);
+			return new PrimitiveParsedElement.IntegerElementBuilder(context, parent, name);
 		}
 	}
 	
@@ -128,9 +128,9 @@ public abstract class ElementSetter {
 		public LongElementSetter(Method method, String name) { super(method, name); }
 		public Class<?> getType(){ return long.class; }
 		public @Override ElementType getElementType() { return ElementType.LONG; }
-		public @Override ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public @Override ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new PrimitiveElementBuilder.LongElementBuilder(context, parent, name);
+			return new PrimitiveParsedElement.LongElementBuilder(context, parent, name);
 		}
 	}
 	
@@ -138,9 +138,9 @@ public abstract class ElementSetter {
 		public FloatElementSetter(Method method, String name) { super(method, name); }
 		public Class<?> getType(){ return float.class; }
 		public @Override ElementType getElementType() { return ElementType.FLOAT; }
-		public @Override ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public @Override ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new PrimitiveElementBuilder.FloatElementBuilder(context, parent, name);
+			return new PrimitiveParsedElement.FloatElementBuilder(context, parent, name);
 		}
 	}
 	
@@ -148,9 +148,9 @@ public abstract class ElementSetter {
 		public DoubleElementSetter(Method method, String name) { super(method, name); }
 		public Class<?> getType(){ return double.class; }
 		public @Override ElementType getElementType() { return ElementType.DOUBLE; }
-		public @Override ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public @Override ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new PrimitiveElementBuilder.DoubleElementBuilder(context, parent, name);
+			return new PrimitiveParsedElement.DoubleElementBuilder(context, parent, name);
 		}
 	}
 	
@@ -158,9 +158,9 @@ public abstract class ElementSetter {
 		public StringElementSetter(Method method, String name) { super(method, name); }
 		public Class<?> getType(){ return String.class; }
 		public @Override ElementType getElementType() { return ElementType.STRING; }
-		public @Override ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public @Override ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new PrimitiveElementBuilder.StringElementBuilder(context, parent, name);
+			return new PrimitiveParsedElement.StringElementBuilder(context, parent, name);
 		}
 	}
 
@@ -189,9 +189,9 @@ public abstract class ElementSetter {
 
 
 		@Override
-		public ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new ObjectElementBuilder(context, parent, name, typeName);
+			return new ObjectParsedElement(context, parent, name, typeName);
 		}
 
 	}
@@ -215,9 +215,9 @@ public abstract class ElementSetter {
 		}
 		
 		@Override
-		public ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new ArrayElementBuilder(context, (ObjectElementBuilder) parent, name, componentType);
+			return new ArrayParsedElement(context, (ObjectParsedElement) parent, name, componentType);
 		}
 	}
 
@@ -233,9 +233,9 @@ public abstract class ElementSetter {
 		}
 
 		@Override
-		public ElementBuilder createElementBuilder(XML_Context context, ElementBuilder parent, String typeName)
+		public ParsedElement createParsedElement(XML_Context context, ParsedElement parent, String typeName)
 				throws Exception {
-			return new MapElementBuilder(context, (ObjectElementBuilder) parent, name);
+			return new MapParsedElement(context, (ObjectParsedElement) parent, name);
 		}
 	}
 

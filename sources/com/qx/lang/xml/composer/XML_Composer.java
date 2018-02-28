@@ -1,10 +1,15 @@
 package com.qx.lang.xml.composer;
 
+import java.util.Stack;
+
 import com.qx.lang.xml.context.XML_Context;
+import com.qx.lang.xml.handler.TypeHandler;
 
 public class XML_Composer {
 
 	private XML_Context context;
+
+	private Stack<ComposableElement> stack = new Stack<>(); 
 	
 	private XML_StreamWriter writer;
 
@@ -14,9 +19,32 @@ public class XML_Composer {
 		this.writer = writer;
 	}
 	
-	public void compose(Object object){
+	public void compose(Object object) throws Exception{
 		
+		add(new ObjectComposableElement(this, "root", object));
+		
+		while(!stack.isEmpty()){
+			stack.pop().compose(writer);
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param element
+	 */
+	public void add(ComposableElement element){
+		stack.push(element);
 	}
 
+	
+	/**
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public TypeHandler getTypeHandler(String typeName){
+		return context.getByDeserialName(typeName);
+	}
 	
 }

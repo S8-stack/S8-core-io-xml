@@ -10,14 +10,14 @@ public class XML_Parser {
 	
 	protected State state;
 
-	private Stack<ElementBuilder> stack;
+	private Stack<ParsedElement> stack;
 
-	private RootElementBuilder rootBuilder;
+	private RootParsedElement rootBuilder;
 
 	public XML_Parser(XML_Context context, XML_StreamReader reader) {
 		super();
 		this.reader = reader;
-		rootBuilder = new RootElementBuilder(context);
+		rootBuilder = new RootParsedElement(context);
 		stack = new Stack<>();
 		state = readContent;
 		

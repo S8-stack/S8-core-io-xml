@@ -3,6 +3,8 @@ package com.qx.lang.xml.handler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.qx.lang.xml.annotation.XML_GetAttribute;
+
 public abstract class AttributeGetter {
 	
 	/**
@@ -43,11 +45,21 @@ public abstract class AttributeGetter {
 		}
 	}
 
-	public Method method;
+	protected Method method;
+	
+	private String name;
 	
 	public AttributeGetter(Method method) {
 		super();
 		this.method = method;
+		XML_GetAttribute getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
+		this.name = getAttributeAnnotation.name();
+		
+	}
+	
+	
+	public String getName(){
+		return name;
 	}
 	
 	public abstract String get(Object object)
@@ -62,7 +74,13 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			return Boolean.toString((boolean) method.invoke(object));
+			Object attribute = method.invoke(object);
+			if(attribute!=null){
+				return Boolean.toString((boolean) attribute);	
+			}
+			else{
+				return null;
+			}
 		}
 		
 	}
@@ -76,7 +94,13 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			return Short.toString((short) method.invoke(object));
+			Object attribute = method.invoke(object);
+			if(attribute!=null){
+				return Short.toString((short) attribute);
+			}
+			else{
+				return null;
+			} 
 		}
 		
 	}
@@ -92,7 +116,13 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			return Integer.toString((short) method.invoke(object));
+			Object attribute = method.invoke(object);
+			if(attribute!=null){
+				return Integer.toString((int) attribute);
+			}
+			else{
+				return null;
+			}
 		}
 		
 	}
@@ -107,7 +137,13 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			return Long.toString((short) method.invoke(object));
+			Object attribute = method.invoke(object);
+			if(attribute!=null){
+				return Long.toString((long) attribute);
+			}
+			else{
+				return null;
+			}
 		}
 		
 	}
@@ -123,7 +159,13 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			return Float.toString((short) method.invoke(object));
+			Object attribute = method.invoke(object);
+			if(attribute!=null){
+				return Float.toString((float) attribute);
+			}
+			else{
+				return null;
+			}
 		}
 		
 	}
@@ -138,7 +180,13 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			return Double.toString((short) method.invoke(object));
+			Object attribute = method.invoke(object);
+			if(attribute!=null){
+				return Double.toString((double) attribute);
+			}
+			else{
+				return null;
+			}
 		}
 		
 	}
@@ -153,7 +201,13 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			return (String) method.invoke(object);
+			Object attribute = method.invoke(object);
+			if(attribute!=null){
+				return (String) attribute;
+			}
+			else{
+				return null;
+			}
 		}
 		
 	}

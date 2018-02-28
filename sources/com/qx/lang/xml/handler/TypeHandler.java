@@ -3,7 +3,9 @@ package com.qx.lang.xml.handler;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.qx.lang.xml.annotation.XML_GetAttribute;
@@ -46,11 +48,11 @@ public class TypeHandler {
 
 	private AttributeSetter valueSetter;
 
-	private Map<String, AttributeGetter> attributeGetters = new HashMap<>();
+	private List<AttributeGetter> attributeGetters = new ArrayList<>();
 
 	private Map<String, AttributeSetter> attributeSetters = new HashMap<>();
 
-	private Map<String, Method> elementGetters = new HashMap<>();
+	private List<ElementGetter> elementGetters = new ArrayList<>();
 
 	private Map<String, ElementSetter> elementSetters = new HashMap<>();
 
@@ -110,7 +112,7 @@ public class TypeHandler {
 			setElementAnnotation = method.getAnnotation(XML_SetElement.class);
 
 			if(getAttributeAnnotation!=null){
-				attributeGetters.put(getAttributeAnnotation.name(), AttributeGetter.create(method));	
+				attributeGetters.add(AttributeGetter.create(method));	
 			}
 			else if(setAttributeAnnotation!=null){
 				attributeSetters.put(setAttributeAnnotation.name(), AttributeSetter.create(method));	
@@ -122,11 +124,7 @@ public class TypeHandler {
 				valueSetter = AttributeSetter.create(method);
 			}
 			else if(getElementAnnotation!=null){
-				Class<?>[] parameters = method.getParameterTypes();
-				if(parameters.length!=0){
-					throw new RuntimeException("Illegal number of parameters for a setter");
-				}
-				elementGetters.put(getElementAnnotation.name(), method);	
+				elementGetters.add(ElementGetter.create(method));	
 			}
 			else if(setElementAnnotation!=null){
 				name =setElementAnnotation.name();
@@ -180,13 +178,8 @@ public class TypeHandler {
 	 * @return
 	 * @throws Exception 
 	 */
-	public String getAttribute(Object object, String name)
-			throws Exception{
-		AttributeGetter getter = attributeGetters.get(name);
-		if(getter==null){
-			throw new Exception("No field with name "+name+" in type "+this.serialName);
-		}
-		return getter.get(object);
+	public List<AttributeGetter> getAttributeGetters() {
+		return attributeGetters;
 	}
 
 	public void setValue(Object object, String value)
@@ -242,12 +235,7 @@ public class TypeHandler {
 	 * @return
 	 * @throws Exception 
 	 */
-	public Object getElement(Object object, String name)
-			throws Exception{
-		Method getter = elementGetters.get(name);
-		if(getter==null){
-			throw new Exception("No field with name "+name+" in type "+this.serialName);
-		}
-		return getter.invoke(object);
+	public List<ElementGetter> getElementGetters() throws Exception{
+		return elementGetters;
 	}
 }
