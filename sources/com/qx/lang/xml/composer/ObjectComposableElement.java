@@ -1,5 +1,8 @@
 package com.qx.lang.xml.composer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.qx.lang.xml.handler.AttributeGetter;
 import com.qx.lang.xml.handler.ElementGetter;
 import com.qx.lang.xml.handler.TypeHandler;
@@ -53,28 +56,25 @@ public class ObjectComposableElement extends ComposableElement {
 				}
 			}
 
-			writer.endTag();
-
 			// write elements
-			boolean hasElements = false;
+			List<ComposableElement> composables = new ArrayList<>();
 			for(ElementGetter elementGetter : typeHandler.getElementGetters()){
 				ComposableElement composable = elementGetter.createComposableElement(composer, object);
 
 				Object value = elementGetter.getValue(object);
 				if(value!=null){
-					if(!hasElements){
-						hasElements = true;
-					}
-					composer.add(composable);	
+					composables.add(composable);	
 				}
 			}
 
-			if(hasElements){
+			if(!composables.isEmpty()){
+				writer.append(">");
 				mode = Mode.END;
-				composer.add(this);
+				composables.add(this);
+				composer.add(composables);
 			}
 			else{
-				writer.endTag();
+				writer.append("/>");
 			}
 			break;
 

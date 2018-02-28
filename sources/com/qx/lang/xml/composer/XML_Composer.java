@@ -1,5 +1,6 @@
 package com.qx.lang.xml.composer;
 
+import java.util.List;
 import java.util.Stack;
 
 import com.qx.lang.xml.context.XML_Context;
@@ -35,6 +36,14 @@ public class XML_Composer {
 	 */
 	public void add(ComposableElement element){
 		stack.push(element);
+	}
+	
+	
+	public void add(List<ComposableElement> elements){
+		int n = elements.size();
+		for(int i=n-1; i>=0; i--){
+			stack.push(elements.get(i));
+		}
 	}
 
 	

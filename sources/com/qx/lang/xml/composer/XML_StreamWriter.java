@@ -34,12 +34,12 @@ public class XML_StreamWriter {
 	}
 	
 	public void endTag() throws IOException{
-		writer.write(">");
+		writer.write('>');
 	}
 	
 	
 	public void appendOpeningTag(String tag) throws IOException{
-		writer.write("</"+tag+">");
+		writer.write("<"+tag+">");
 	}
 	
 	public void appendClosingTag(String tag) throws IOException{
@@ -50,5 +50,11 @@ public class XML_StreamWriter {
 		writer.write('<'+tag+'>');
 		writer.write(value);
 		writer.write("</"+tag+">");		
+	}
+
+
+
+	public void append(String string) throws IOException {
+		writer.write(string);
 	}
 }

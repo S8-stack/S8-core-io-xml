@@ -41,4 +41,9 @@ public class Wrapper {
 		this.array = array;
 	}
 	
+	@XML_GetElement(name="items")
+	public TestClass3[] getArray(){
+		return array;
+	}
+	
 }

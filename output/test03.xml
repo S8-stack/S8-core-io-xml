@@ -1,0 +1,19 @@
+<root:test factor="5.0">
+	<field:ee2 b="1" toto="76" />
+	<items>
+		<ee toto="45" />
+		<ee toto="46" />
+		<ee2 b="1" toto="47" />
+		<ee2 b="3" toto="48">
+			<users>
+				<user toto="1" />
+				<user toto="1" />
+				<user toto="1" />
+				<user toto="1">
+					<note>this user is special</note>
+				</user>
+				<user toto="1" />
+			</users>
+		</ee2>
+	</items>
+</root:test>

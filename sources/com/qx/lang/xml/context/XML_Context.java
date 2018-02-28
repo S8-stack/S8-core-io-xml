@@ -1,9 +1,12 @@
 package com.qx.lang.xml.context;
 
 import java.io.Reader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.qx.lang.xml.composer.XML_Composer;
+import com.qx.lang.xml.composer.XML_StreamWriter;
 import com.qx.lang.xml.handler.TypeHandler;
 import com.qx.lang.xml.parser.XML_Parser;
 import com.qx.lang.xml.parser.XML_StreamReader;
@@ -84,6 +87,11 @@ public class XML_Context {
 	public Object deserialize(Reader reader) throws Exception{
 		XML_StreamReader streamReader = new XML_StreamReader(reader);
 		return new XML_Parser(this, streamReader).parse();
+	}
+	
+	public void serialize(Object object, Writer writer) throws Exception{
+		XML_StreamWriter streamWriter = new XML_StreamWriter(writer);
+		new XML_Composer(this, streamWriter).compose(object);
 	}
 
 }

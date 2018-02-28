@@ -2,6 +2,7 @@ package com.qx.lang.xml.example;
 
 
 import com.qx.lang.xml.annotation.XML_GetAttribute;
+import com.qx.lang.xml.annotation.XML_GetElement;
 import com.qx.lang.xml.annotation.XML_SetAttribute;
 import com.qx.lang.xml.annotation.XML_SetElement;
 import com.qx.lang.xml.annotation.XML_Type;
@@ -26,6 +27,11 @@ public class TestClass4 extends TestClass3 {
 	@XML_SetElement(name="users")
 	public void setUsers(User[] users){
 		this.users = users;
+	}
+	
+	@XML_GetElement(name="users")
+	public User[] getUsers(){
+		return users;
 	}
 	
 }
