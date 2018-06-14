@@ -1,6 +1,8 @@
 package com.qx.lang.xml;
 
 public class XML_Syntax {
+	
+	public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
 	public static final char[] BASE_IGNORED_CHARS = {'\n', '\t'};
 	

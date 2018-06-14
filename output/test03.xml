@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <root:test factor="5.0">
 	<field:ee2 b="1" toto="76" />
 	<items>
@@ -6,13 +7,13 @@
 		<ee2 b="1" toto="47" />
 		<ee2 b="3" toto="48">
 			<users>
-				<user toto="1" />
-				<user toto="1" />
-				<user toto="1" />
-				<user toto="1">
+				<user toto="-1" />
+				<user toto="-1" />
+				<user toto="-1" />
+				<user toto="-1">
 					<note>this user is special</note>
 				</user>
-				<user toto="1" />
+				<user toto="-1" />
 			</users>
 		</ee2>
 	</items>

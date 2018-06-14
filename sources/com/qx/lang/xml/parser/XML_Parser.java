@@ -19,7 +19,7 @@ public class XML_Parser {
 		this.reader = reader;
 		rootBuilder = new RootParsedElement(context);
 		stack = new Stack<>();
-		state = readContent;
+		state = readHeader;
 		
 	}
 
@@ -74,6 +74,23 @@ public class XML_Parser {
 		public abstract void parse() throws Exception;
 
 	}
+	
+	
+	/**
+	 * read doc header
+	 */
+	private State readHeader = new State() {
+
+		@Override
+		public void parse() throws Exception {
+			reader.next();
+			reader.check("<?xml");
+			String value = reader.until(new char[]{'>'}, null, null, false);
+			System.out.println("[XML_Parser] read header: "+value);
+			state = readContent;
+		}
+		
+	};
 
 
 	private State readContent = new State() {
@@ -110,7 +127,7 @@ public class XML_Parser {
 				state = readComment;
 			}
 			else if(reader.isCurrent('?')){
-				state = readHeader;
+				state = readElementHeader;
 			}
 			else{
 				state = readOpeningTag;
@@ -137,7 +154,7 @@ public class XML_Parser {
 			else if(reader.isCurrent(' ')){
 				push(tag);
 				reader.skipWhiteSpace();
-				state = readAttribute;
+				state = readElementAttribute;
 			}
 			else if(reader.isCurrent('/')){
 				reader.next();
@@ -177,7 +194,7 @@ public class XML_Parser {
 
 	};
 	
-	private State readHeader = new State() {
+	private State readElementHeader = new State() {
 
 		@Override
 		public void parse() throws Exception {
@@ -194,7 +211,7 @@ public class XML_Parser {
 
 
 
-	private State readAttribute = new State() {
+	private State readElementAttribute = new State() {
 
 		@Override
 		public void parse() throws Exception {

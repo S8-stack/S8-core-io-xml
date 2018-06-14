@@ -8,7 +8,7 @@ import com.qx.lang.xml.annotation.XML_Type;
 @XML_Type(name="ee", sub={TestClass4.class})
 public class TestClass3 {
 
-	private int toto = 1;
+	private int toto = -1;
 	
 	@XML_SetAttribute(name="toto")
 	public void setToto(int b){

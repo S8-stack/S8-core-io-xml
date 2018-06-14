@@ -3,6 +3,7 @@ package com.qx.lang.xml.composer;
 import java.util.List;
 import java.util.Stack;
 
+import com.qx.lang.xml.XML_Syntax;
 import com.qx.lang.xml.context.XML_Context;
 import com.qx.lang.xml.handler.TypeHandler;
 
@@ -22,6 +23,7 @@ public class XML_Composer {
 	
 	public void compose(Object object) throws Exception{
 		
+		writer.append(XML_Syntax.HEADER+"\n");
 		add(new ObjectComposableElement(this, "root", object));
 		
 		while(!stack.isEmpty()){
