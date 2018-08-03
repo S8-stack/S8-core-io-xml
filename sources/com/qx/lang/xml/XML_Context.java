@@ -1,5 +1,12 @@
-package com.qx.lang.xml.context;
+package com.qx.lang.xml;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
@@ -47,11 +54,11 @@ public class XML_Context {
 	public void discover(Class<?> type) throws Exception {
 		TypeHandler typeHandler = new TypeHandler(type);
 		if(!deserialMap.containsKey(typeHandler.getDeserialName())){
-			
+
 			serialMap.put(typeHandler.getSerialName(), typeHandler);
-			
+
 			deserialMap.put(typeHandler.getDeserialName(), typeHandler);
-			
+
 			try {
 				typeHandler.initialize(this);
 			} catch (NoSuchMethodException | SecurityException e) {
@@ -77,7 +84,7 @@ public class XML_Context {
 	public TypeHandler getByDeserialName(String deserialName){
 		return deserialMap.get(deserialName);
 	}
-	
+
 	/**
 	 * 
 	 * @param reader
@@ -88,10 +95,26 @@ public class XML_Context {
 		XML_StreamReader streamReader = new XML_StreamReader(reader);
 		return new XML_Parser(this, streamReader).parse();
 	}
+
+	public Object deserialize(InputStream inputStream) throws Exception{
+		return deserialize(new InputStreamReader(inputStream));
+	}
 	
+	public Object deserialize(File file) throws Exception{
+		return deserialize(new FileInputStream(file));
+	}
+
 	public void serialize(Object object, Writer writer) throws Exception{
 		XML_StreamWriter streamWriter = new XML_StreamWriter(writer);
 		new XML_Composer(this, streamWriter).compose(object);
+	}
+	
+	public void serialize(Object object, OutputStream outputStream) throws Exception{
+		serialize(object, new OutputStreamWriter(outputStream));
+	}
+	
+	public void serialize(Object object, File file) throws Exception{
+		serialize(object, new FileOutputStream(file));
 	}
 
 }

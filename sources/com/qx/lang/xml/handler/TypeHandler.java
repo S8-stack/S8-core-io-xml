@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.qx.lang.xml.XML_Context;
 import com.qx.lang.xml.annotation.XML_GetAttribute;
 import com.qx.lang.xml.annotation.XML_GetElement;
 import com.qx.lang.xml.annotation.XML_GetValue;
@@ -15,7 +16,6 @@ import com.qx.lang.xml.annotation.XML_SetAttribute;
 import com.qx.lang.xml.annotation.XML_SetElement;
 import com.qx.lang.xml.annotation.XML_SetValue;
 import com.qx.lang.xml.annotation.XML_Type;
-import com.qx.lang.xml.context.XML_Context;
 
 /**
  * 

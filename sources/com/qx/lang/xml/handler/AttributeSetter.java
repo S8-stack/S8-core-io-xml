@@ -13,7 +13,8 @@ public abstract class AttributeSetter {
 	public static AttributeSetter create(Method method){
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=1){
-			throw new RuntimeException("Illegal number of parameters for a setter");
+			throw new RuntimeException("Illegal number of parameters for a setter "+method.getName()+" in type "
+					+method.getDeclaringClass().getName());
 		}
 		Class<?> type = parameters[0];
 		

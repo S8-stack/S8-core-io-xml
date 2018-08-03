@@ -15,7 +15,8 @@ public abstract class AttributeGetter {
 	public static AttributeGetter create(Method method){
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=0){
-			throw new RuntimeException("Illegal number of parameters for a setter");
+			throw new RuntimeException("Illegal number of parameters for a setter: "+method.getName()
+			+" in type "+method.getDeclaringClass().getName());
 		}
 		Class<?> type = method.getReturnType();
 		

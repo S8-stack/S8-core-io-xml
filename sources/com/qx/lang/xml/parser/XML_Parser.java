@@ -2,7 +2,7 @@ package com.qx.lang.xml.parser;
 
 import java.util.Stack;
 
-import com.qx.lang.xml.context.XML_Context;
+import com.qx.lang.xml.XML_Context;
 
 public class XML_Parser {
 
@@ -83,9 +83,9 @@ public class XML_Parser {
 
 		@Override
 		public void parse() throws Exception {
-			reader.next();
+			reader.readNext();
 			reader.check("<?xml");
-			String value = reader.until(new char[]{'>'}, null, null, false);
+			String value = reader.until(new char[]{'>'}, null, null);
 			System.out.println("[XML_Parser] read header: "+value);
 			state = readContent;
 		}
@@ -98,14 +98,17 @@ public class XML_Parser {
 		@Override
 		public void parse() throws Exception {
 
+			// remove new line or leading spaces
+			reader.skip(' ', '\n');
+			
+			// read value until next tag start
 			String value = reader.until(
 					/* stop at */ new char[]{'<'},
 					/* ignore */ null,
-					/* forbid */ null,
-					/* include current? */ false);	
+					/* forbid */ null);	
 
 			// set value if any
-			if(!isBlank(value)){
+			if(!isBlank(value) && !stack.isEmpty()){
 				stack.peek().setValue(value);
 			}
 			state = readTag;
@@ -118,12 +121,14 @@ public class XML_Parser {
 		@Override
 		public void parse() throws Exception {
 			reader.check('<');
-			reader.next();
+			reader.readNext();
 			// closing tag
 			if(reader.isCurrent('/')){
+				reader.readNext();
 				state = readClosingTag;
 			}
 			else if(reader.isCurrent('-')){
+				reader.readNext();
 				state = readComment;
 			}
 			else if(reader.isCurrent('?')){
@@ -141,23 +146,23 @@ public class XML_Parser {
 		@Override
 		public void parse() throws Exception {
 			String tag = reader.until(
-					/* stop at */ new char[]{'>', ' ', '/'},
+					/* stop at */ new char[]{'>', ' ', '/', '\n'},
 					/* ignore */ null,
-					/* forbid */ new char[]{',', '=', '"'},
-					/* include current? */ true);
+					/* forbid */ new char[]{',', '=', '"'});
 
 			// prefix is detected -> field name
 			if(reader.isCurrent('>')) {
 				push(tag);
+				reader.readNext();
 				state = readContent;
 			}
-			else if(reader.isCurrent(' ')){
+			else if(reader.isCurrent(' ') || reader.isCurrent('\n')){
 				push(tag);
-				reader.skipWhiteSpace();
+				reader.skip(' ', '\n');
 				state = readElementAttribute;
 			}
 			else if(reader.isCurrent('/')){
-				reader.next();
+				reader.readNext();
 				reader.check('>');
 				pop(tag);
 			}
@@ -172,8 +177,8 @@ public class XML_Parser {
 			String tag = reader.until(
 					/* stop at */ new char[]{'>'},
 					/* ignore */ new char[]{' '},
-					/* forbid */ new char[]{',', '=', '"', '/'},
-					/* include current? */ false);
+					/* forbid */ new char[]{',', '=', '"', '/'});
+			reader.readNext();
 			pop(tag);
 		}
 
@@ -186,8 +191,7 @@ public class XML_Parser {
 			String comment = reader.until(
 					/* stop at */ new char[]{'>'},
 					/* ignore */ null,
-					/* forbid */ null,
-					/* include current? */ false);
+					/* forbid */ null);
 			System.out.println("XML COmment: "+comment);
 			state = readContent;
 		}
@@ -201,8 +205,7 @@ public class XML_Parser {
 			String header = reader.until(
 					/* stop at */ new char[]{'>'},
 					/* ignore */ null,
-					/* forbid */ null,
-					/* include current? */ false);
+					/* forbid */ null);
 			System.out.println("XML Header: "+header);
 			state = readContent;
 		}
@@ -218,25 +221,30 @@ public class XML_Parser {
 			
 			String name = reader.until(
 					/* stop at */ new char[]{'='},
-					/* ignore */ new char[]{' '},
-					/* forbid */ new char[]{',', '<', '>', '"'},
-					/* include current? */ true);
+					/* ignore */ new char[]{' ', '\n'},
+					/* forbid */ new char[]{',', '<', '>', '"'});
 
-			reader.skipWhiteSpace();
+			reader.readNext();
+			reader.skip(' ','\t');
 			reader.check('"');
+			reader.readNext();
+			
 			String value = reader.until(
 					/* stop at */ new char[]{'"'},
-					/* ignore */ new char[]{' '},
-					/* forbid */ new char[]{',', '<', '>', '='},
-					/* include current? */ false);
+					/* ignore */ new char[]{' ', '\n'},
+					/* forbid */ new char[]{',', '<', '>', '='});
 			stack.peek().setAttribute(name, value);
-			reader.skipWhiteSpace();
+			reader.readNext();
+			
+			reader.skip(' ', '\n');
 			if(reader.isCurrent('>')){
+				reader.readNext();
 				state = readContent;
 			}
 			else if(reader.isCurrent('/')){
-				reader.next();
+				reader.readNext();
 				reader.check('>');
+				reader.readNext();
 				pop();
 			}
 			// else: state = readAttribute
@@ -256,8 +264,7 @@ public class XML_Parser {
 		}
 		else{
 			return true;
-		}
-		
+		}	
 	}
 
 }

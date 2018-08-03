@@ -1,6 +1,7 @@
 package com.qx.lang.xml.example;
 
 
+import com.qx.lang.xml.annotation.XML_GetAttribute;
 import com.qx.lang.xml.annotation.XML_GetElement;
 import com.qx.lang.xml.annotation.XML_SetAttribute;
 import com.qx.lang.xml.annotation.XML_SetElement;
@@ -11,7 +12,7 @@ public class User extends TestClass3 {
 
 	private String name = "none";
 	
-	private String password = "none";
+	private String password;
 
 	private String note;
 	
@@ -24,14 +25,15 @@ public class User extends TestClass3 {
 		this.name = name;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
 
 	@XML_SetAttribute(name="password")
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	@XML_GetAttribute(name="password")
+	public String getPassword() {
+		return password;
 	}
 	
 	@XML_SetElement(name="note")

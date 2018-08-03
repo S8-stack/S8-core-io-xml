@@ -3,8 +3,8 @@ package com.qx.lang.xml.composer;
 import java.util.List;
 import java.util.Stack;
 
+import com.qx.lang.xml.XML_Context;
 import com.qx.lang.xml.XML_Syntax;
-import com.qx.lang.xml.context.XML_Context;
 import com.qx.lang.xml.handler.TypeHandler;
 
 public class XML_Composer {

@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
-import com.qx.lang.xml.context.XML_Context;
+import com.qx.lang.xml.XML_Context;
 import com.qx.lang.xml.parser.ArrayParsedElement;
 import com.qx.lang.xml.parser.ParsedElement;
 import com.qx.lang.xml.parser.MapParsedElement;

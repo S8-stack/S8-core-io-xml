@@ -1,7 +1,7 @@
 package com.qx.lang.xml.parser;
 
 
-import com.qx.lang.xml.context.XML_Context;
+import com.qx.lang.xml.XML_Context;
 import com.qx.lang.xml.handler.ElementSetter;
 import com.qx.lang.xml.handler.TypeHandler;
 

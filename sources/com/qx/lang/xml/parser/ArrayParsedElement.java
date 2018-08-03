@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.qx.lang.xml.context.XML_Context;
+import com.qx.lang.xml.XML_Context;
 
 public class ArrayParsedElement extends ParsedElement {
 

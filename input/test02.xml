@@ -7,7 +7,7 @@
 		<ee2 toto="47" />
 		<ee2 toto="48" b="3">
 			<users>
-				<user name="ojo" password="rekhejj" />
+				<user name="ojo" />
 				<user name="ojo1" password="rekhejj" />
 				<user name="ojo2" password="rekhejj" />
 				<user name="ojo3" password="rekhejj">
