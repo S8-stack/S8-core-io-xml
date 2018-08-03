@@ -57,4 +57,10 @@ public class XML_StreamWriter {
 	public void append(String string) throws IOException {
 		writer.write(string);
 	}
+
+
+
+	public void close() throws IOException {
+		writer.close();
+	}
 }

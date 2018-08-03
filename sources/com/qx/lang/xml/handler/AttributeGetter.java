@@ -202,13 +202,21 @@ public abstract class AttributeGetter {
 		@Override
 		public String get(Object object)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			Object attribute = method.invoke(object);
-			if(attribute!=null){
-				return (String) attribute;
+			try{
+				Object attribute = method.invoke(object);
+				if(attribute!=null){
+					return (String) attribute;
+				}
+				else{
+					return null;
+				}
 			}
-			else{
-				return null;
+			catch (Exception e) {
+				e.printStackTrace();
+				throw e;
 			}
+			
+			
 		}
 		
 	}

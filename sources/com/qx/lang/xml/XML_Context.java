@@ -93,7 +93,9 @@ public class XML_Context {
 	 */
 	public Object deserialize(Reader reader) throws Exception{
 		XML_StreamReader streamReader = new XML_StreamReader(reader);
-		return new XML_Parser(this, streamReader).parse();
+		Object object = new XML_Parser(this, streamReader).parse();
+		streamReader.close();
+		return object;
 	}
 
 	public Object deserialize(InputStream inputStream) throws Exception{
@@ -107,6 +109,7 @@ public class XML_Context {
 	public void serialize(Object object, Writer writer) throws Exception{
 		XML_StreamWriter streamWriter = new XML_StreamWriter(writer);
 		new XML_Composer(this, streamWriter).compose(object);
+		streamWriter.close();
 	}
 	
 	public void serialize(Object object, OutputStream outputStream) throws Exception{
