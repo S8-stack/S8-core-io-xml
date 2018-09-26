@@ -16,6 +16,7 @@ import com.qx.lang.xml.annotation.XML_SetAttribute;
 import com.qx.lang.xml.annotation.XML_SetElement;
 import com.qx.lang.xml.annotation.XML_SetValue;
 import com.qx.lang.xml.annotation.XML_Type;
+import com.qx.lang.xml.parser.XML_ParsingException;
 
 /**
  * 
@@ -147,12 +148,14 @@ public class TypeHandler {
 
 
 	public Object create()
-			throws
-			InstantiationException,
-			IllegalAccessException,
-			IllegalArgumentException,
-			InvocationTargetException {
-		return constructor.newInstance(new Object[]{});
+			throws XML_ParsingException {
+		try {
+			return constructor.newInstance(new Object[]{});
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			e.printStackTrace();
+			throw new XML_ParsingException("Cannot instantiate "+deserialName+" due to "+e.getMessage());
+		}
 	}
 
 	/**
@@ -160,12 +163,13 @@ public class TypeHandler {
 	 * @param object
 	 * @param name
 	 * @param value
+	 * @throws XML_ParsingException 
 	 * @throws Exception 
 	 */
-	public void setAttribute(Object object, String name, String value) throws Exception{
+	public void setAttribute(Object object, String name, String value) throws XML_ParsingException {
 		AttributeSetter setter = attributeSetters.get(name);
 		if(setter==null){
-			throw new Exception("No field with name "+name+" in type "+this.serialName);
+			throw new XML_ParsingException("No field with name "+name+" in type "+this.serialName);
 		}
 		setter.set(object, value);
 	}
@@ -182,20 +186,22 @@ public class TypeHandler {
 		return attributeGetters;
 	}
 
-	public void setValue(Object object, String value)
-			throws Exception{
+	public void setValue(Object object, String value) throws XML_ParsingException{
 		if(valueSetter==null){
-			throw new Exception("No value can be set in type "+this.serialName);
+			throw new XML_ParsingException("No value can be set in type "+this.serialName);
 		}
 		valueSetter.set(object, value);
 	}
 
-	public String getValue(Object object)
-			throws Exception{
+	public String getValue(Object object) throws XML_ParsingException{
 		if(valueGetter==null){
-			throw new Exception("No value can be get in type "+this.serialName);
+			throw new XML_ParsingException("No value can be get in type "+this.serialName);
 		}
-		return valueGetter.get(object);
+		try {
+			return valueGetter.get(object);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new XML_ParsingException(e.getMessage());
+		}
 	}
 
 	/**
@@ -205,24 +211,31 @@ public class TypeHandler {
 	 * @param value
 	 * @throws Exception 
 	 */
-	public void setElement(Object object, String name, Object value) throws Exception{
+	public void setElement(Object object, String name, Object value) throws XML_ParsingException {
 		ElementSetter setter = elementSetters.get(name);
 		if(setter==null){
-			throw new Exception("No field with name "+name+" in type "+this.serialName);
+			throw new XML_ParsingException("No field with name "+name+" in type "+this.serialName);
 		}
-		setter.set(object, value);
+		try {
+			setter.set(object, value);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			new XML_ParsingException(e.getMessage());
+		}
 	}
 	
 	/**
 	 * 
 	 * @param name
 	 * @return
+	 * @throws XML_ParsingException 
 	 * @throws Exception
 	 */
-	public ElementSetter getElementSetter(String name) throws Exception{
+	public ElementSetter getElementSetter(String name) throws XML_ParsingException {
 		ElementSetter setter = elementSetters.get(name);
 		if(setter==null){
-			throw new Exception("No field with name "+name+" in type "+this.serialName);
+			throw new XML_ParsingException("No field with name "+name+" in type "+this.serialName);
 		}
 		return setter;
 	}

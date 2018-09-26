@@ -41,6 +41,9 @@ public abstract class AttributeGetter {
 		else if(type==String.class){
 			return new StringFieldGetter(method);
 		}
+		else if(type.isEnum()){
+			return new EnumFieldGetter(method);
+		}
 		else{
 			throw new RuntimeException("parameters type is not supported: "+type.getName());
 		}
@@ -215,10 +218,32 @@ public abstract class AttributeGetter {
 				e.printStackTrace();
 				throw e;
 			}
-			
-			
 		}
-		
+	}
+	
+	private static class EnumFieldGetter extends AttributeGetter {
+
+		public EnumFieldGetter(Method method) {
+			super(method);
+		}
+
+		@Override
+		public String get(Object object)
+				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			try{
+				Object attribute = method.invoke(object);
+				if(attribute!=null){
+					return attribute.toString();
+				}
+				else{
+					return null;
+				}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			}
+		}
 	}
 	
 }

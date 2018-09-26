@@ -12,5 +12,5 @@ public @interface XML_Type {
 
 	public String name();
 	
-	public Class<?>[] sub();
+	public Class<?>[] sub() default {};
 }

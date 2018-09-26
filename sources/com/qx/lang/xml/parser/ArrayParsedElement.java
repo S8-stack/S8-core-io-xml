@@ -20,7 +20,7 @@ public class ArrayParsedElement extends ParsedElement {
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws Exception {
+	public ParsedElement createField(String tag) throws XML_ParsingException {
 		String typeName = tag;
 		return new ObjectParsedElement(context, this, null, typeName);
 	}
@@ -29,22 +29,22 @@ public class ArrayParsedElement extends ParsedElement {
 	@SuppressWarnings("unchecked")
 	// TODO type safety could be done externally...
 	@Override
-	public void setElement(String fieldName, Object object) throws Exception {
+	public void setElement(String fieldName, Object object) {
 		list.add(object);
 	}
 	
 	@Override
-	public void setValue(String value) throws Exception {
-		throw new Exception("Cannot set inner value in array");	
+	public void setValue(String value) throws XML_ParsingException {
+		throw new XML_ParsingException("Cannot set inner value in array");	
 	}
 	
 	@Override
-	public void setAttribute(String name, String value) throws Exception {
-		throw new Exception("Cannot set attribute in array");	
+	public void setAttribute(String name, String value) throws XML_ParsingException {
+		throw new XML_ParsingException("Cannot set attribute in array");	
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws XML_ParsingException {
 		int length = list.size();
 		Object array = Array.newInstance(componentType, length);
 		for(int i=0; i<length; i++){

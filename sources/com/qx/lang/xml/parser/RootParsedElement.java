@@ -13,14 +13,14 @@ public class RootParsedElement extends ParsedElement {
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws Exception {
+	public ParsedElement createField(String tag) throws XML_ParsingException {
 		String[] fragments = tag.split(":");
 		if(fragments.length!=2){
-			throw new Exception("Illegal tag formatting for root element");
+			throw new XML_ParsingException("Illegal tag formatting for root element");
 		}
 		String fieldName = fragments[0];
 		if(!fieldName.equals(ROOT_FIELD_NAME)){
-			throw new Exception("Illegal field name");
+			throw new XML_ParsingException("Illegal field name");
 		}
 		String typeName = fragments[1];
 		
@@ -30,7 +30,7 @@ public class RootParsedElement extends ParsedElement {
 
 
 	@Override
-	public void close() throws Exception {
+	public void close() {
 	}
 
 
@@ -40,19 +40,19 @@ public class RootParsedElement extends ParsedElement {
 	}
 
 	@Override
-	public void setValue(String value) throws Exception {
-		throw new Exception("Illegal value setting on root builder");
+	public void setValue(String value) throws XML_ParsingException {
+		throw new XML_ParsingException("Illegal value setting on root builder");
 	}
 
 	@Override
-	public void setAttribute(String name, String value) throws Exception {
-		throw new Exception("Illegal attribute setting on root builder");
+	public void setAttribute(String name, String value) throws XML_ParsingException {
+		throw new XML_ParsingException("Illegal attribute setting on root builder");
 	}
 
 	@Override
-	public void setElement(String fieldName, Object object) throws Exception {
+	public void setElement(String fieldName, Object object) throws XML_ParsingException {
 		if(!fieldName.equals(ROOT_FIELD_NAME)){
-			throw new Exception("Illegal field name");
+			throw new XML_ParsingException("Illegal field name");
 		}
 		this.object = object;
 	}

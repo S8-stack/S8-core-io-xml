@@ -12,9 +12,9 @@ public class XML_StreamReader {
 
 	private Reader reader;
 
-	private int line;
+	public int line;
 
-	private int column;
+	public int column;
 
 	private boolean isRunning;
 
@@ -23,9 +23,15 @@ public class XML_StreamReader {
 	 */
 	private int c;
 
-	public XML_StreamReader(Reader reader) throws Exception {
+	/**
+	 * 
+	 * @param reader
+	 * @param filename: for debugging purposes
+	 */
+	public XML_StreamReader(Reader reader) {
 		super();
 		this.reader = reader;
+		
 		line = 1;
 		column = 1;
 		isRunning = true;
@@ -36,13 +42,15 @@ public class XML_StreamReader {
 	 * check (do not read next)
 	 * 
 	 * @param sequence
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public void check(String sequence) throws Exception {
+	public void check(String sequence) throws XML_ParsingException, IOException {
 		int n=sequence.length();
 		for(int i=0; i<n; i++){
 			if(c!=sequence.charAt(i)){
-				throw new Exception("Unexpected sequence encountered while deserializing");
+				throw new XML_ParsingException(line, column,
+						"Unexpected sequence encountered while deserializing");
 			}
 			if(i<n-1){
 				readNext();	
@@ -56,9 +64,9 @@ public class XML_StreamReader {
 	 * @param c
 	 * @throws Exception
 	 */
-	public void check(char c) throws Exception {
+	public void check(char c) throws XML_ParsingException {
 		if(this.c!=c){
-			throw new Exception("Unexpected sequence encountered while deserializing");
+			throw new XML_ParsingException(line, column, "Unexpected sequence encountered while deserializing");
 		}
 	}
 
@@ -69,9 +77,9 @@ public class XML_StreamReader {
 	 * @param expectedChars
 	 * @throws Exception
 	 */
-	public void check(char... expectedChars) throws Exception{
+	public void check(char... expectedChars) throws XML_ParsingException {
 		if(!isOneOf(expectedChars)){
-			throw new Exception("Unexpected sequence encountered while deserializing");
+			throw new XML_ParsingException(line, column, "Unexpected sequence encountered while deserializing");
 		}
 	}
 
@@ -93,7 +101,8 @@ public class XML_StreamReader {
 				return builder.toString();
 			}
 			else if(isOneOf(forbidden)){
-				throw new XML_ParsingException("Forbidden char has been found>"+((char)c)+"<", line, column);
+				throw new XML_ParsingException(line, column,
+						"Forbidden char has been found>"+((char)c)+"<");
 			}
 			else if(isOneOf(ignored)){
 				// skipped
@@ -118,7 +127,7 @@ public class XML_StreamReader {
 			readNext();
 
 			if(isOneOf(forbidden)){
-				throw new XML_ParsingException("Forbidden char has been found", line, column);
+				throw new XML_ParsingException(line, column, "Forbidden char has been found");
 			}
 			else if(isOneOf(ignored)){
 				// skipped
@@ -173,13 +182,20 @@ public class XML_StreamReader {
 					column+=5;
 					// skipped
 				}
+				/*
+				 * It's a zero-width no-break space.
+				 * It's more commonly used as a byte-order mark (BOM).
+				 */
+				else if(c==65279){
+					// skipped
+				}
 				else{
 					isNext = true;
 				}
 			}	
 		}
 		else{
-			throw new XML_ParsingException("Attempting to read closed stream", line, column);
+			throw new XML_ParsingException(line, column, "Attempting to read closed stream");
 		}
 	}
 

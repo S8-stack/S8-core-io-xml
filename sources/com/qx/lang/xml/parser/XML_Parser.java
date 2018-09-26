@@ -1,5 +1,6 @@
 package com.qx.lang.xml.parser;
 
+import java.io.IOException;
 import java.util.Stack;
 
 import com.qx.lang.xml.XML_Context;
@@ -7,7 +8,7 @@ import com.qx.lang.xml.XML_Context;
 public class XML_Parser {
 
 	private XML_StreamReader reader;
-	
+
 	protected State state;
 
 	private Stack<ParsedElement> stack;
@@ -20,41 +21,62 @@ public class XML_Parser {
 		rootBuilder = new RootParsedElement(context);
 		stack = new Stack<>();
 		state = readHeader;
-		
 	}
 
 	/**
 	 * 
 	 * @return
+	 * @throws XML_ParsingException 
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public Object parse() throws Exception{
+	public Object parse() throws XML_ParsingException, IOException {
 		while(state!=null){
-			state.parse();
+			try {
+				state.parse();
+			}
+			catch (XML_ParsingException e) {
+				e.acquire(reader);
+				throw e;
+			}
 		}
 		return rootBuilder.getObject();
 	}
-	
-	
-	private void push(String tag) throws Exception{
-		if(stack.isEmpty()){
-			stack.push(rootBuilder.createField(tag));
+
+
+	private void push(String tag) throws XML_ParsingException {
+		try {
+
+			if(stack.isEmpty()){
+				stack.push(rootBuilder.createField(tag));
+			}
+			else{
+				stack.push(stack.peek().createField(tag));
+
+			}
 		}
-		else{
-			stack.push(stack.peek().createField(tag));	
+		catch (XML_ParsingException e) {
+			throw new XML_ParsingException(e.getMessage());
 		}
 	}
 
 
-	private void pop(String tag) throws Exception{
+	private void pop(String tag) throws XML_ParsingException {
 		if(!tag.equals(stack.peek().getTag())){
-			throw new Exception("Tag is not matching");
+			throw new XML_ParsingException("Tag is not matching");
 		}
 		pop();
 	}
 
-	private void pop() throws Exception{
-		stack.peek().close();
+	private void pop() throws XML_ParsingException {
+		try {
+			stack.peek().close();
+		}
+		catch (XML_ParsingException e) {
+			e.acquire(reader);
+			e.printStackTrace();
+			throw e;
+		}
 		stack.pop();
 		if(stack.isEmpty()){
 			state = null;
@@ -71,36 +93,36 @@ public class XML_Parser {
 	 */
 	private abstract class State {
 
-		public abstract void parse() throws Exception;
+		public abstract void parse() throws XML_ParsingException, IOException;
 
 	}
-	
-	
+
+
 	/**
 	 * read doc header
 	 */
 	private State readHeader = new State() {
 
 		@Override
-		public void parse() throws Exception {
+		public void parse() throws XML_ParsingException, IOException {
 			reader.readNext();
 			reader.check("<?xml");
 			String value = reader.until(new char[]{'>'}, null, null);
 			System.out.println("[XML_Parser] read header: "+value);
 			state = readContent;
 		}
-		
+
 	};
 
 
 	private State readContent = new State() {
 
 		@Override
-		public void parse() throws Exception {
+		public void parse() throws XML_ParsingException, IOException {
 
 			// remove new line or leading spaces
 			reader.skip(' ', '\n');
-			
+
 			// read value until next tag start
 			String value = reader.until(
 					/* stop at */ new char[]{'<'},
@@ -119,7 +141,7 @@ public class XML_Parser {
 	private State readTag = new State() {
 
 		@Override
-		public void parse() throws Exception {
+		public void parse() throws XML_ParsingException, IOException {
 			reader.check('<');
 			reader.readNext();
 			// closing tag
@@ -127,7 +149,7 @@ public class XML_Parser {
 				reader.readNext();
 				state = readClosingTag;
 			}
-			else if(reader.isCurrent('-')){
+			else if(reader.isCurrent('!')){
 				reader.readNext();
 				state = readComment;
 			}
@@ -144,7 +166,7 @@ public class XML_Parser {
 	private State readOpeningTag = new State() {
 
 		@Override
-		public void parse() throws Exception {
+		public void parse() throws XML_ParsingException, IOException {
 			String tag = reader.until(
 					/* stop at */ new char[]{'>', ' ', '/', '\n'},
 					/* ignore */ null,
@@ -173,7 +195,7 @@ public class XML_Parser {
 	private State readClosingTag = new State() {
 
 		@Override
-		public void parse() throws Exception {
+		public void parse() throws XML_ParsingException, IOException {
 			String tag = reader.until(
 					/* stop at */ new char[]{'>'},
 					/* ignore */ new char[]{' '},
@@ -187,21 +209,22 @@ public class XML_Parser {
 	private State readComment = new State() {
 
 		@Override
-		public void parse() throws Exception {
+		public void parse() throws XML_ParsingException, IOException {
 			String comment = reader.until(
 					/* stop at */ new char[]{'>'},
 					/* ignore */ null,
 					/* forbid */ null);
+			reader.readNext();
 			System.out.println("XML COmment: "+comment);
 			state = readContent;
 		}
 
 	};
-	
+
 	private State readElementHeader = new State() {
 
 		@Override
-		public void parse() throws Exception {
+		public void parse() throws XML_ParsingException, IOException {
 			String header = reader.until(
 					/* stop at */ new char[]{'>'},
 					/* ignore */ null,
@@ -217,8 +240,8 @@ public class XML_Parser {
 	private State readElementAttribute = new State() {
 
 		@Override
-		public void parse() throws Exception {
-			
+		public void parse() throws XML_ParsingException, IOException {
+
 			String name = reader.until(
 					/* stop at */ new char[]{'='},
 					/* ignore */ new char[]{' ', '\n'},
@@ -228,14 +251,14 @@ public class XML_Parser {
 			reader.skip(' ','\t');
 			reader.check('"');
 			reader.readNext();
-			
+
 			String value = reader.until(
 					/* stop at */ new char[]{'"'},
 					/* ignore */ new char[]{' ', '\n'},
 					/* forbid */ new char[]{',', '<', '>', '='});
 			stack.peek().setAttribute(name, value);
 			reader.readNext();
-			
+
 			reader.skip(' ', '\n');
 			if(reader.isCurrent('>')){
 				reader.readNext();

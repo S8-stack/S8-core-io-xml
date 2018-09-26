@@ -18,8 +18,7 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 	 * @param object
 	 * @throws Exception 
 	 */
-	public PrimitiveParsedElement(XML_Context context, ParsedElement parent, String parentFieldName)
-			throws Exception {
+	public PrimitiveParsedElement(XML_Context context, ParsedElement parent, String parentFieldName){
 		super(context, parent, parentFieldName);
 	}
 	
@@ -30,18 +29,18 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 
 	@Override
-	public void setAttribute(String name, String value) throws Exception {
-		throw new Exception("Cannot set attribute in primitive element");
+	public void setAttribute(String name, String value) throws XML_ParsingException {
+		throw new XML_ParsingException("Cannot set attribute in primitive element");
 	}
 
 	@Override
-	public void setElement(String fieldName, Object object) throws Exception {
-		throw new Exception("Cannot set element in primitive element");
+	public void setElement(String fieldName, Object object) throws XML_ParsingException {
+		throw new XML_ParsingException("Cannot set element in primitive element");
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws Exception {
-		throw new Exception("Cannot create field based on primitive element");
+	public ParsedElement createField(String tag) throws XML_ParsingException {
+		throw new XML_ParsingException("Cannot create field based on primitive element");
 	}
 
 	
@@ -49,18 +48,17 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 		private boolean value;
 		
-		public BooleanElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName)
-				throws Exception {
+		public BooleanElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName) {
 			super(context, parent, parentFieldName);
 		}
 
 		@Override
-		public void close() throws Exception {
+		public void close() throws XML_ParsingException {
 			parent.setElement(fieldNameInParent, value);
 		}
 
 		@Override
-		public void setValue(String value) throws Exception {
+		public void setValue(String value) {
 			this.value = Boolean.valueOf(value);
 		}
 	}
@@ -69,18 +67,17 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 		private short value;
 		
-		public ShortElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName)
-				throws Exception {
+		public ShortElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName) {
 			super(context, parent, parentFieldName);
 		}
 
 		@Override
-		public void close() throws Exception {
+		public void close() throws XML_ParsingException {
 			parent.setElement(fieldNameInParent, value);
 		}
 
 		@Override
-		public void setValue(String value) throws Exception {
+		public void setValue(String value) {
 			this.value = Short.valueOf(value);
 		}
 	}
@@ -89,18 +86,17 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 		private int value;
 		
-		public IntegerElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName)
-				throws Exception {
+		public IntegerElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
 		@Override
-		public void close() throws Exception {
+		public void close() throws XML_ParsingException {
 			parent.setElement(fieldNameInParent, value);
 		}
 
 		@Override
-		public void setValue(String value) throws Exception {
+		public void setValue(String value) {
 			this.value = Integer.valueOf(value);
 		}
 	}
@@ -109,18 +105,17 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 		private long value;
 		
-		public LongElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName)
-				throws Exception {
+		public LongElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
 		@Override
-		public void close() throws Exception {
+		public void close() throws XML_ParsingException {
 			parent.setElement(fieldNameInParent, value);
 		}
 
 		@Override
-		public void setValue(String value) throws Exception {
+		public void setValue(String value) {
 			this.value = Long.valueOf(value);
 		}
 	}
@@ -129,18 +124,17 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 		private float value;
 		
-		public FloatElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName)
-				throws Exception {
+		public FloatElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
 		@Override
-		public void close() throws Exception {
+		public void close() throws XML_ParsingException {
 			parent.setElement(fieldNameInParent, value);
 		}
 
 		@Override
-		public void setValue(String value) throws Exception {
+		public void setValue(String value) {
 			this.value = Float.valueOf(value);
 		}
 	}
@@ -149,18 +143,17 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 		private double value;
 		
-		public DoubleElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName)
-				throws Exception {
+		public DoubleElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
 		@Override
-		public void close() throws Exception {
+		public void close() throws XML_ParsingException {
 			parent.setElement(fieldNameInParent, value);
 		}
 
 		@Override
-		public void setValue(String value) throws Exception {
+		public void setValue(String value) {
 			this.value = Double.valueOf(value);
 		}
 	}
@@ -169,18 +162,17 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 
 		private String value;
 		
-		public StringElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName)
-				throws Exception {
+		public StringElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
 		@Override
-		public void close() throws Exception {
+		public void close() throws XML_ParsingException {
 			parent.setElement(fieldNameInParent, value);
 		}
 
 		@Override
-		public void setValue(String value) throws Exception {
+		public void setValue(String value) {
 			this.value = value;
 		}
 	}

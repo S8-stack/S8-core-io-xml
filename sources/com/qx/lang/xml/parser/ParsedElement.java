@@ -23,19 +23,19 @@ public abstract class ParsedElement {
 	}
 
 
-	public abstract ParsedElement createField(String tag) throws Exception;
+	public abstract ParsedElement createField(String tag) throws XML_ParsingException;
 	
 	
 	
 	public abstract String getTag();
 	
-	public abstract void close() throws Exception;
+	public abstract void close() throws XML_ParsingException;
 
-	public abstract void setValue(String value) throws Exception;
+	public abstract void setValue(String value) throws XML_ParsingException;
 
-	public abstract void setAttribute(String name, String value) throws Exception;
+	public abstract void setAttribute(String name, String value) throws XML_ParsingException;
 
-	public abstract void setElement(String fieldName, Object object) throws Exception;
+	public abstract void setElement(String fieldName, Object object) throws XML_ParsingException ;
 	
 	
 }

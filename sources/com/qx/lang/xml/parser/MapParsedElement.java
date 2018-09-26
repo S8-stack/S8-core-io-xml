@@ -17,7 +17,7 @@ public class MapParsedElement extends ParsedElement {
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws Exception {
+	public ParsedElement createField(String tag) throws XML_ParsingException {
 
 		String[] fragments = tag.split(":");
 		String fieldName = fragments[0];
@@ -30,12 +30,12 @@ public class MapParsedElement extends ParsedElement {
 	@SuppressWarnings("unchecked")
 	// TODO type safety could be done externally...
 	@Override
-	public void setElement(String fieldName, Object object) throws Exception {
+	public void setElement(String fieldName, Object object) {
 		map.put(fieldName, object);
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws XML_ParsingException {
 		parent.setElement(fieldNameInParent, map);
 	}
 
@@ -45,13 +45,13 @@ public class MapParsedElement extends ParsedElement {
 	}
 
 	@Override
-	public void setValue(String value) throws Exception {
-		throw new Exception("Cannot set inner value in map");	
+	public void setValue(String value) throws XML_ParsingException {
+		throw new XML_ParsingException("Cannot set inner value in map");	
 	}
 
 	@Override
-	public void setAttribute(String name, String value) throws Exception {
-		throw new Exception("Cannot set attribute in map");	
+	public void setAttribute(String name, String value) throws XML_ParsingException {
+		throw new XML_ParsingException("Cannot set attribute in map");	
 	}
 
 }

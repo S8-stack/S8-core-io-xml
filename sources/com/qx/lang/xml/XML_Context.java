@@ -3,6 +3,7 @@ package com.qx.lang.xml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -16,6 +17,7 @@ import com.qx.lang.xml.composer.XML_Composer;
 import com.qx.lang.xml.composer.XML_StreamWriter;
 import com.qx.lang.xml.handler.TypeHandler;
 import com.qx.lang.xml.parser.XML_Parser;
+import com.qx.lang.xml.parser.XML_ParsingException;
 import com.qx.lang.xml.parser.XML_StreamReader;
 
 /**
@@ -89,9 +91,10 @@ public class XML_Context {
 	 * 
 	 * @param reader
 	 * @return
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public Object deserialize(Reader reader) throws Exception{
+	public Object deserialize(Reader reader) throws XML_ParsingException, IOException {
 		XML_StreamReader streamReader = new XML_StreamReader(reader);
 		Object object = new XML_Parser(this, streamReader).parse();
 		streamReader.close();

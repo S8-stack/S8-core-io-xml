@@ -2,9 +2,13 @@ package com.qx.lang.xml.handler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.qx.lang.xml.parser.XML_ParsingException;
 
 public abstract class AttributeSetter {
-	
+
 	/**
 	 * 
 	 * @param method
@@ -17,7 +21,7 @@ public abstract class AttributeSetter {
 					+method.getDeclaringClass().getName());
 		}
 		Class<?> type = parameters[0];
-		
+
 		if(type==boolean.class){
 			return new BooleanFieldSetter(method);
 		}
@@ -39,21 +43,23 @@ public abstract class AttributeSetter {
 		else if(type==String.class){
 			return new StringFieldSetter(method);
 		}
+		else if(type.isEnum()){
+			return new EnumFieldSetter(method, type);
+		}
 		else{
 			throw new RuntimeException("parameters type is not supported: "+type.getName());
 		}
 	}
 
 	protected Method method;
-	
+
 	public AttributeSetter(Method method) {
 		super();
 		this.method = method;
 	}
-	
-	public abstract void set(Object object, String value)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
-	
+
+	public abstract void set(Object object, String value) throws XML_ParsingException;
+
 	private static class BooleanFieldSetter extends AttributeSetter {
 
 		public BooleanFieldSetter(Method method) {
@@ -61,13 +67,17 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value)
-				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			method.invoke(object, Boolean.valueOf(value));
+		public void set(Object object, String value) throws XML_ParsingException {
+			try {
+				method.invoke(object, Boolean.valueOf(value));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
 		}
-		
+
 	}
-	
+
 	private static class ShortFieldSetter extends AttributeSetter {
 
 		public ShortFieldSetter(Method method) {
@@ -75,13 +85,17 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value)
-				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			method.invoke(object, Short.valueOf(value));
+		public void set(Object object, String value) throws XML_ParsingException{
+			try{
+				method.invoke(object, Short.valueOf(value));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
 		}
-		
+
 	}
-	
+
 	private static class IntegerFieldSetter extends AttributeSetter {
 
 		public IntegerFieldSetter(Method method) {
@@ -89,13 +103,17 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value)
-				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			method.invoke(object, Integer.valueOf(value));
+		public void set(Object object, String value) throws XML_ParsingException {
+			try{
+				method.invoke(object, Integer.valueOf(value));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
 		}
-		
+
 	}
-	
+
 	private static class LongFieldSetter extends AttributeSetter {
 
 		public LongFieldSetter(Method method) {
@@ -103,13 +121,18 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value)
-				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			method.invoke(object, Long.valueOf(value));
+		public void set(Object object, String value) throws XML_ParsingException {
+			try{
+
+				method.invoke(object, Long.valueOf(value));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
 		}
-		
+
 	}
-	
+
 	private static class FloatFieldSetter extends AttributeSetter {
 
 		public FloatFieldSetter(Method method) {
@@ -117,13 +140,17 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value)
-				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			method.invoke(object, Float.valueOf(value));
+		public void set(Object object, String value) throws XML_ParsingException {
+			try{
+				method.invoke(object, Float.valueOf(value));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
 		}
-		
+
 	}
-	
+
 	private static class DoubleFieldSetter extends AttributeSetter {
 
 		public DoubleFieldSetter(Method method) {
@@ -131,13 +158,17 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value)
-				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			method.invoke(object, Double.valueOf(value));
+		public void set(Object object, String value) throws XML_ParsingException {
+			try{
+				method.invoke(object, Double.valueOf(value));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
 		}
-		
+
 	}
-	
+
 	private static class StringFieldSetter extends AttributeSetter {
 
 		public StringFieldSetter(Method method) {
@@ -145,11 +176,40 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value)
-				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			method.invoke(object, value);
+		public void set(Object object, String value) throws XML_ParsingException {
+			try{
+
+
+				method.invoke(object, value);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
 		}
-		
+
 	}
-	
+
+	private static class EnumFieldSetter extends AttributeSetter {
+
+		private Map<String, Object> map;
+
+		public EnumFieldSetter(Method method, Class<?> type) {
+			super(method);
+			map = new HashMap<>();
+			for(Object enumInstance : type.getEnumConstants()){
+				map.put(enumInstance.toString(), enumInstance);
+			}
+		}
+
+		@Override
+		public void set(Object object, String value) throws XML_ParsingException {
+			try{
+				method.invoke(object, map.get(value));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+						+e.getMessage());
+			}
+		}	
+	}
+
 }
