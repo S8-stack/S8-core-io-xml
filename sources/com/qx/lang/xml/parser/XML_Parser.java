@@ -7,6 +7,8 @@ import com.qx.lang.xml.XML_Context;
 
 public class XML_Parser {
 
+	private boolean isVerbose;
+	
 	private XML_StreamReader reader;
 
 	protected State state;
@@ -15,8 +17,9 @@ public class XML_Parser {
 
 	private RootParsedElement rootBuilder;
 
-	public XML_Parser(XML_Context context, XML_StreamReader reader) {
+	public XML_Parser(XML_Context context, XML_StreamReader reader, boolean isVerbose) {
 		super();
+		this.isVerbose = isVerbose;
 		this.reader = reader;
 		rootBuilder = new RootParsedElement(context);
 		stack = new Stack<>();
@@ -108,7 +111,9 @@ public class XML_Parser {
 			reader.readNext();
 			reader.check("<?xml");
 			String value = reader.until(new char[]{'>'}, null, null);
-			System.out.println("[XML_Parser] read header: "+value);
+			if(isVerbose) {
+				System.out.println("[XML_Parser] read header: "+value);	
+			}
 			state = readContent;
 		}
 
@@ -215,7 +220,9 @@ public class XML_Parser {
 					/* ignore */ null,
 					/* forbid */ null);
 			reader.readNext();
-			System.out.println("XML COmment: "+comment);
+			if(isVerbose) {
+				System.out.println("XML COmment: "+comment);	
+			}
 			state = readContent;
 		}
 
@@ -229,7 +236,9 @@ public class XML_Parser {
 					/* stop at */ new char[]{'>'},
 					/* ignore */ null,
 					/* forbid */ null);
-			System.out.println("XML Header: "+header);
+			if(isVerbose) {
+				System.out.println("XML Header: "+header);	
+			}
 			state = readContent;
 		}
 

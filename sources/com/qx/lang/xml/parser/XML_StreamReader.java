@@ -7,8 +7,8 @@ import com.qx.lang.xml.XML_Syntax;
 
 
 public class XML_StreamReader {
-
-	public static final boolean IS_DEBUG_ENABLED = true;
+	
+	private boolean isVerbose;
 
 	private Reader reader;
 
@@ -28,9 +28,10 @@ public class XML_StreamReader {
 	 * @param reader
 	 * @param filename: for debugging purposes
 	 */
-	public XML_StreamReader(Reader reader) {
+	public XML_StreamReader(Reader reader, boolean isVerbose) {
 		super();
 		this.reader = reader;
+		this.isVerbose = isVerbose;
 		
 		line = 1;
 		column = 1;
@@ -162,7 +163,7 @@ public class XML_StreamReader {
 			boolean isNext = false;
 			while(!isNext) {
 				c = reader.read();
-				if(IS_DEBUG_ENABLED){
+				if(isVerbose){
 					System.out.print((char) c);
 				}
 				if(c==-1){
@@ -249,7 +250,7 @@ public class XML_StreamReader {
 
 	public void readNextWhileIgnoring(char... ignoredChars) throws IOException, XML_ParsingException {
 		readNext();
-		if(IS_DEBUG_ENABLED){
+		if(isVerbose){
 			System.out.print((char) c);
 		}
 		while(isOneOf(ignoredChars)){

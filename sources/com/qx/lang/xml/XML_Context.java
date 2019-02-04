@@ -27,6 +27,7 @@ import com.qx.lang.xml.parser.XML_StreamReader;
  */
 public class XML_Context {
 
+	private boolean isVerbose = false;
 
 	private Map<String, TypeHandler> serialMap = new HashMap<>();
 
@@ -45,6 +46,11 @@ public class XML_Context {
 			discover(type);
 		}
 	}
+	
+	public void setVerbosity(boolean isVerbose) {
+		this.isVerbose = isVerbose;
+	}
+	
 
 	/**
 	 * 
@@ -95,8 +101,8 @@ public class XML_Context {
 	 * @throws Exception
 	 */
 	public Object deserialize(Reader reader) throws XML_ParsingException, IOException {
-		XML_StreamReader streamReader = new XML_StreamReader(reader);
-		Object object = new XML_Parser(this, streamReader).parse();
+		XML_StreamReader streamReader = new XML_StreamReader(reader, isVerbose);
+		Object object = new XML_Parser(this, streamReader, isVerbose).parse();
 		streamReader.close();
 		return object;
 	}
