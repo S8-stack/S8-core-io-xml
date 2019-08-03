@@ -10,7 +10,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-import com.qx.back.lang.xml.XML_Context;
+import com.qx.lang.xml.XML_Context;
 import com.qx.lang.xml.example.Wrapper;
 
 public class UnitTest02 {

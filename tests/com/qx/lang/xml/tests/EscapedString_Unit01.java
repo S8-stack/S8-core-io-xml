@@ -1,6 +1,6 @@
 package com.qx.lang.xml.tests;
 
-import com.qx.back.lang.xml.XML_Syntax;
+import com.qx.lang.xml.XML_Syntax;
 
 public class EscapedString_Unit01 {
 

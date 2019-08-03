@@ -1,9 +1,9 @@
 package com.qx.lang.xml.example;
 
 
-import com.qx.back.lang.xml.annotation.XML_GetAttribute;
-import com.qx.back.lang.xml.annotation.XML_SetAttribute;
-import com.qx.back.lang.xml.annotation.XML_Type;
+import com.qx.lang.xml.annotation.XML_GetAttribute;
+import com.qx.lang.xml.annotation.XML_SetAttribute;
+import com.qx.lang.xml.annotation.XML_Type;
 
 @XML_Type(name="test2", sub={})
 public class TestClass2 extends Wrapper {
