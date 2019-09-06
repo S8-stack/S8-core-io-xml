@@ -1,5 +1,6 @@
 package com.qx.lang.xml;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -112,7 +113,10 @@ public class XML_Context {
 	}
 	
 	public Object deserialize(File file) throws Exception{
-		return deserialize(new FileInputStream(file));
+		BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+		Object result = deserialize(inputStream);
+		inputStream.close();
+		return result;
 	}
 
 	public void serialize(Object object, Writer writer) throws Exception{
