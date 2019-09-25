@@ -113,10 +113,11 @@ public class XML_Context {
 	}
 	
 	public Object deserialize(File file) throws Exception{
-		BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-		Object result = deserialize(inputStream);
-		inputStream.close();
-		return result;
+		try(BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))){
+			Object result = deserialize(inputStream);
+			inputStream.close();
+			return result;	
+		}
 	}
 
 	public void serialize(Object object, Writer writer) throws Exception{
