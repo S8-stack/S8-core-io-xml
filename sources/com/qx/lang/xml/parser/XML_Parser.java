@@ -59,7 +59,7 @@ public class XML_Parser {
 			}
 		}
 		catch (XML_ParsingException e) {
-			throw new XML_ParsingException(e.getMessage());
+			throw new XML_ParsingException(e.getMessage()+", for tag: "+tag);
 		}
 	}
 
