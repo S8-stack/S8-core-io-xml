@@ -5,7 +5,7 @@
  * @author pc
  *
  */
-module com.qx.lang.xml {
+module com.qx.level0.lang.xml {
 	
 	exports com.qx.level0.lang.xml.composer;
 	exports com.qx.level0.lang.xml.annotation;
