@@ -13,5 +13,4 @@ module com.qx.lang.xml {
 	exports com.qx.lang.xml;
 	exports com.qx.lang.xml.handler;
 	
-
 }
