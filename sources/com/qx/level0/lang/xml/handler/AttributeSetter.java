@@ -105,7 +105,7 @@ public abstract class AttributeSetter {
 		@Override
 		public void set(Object object, String value) throws XML_ParsingException {
 			try{
-				method.invoke(object, Integer.valueOf(value));
+				method.invoke(object, Integer.decode(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
