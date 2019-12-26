@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 public @interface XML_SetElement {
 
-	public String name();
+	public String tag();
 	
 }

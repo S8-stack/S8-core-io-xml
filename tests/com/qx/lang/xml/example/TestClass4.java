@@ -24,7 +24,7 @@ public class TestClass4 extends TestClass3 {
 		return b;
 	}
 	
-	@XML_SetElement(name="users")
+	@XML_SetElement(tag="users")
 	public void setUsers(User[] users){
 		this.users = users;
 	}

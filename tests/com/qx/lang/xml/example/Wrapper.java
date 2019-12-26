@@ -26,7 +26,7 @@ public class Wrapper {
 		return a;
 	}
 	
-	@XML_SetElement(name="field")
+	@XML_SetElement(tag="field")
 	public void setField(TestClass3 field){
 		this.field = field;
 	}
@@ -36,7 +36,7 @@ public class Wrapper {
 		return field;
 	}
 	
-	@XML_SetElement(name="items")
+	@XML_SetElement(tag="items")
 	public void setArray(TestClass3[] array){
 		this.array = array;
 	}

@@ -4,26 +4,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.parser2.XML_ParsingException;
 
-public class MapParsedElement extends ParsedElement {
+public class OldMapParsedElement extends OldElementParsing {
 
 
 	@SuppressWarnings("rawtypes")
 	private Map map;
 
-	public MapParsedElement(XML_Context context, ObjectParsedElement parent, String fieldName) {
+	public OldMapParsedElement(XML_Context context, ObjectParsing parent, String fieldName) {
 		super(context, parent, fieldName);
 		map = new HashMap<>();
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws XML_ParsingException {
+	public OldElementParsing createField(String tag) throws XML_ParsingException {
 
 		String[] fragments = tag.split(":");
 		String fieldName = fragments[0];
 		String typeName = fragments[1];
 
-		return new ObjectParsedElement(context, this, fieldName, typeName);
+		return new ObjectParsing(context, this, fieldName, typeName);
 	}
 
 

@@ -1,7 +1,11 @@
 package com.qx.level0.lang.xml.parser;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.parser2.XML_ParsingException;
 
 
 /**
@@ -9,8 +13,15 @@ import com.qx.level0.lang.xml.XML_Context;
  * @author pc
  *
  */
-public abstract class PrimitiveParsedElement extends ParsedElement {
+public abstract class OldPrimitiveScope extends OldElementParsing {
 
+	/**
+	 * target (parent) object
+	 */
+	private Object object;
+	
+	private Method method;
+	
 	
 	/**
 	 * 
@@ -18,8 +29,16 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 	 * @param object
 	 * @throws Exception 
 	 */
-	public PrimitiveParsedElement(XML_Context context, ParsedElement parent, String parentFieldName){
-		super(context, parent, parentFieldName);
+	public OldPrimitiveScope(){
+		super();
+	}
+	
+	
+	
+	@Override
+	public void close() {
+			
+		
 	}
 	
 	@Override
@@ -39,16 +58,16 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws XML_ParsingException {
+	public OldElementParsing createField(String tag) throws XML_ParsingException {
 		throw new XML_ParsingException("Cannot create field based on primitive element");
 	}
 
 	
-	public static class BooleanElementBuilder extends PrimitiveParsedElement {
+	public static class BooleanElementBuilder extends OldPrimitiveScope {
 
 		private boolean value;
 		
-		public BooleanElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName) {
+		public BooleanElementBuilder(XML_Context context, OldElementParsing parent, String parentFieldName) {
 			super(context, parent, parentFieldName);
 		}
 
@@ -63,11 +82,11 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 		}
 	}
 	
-	public static class ShortElementBuilder extends PrimitiveParsedElement {
+	public static class ShortElementBuilder extends OldPrimitiveScope {
 
 		private short value;
 		
-		public ShortElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName) {
+		public ShortElementBuilder(XML_Context context, OldElementParsing parent, String parentFieldName) {
 			super(context, parent, parentFieldName);
 		}
 
@@ -82,11 +101,11 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 		}
 	}
 	
-	public static class IntegerElementBuilder extends PrimitiveParsedElement {
+	public static class IntegerElementBuilder extends OldPrimitiveScope {
 
 		private int value;
 		
-		public IntegerElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
+		public IntegerElementBuilder(XML_Context context, OldElementParsing parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
@@ -101,11 +120,11 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 		}
 	}
 	
-	public static class LongElementBuilder extends PrimitiveParsedElement {
+	public static class LongElementBuilder extends OldPrimitiveScope {
 
 		private long value;
 		
-		public LongElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
+		public LongElementBuilder(XML_Context context, OldElementParsing parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
@@ -120,11 +139,11 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 		}
 	}
 	
-	public static class FloatElementBuilder extends PrimitiveParsedElement {
+	public static class FloatElementBuilder extends OldPrimitiveScope {
 
 		private float value;
 		
-		public FloatElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
+		public FloatElementBuilder(XML_Context context, OldElementParsing parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
@@ -139,11 +158,11 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 		}
 	}
 	
-	public static class DoubleElementBuilder extends PrimitiveParsedElement {
+	public static class DoubleElementBuilder extends OldPrimitiveScope {
 
 		private double value;
 		
-		public DoubleElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
+		public DoubleElementBuilder(XML_Context context, OldElementParsing parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 
@@ -158,11 +177,11 @@ public abstract class PrimitiveParsedElement extends ParsedElement {
 		}
 	}
 	
-	public static class StringElementBuilder extends PrimitiveParsedElement {
+	public static class StringElementBuilder extends OldPrimitiveScope {
 
 		private String value;
 		
-		public StringElementBuilder(XML_Context context, ParsedElement parent, String parentFieldName){
+		public StringElementBuilder(XML_Context context, OldElementParsing parent, String parentFieldName){
 			super(context, parent, parentFieldName);
 		}
 

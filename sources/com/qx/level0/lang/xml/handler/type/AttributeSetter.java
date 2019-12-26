@@ -1,11 +1,12 @@
-package com.qx.level0.lang.xml.handler;
+package com.qx.level0.lang.xml.handler.type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser2.XML_ParsingException;
+import com.qx.level0.lang.xml.parser2.XML_StreamReader;
 
 public abstract class AttributeSetter {
 
@@ -58,7 +59,7 @@ public abstract class AttributeSetter {
 		this.method = method;
 	}
 
-	public abstract void set(Object object, String value) throws XML_ParsingException;
+	public abstract void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException;
 
 	private static class BooleanFieldSetter extends AttributeSetter {
 
@@ -67,11 +68,11 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException {
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try {
 				method.invoke(object, Boolean.valueOf(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}
@@ -85,11 +86,11 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException{
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException{
 			try{
 				method.invoke(object, Short.valueOf(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}
@@ -103,11 +104,11 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException {
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try{
 				method.invoke(object, Integer.decode(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}
@@ -121,12 +122,12 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException {
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try{
 
 				method.invoke(object, Long.valueOf(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}
@@ -140,11 +141,11 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException {
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try{
 				method.invoke(object, Float.valueOf(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}
@@ -158,11 +159,11 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException {
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try{
 				method.invoke(object, Double.valueOf(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}
@@ -176,13 +177,13 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException {
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try{
 
 
 				method.invoke(object, value);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}
@@ -202,11 +203,11 @@ public abstract class AttributeSetter {
 		}
 
 		@Override
-		public void set(Object object, String value) throws XML_ParsingException {
+		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try{
 				method.invoke(object, map.get(value));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException("Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
 						+e.getMessage());
 			}
 		}	

@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import com.qx.level0.lang.xml.XML_Context;
 import com.qx.level0.lang.xml.XML_Syntax;
-import com.qx.level0.lang.xml.handler.TypeHandler;
+import com.qx.level0.lang.xml.handler.type.TypeHandler;
 
 public class XML_Composer {
 
@@ -54,8 +54,8 @@ public class XML_Composer {
 	 * @param typeName
 	 * @return
 	 */
-	public TypeHandler getTypeHandler(String typeName){
-		return context.getByDeserialName(typeName);
+	public TypeHandler getTypeHandler(Class<?> type){
+		return context.getTypeHandler(type);
 	}
 	
 }

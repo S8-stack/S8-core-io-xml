@@ -13,4 +13,10 @@ public @interface XML_Type {
 	public String name();
 	
 	public Class<?>[] sub() default {};
+	
+	/**
+	 * Tells whether this type can be used as a root type.
+	 * @return
+	 */
+	public boolean isRoot() default false;
 }

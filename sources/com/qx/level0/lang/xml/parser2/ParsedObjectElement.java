@@ -1,0 +1,287 @@
+package com.qx.level0.lang.xml.parser2;
+
+
+import java.io.IOException;
+
+import com.qx.level0.lang.xml.handler.type.TypeHandler;
+
+
+/**
+ * 
+ * @author pc
+ *
+ */
+public class ParsedObjectElement implements ParsedElement {
+
+	/**
+	 * Callback method for the Object element
+	 * @author pc
+	 *
+	 */
+	public interface Callback {
+
+		public void set(Object object) throws XML_ParsingException;
+
+	}
+
+
+	/**
+	 * <b>Callback #1</b>: for returning to the parent scope when done
+	 */
+	private ParsedElement parent;
+
+	/**
+	 * <b>Callback #2</b>: for setting the object when done
+	 */
+	private Callback callback;
+
+
+	private String tag;
+
+
+	/**
+	 * 
+	 */
+	private TypeHandler typeHandler;
+
+
+	/**
+	 * the object currently built
+	 */
+	private Object object;
+	
+	
+
+	/**
+	 * current parsing state
+	 */
+	private State state;
+	
+	
+	private boolean isActive;
+
+	private boolean isClosed;
+	
+	
+	/**
+	 * sub-scopes
+	 */
+	public ParsedListElement[] lists;
+
+	
+	/**
+	 * 
+	 * @param tag
+	 * @param callback
+	 * @param handler
+	 * @throws XML_ParsingException
+	 */
+	public ParsedObjectElement(ParsedElement parent, 
+			Callback callback, 
+			String tag, 
+			TypeHandler handler,
+			XML_StreamReader.Point point) throws XML_ParsingException {
+		super();
+		this.parent = parent;
+		this.tag = tag;
+		this.typeHandler = handler;
+		this.object = handler.create(point);
+		
+		// initialize
+		state = new ReadAttributes();
+		
+		int nLists = typeHandler.getNumberOfLists();
+		lists = new ParsedListElement[nLists];
+	}
+
+
+	public Object getObject() {
+		return object;
+	}
+
+	@Override
+	public void parse(XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException {
+		if(isClosed) {
+			throw new XML_ParsingException(reader, "This scope has already been closed");
+		}
+		isActive = true;
+		while(isActive){
+			state.parse(parser, reader);
+		}
+	}
+
+
+	private void setValue(String value, XML_StreamReader.Point point) throws XML_ParsingException {
+		typeHandler.setValue(object, value, point);
+	}
+
+
+
+
+	/**
+	 * 
+	 * @author pc
+	 *
+	 */
+	public interface State {
+
+		public abstract void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException;
+
+	}
+	
+	private class ReadAttributes implements State {
+
+		@Override
+		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+
+			reader.skip(' ', '\t' , '\n');
+
+			// find next attribute name if any
+			String name = reader.until(
+					/* stop at */ new char[]{' ', '=', '/', '>', '\t', '\n'},
+					/* ignore */ null,
+					/* forbid */ new char[]{',', '<', '"'});
+
+			reader.skip(' ', '\t' , '\n');
+
+			// we found an attribute definition
+			if(reader.isCurrent('=')) {
+				reader.readNext();
+				reader.skip(' ', '\t' , '\n');
+				reader.check('"');
+				reader.readNext();
+
+				String value = reader.until(
+						/* stop at */ new char[]{'"'},
+						/* ignore */ null,
+						/* forbid */ new char[]{',', '<', '>', '=', '\n'});
+
+				typeHandler.setAttribute(object, name, value, reader.getPoint());
+				reader.readNext();
+			}
+			else if(reader.isCurrent('>')){
+				reader.readNext();
+				state = new ReadContent();
+			}
+			else if(reader.isCurrent('/')){
+				reader.readNext();
+				reader.check('>');
+				reader.readNext();
+				state = new CloseScope();
+			}
+		}
+	}
+
+
+
+	private class ReadContent implements State {
+
+		@Override
+		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+
+			// read value until next tag start
+			String value = reader.until(
+					/* stop at */ new char[]{'<'},
+					/* ignore */ null,
+					/* forbid */ null);	
+
+			// set value if any
+			if(!ParsedElement.isBlank(value)){
+				setValue(value, reader.getPoint());
+			}
+			state = new ReadOpeningTag();
+		}
+	}
+
+
+	private class ReadOpeningTag implements State {
+
+		@Override
+		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+			reader.check('<');
+			reader.readNext();
+			// closing tag
+			if(reader.isCurrent('/')){
+				reader.readNext();
+				state = new ReadClosingTag();
+			}
+			else if(reader.isCurrent('!')){
+				reader.readNext();
+				state = new ReadComment();
+			}
+			else if(reader.isCurrent('?')){
+				throw new XML_ParsingException(reader, "Illegal header position within an element");
+				//state = new ReadElementHeader();
+			}
+			else{
+				String tag = reader.until(
+						/* stop at */ new char[]{'>', ' ', '/', '\n'},
+						/* ignore */ null,
+						/* forbid */ new char[]{',', '=', '"'});
+
+				/* create new scope */
+
+				// switch to new scope
+				parser.scope = typeHandler.createParsedElement(ParsedObjectElement.this, tag, reader.getPoint());
+
+				// and escape this scope...
+				isActive = false;
+				
+				// ...and come back as reading content
+				state = new ReadContent();
+			}
+		}
+	}
+
+
+	private class ReadClosingTag implements State {
+
+		@Override
+		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+			String tag = reader.until(
+					/* stop at */ new char[]{'>'},
+					/* ignore */ new char[]{' '},
+					/* forbid */ new char[]{',', '=', '"', '/'});
+			
+			// check closing tag
+			if(ParsedObjectElement.this.tag.equals(tag)) {
+				throw new XML_ParsingException(reader, "Closing tag is not matching: "+tag+ "instead of "
+						+ParsedObjectElement.this.tag+".");
+			}
+			
+			reader.readNext();
+			state = new CloseScope();
+		}
+	}
+
+	private class ReadComment implements State {
+
+		@Override
+		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+			String comment = reader.until(
+					/* stop at */ new char[]{'>'},
+					/* ignore */ null,
+					/* forbid */ null);
+			reader.readNext();
+			if(parser.isVerbose) {
+				System.out.println("XML COmment: "+comment);	
+			}
+			state = new ReadContent();
+		}
+	}
+
+	
+	private class CloseScope implements State {
+
+
+		@Override
+		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+			callback.set(object);
+			state = null;
+			// never returning to this scope parser.
+			isClosed = true;
+			parser.scope = parent;
+		}
+	}
+	
+}

@@ -3,9 +3,9 @@ package com.qx.level0.lang.xml.composer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.qx.level0.lang.xml.handler.AttributeGetter;
-import com.qx.level0.lang.xml.handler.ElementGetter;
-import com.qx.level0.lang.xml.handler.TypeHandler;
+import com.qx.level0.lang.xml.handler.type.AttributeGetter;
+import com.qx.level0.lang.xml.handler.type.ElementGetter;
+import com.qx.level0.lang.xml.handler.type.TypeHandler;
 
 public class ObjectComposableElement extends ComposableElement {
 
@@ -28,7 +28,7 @@ public class ObjectComposableElement extends ComposableElement {
 	public ObjectComposableElement(XML_Composer composer, String fieldName, Object fieldValue){
 		super(composer, fieldName);
 		this.object = fieldValue;
-		this.typeHandler = composer.getTypeHandler(fieldValue.getClass().getName());
+		this.typeHandler = composer.getTypeHandler(fieldValue.getClass());
 	}
 
 
@@ -41,10 +41,10 @@ public class ObjectComposableElement extends ComposableElement {
 
 			// start tag
 			if(fieldName!=null){
-				writer.startTag(fieldName+':'+typeHandler.getSerialName());	
+				writer.startTag(fieldName+':'+typeHandler.getXmlName());	
 			}
 			else{
-				writer.startTag(typeHandler.getSerialName());	
+				writer.startTag(typeHandler.getXmlName());	
 			}
 
 			// write attributes
@@ -80,10 +80,10 @@ public class ObjectComposableElement extends ComposableElement {
 
 		case END:
 			if(fieldName!=null){
-				writer.appendClosingTag(fieldName+':'+typeHandler.getSerialName());
+				writer.appendClosingTag(fieldName+':'+typeHandler.getXmlName());
 			}
 			else{
-				writer.appendClosingTag(typeHandler.getSerialName());
+				writer.appendClosingTag(typeHandler.getXmlName());
 			}
 			break;
 		}

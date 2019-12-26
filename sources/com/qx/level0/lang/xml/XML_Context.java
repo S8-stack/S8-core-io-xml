@@ -11,17 +11,58 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.qx.level0.lang.xml.composer.XML_Composer;
 import com.qx.level0.lang.xml.composer.XML_StreamWriter;
-import com.qx.level0.lang.xml.handler.TypeHandler;
-import com.qx.level0.lang.xml.parser.XML_Parser;
-import com.qx.level0.lang.xml.parser.XML_ParsingException;
-import com.qx.level0.lang.xml.parser.XML_StreamReader;
+import com.qx.level0.lang.xml.handler.type.TypeHandler;
+import com.qx.level0.lang.xml.handler.type.XML_TypeCompilationException;
+import com.qx.level0.lang.xml.parser2.XML_Parser;
+import com.qx.level0.lang.xml.parser2.XML_ParsingException;
+import com.qx.level0.lang.xml.parser2.XML_StreamReader;
 
 /**
+ * <h1>XML Context</h1>
+ * <h2>Syntax</h2>
+ * <p>
+ * XML context is now supporting a wider syntax:
+ * </p>
+ * <ul>
+ * <li>Only type annotated as <code>isRoot=true</code> are eligible as
+ * roots.</li>
+ * <li>Field elements are declared with the default syntax
+ * <code>{$field_name}:{$type_name}</code></li>
+ * <li><b>Contextual naming</b>. Note that <b>it is allowed that types names
+ * conflict in the global scope</b>, they just need not to raise conflict on a
+ * specific field. For instance, you can have 3 different types called
+ * <code>Function</code> as long as no field possible elements includes more
+ * than one of them.</li>
+ * <li>Reference to the list can be omitted when there is no conflicts. For
+ * instance if a JAVA object (XML-called <code>my-object</code>) has 3 lists of
+ * elements whose types are different (say: List of View, List of Callback, List
+ * of Schematics), them the following syntax is correct:
+ * 
+ * <pre>
+ * {@code
+ * 		<my-object>
+ * 			<view id="view01"/>
+ * 			<view id="view01"/>
+ * 			<view id="view01"/>
+ * 			<callback func="whatdoyouwanttodo()"/>
+ * 		</my-object>
+ * }
+ * </pre>
+ * 
+ * </li>
+ * </ul>
+ * <p>
+ * <h2>Implementation notes</h2>
+ * <p>
+ * All setting (i.e. support of the various syntaxes exposed above)
+ * possibilities are hard-compiled when building the type handler.
+ * </p>
  * 
  * @author pc
  *
@@ -30,9 +71,8 @@ public class XML_Context {
 
 	private boolean isVerbose = false;
 
-	private Map<String, TypeHandler> serialMap = new HashMap<>();
 
-	private Map<String, TypeHandler> deserialMap = new HashMap<>();
+	private Map<String, TypeHandler> typeMap = new HashMap<>();
 
 	/**
 	 * 
@@ -41,10 +81,10 @@ public class XML_Context {
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	public XML_Context(Class<?>... types) throws Exception {
+	public XML_Context(Class<?>... types) throws XML_TypeCompilationException {
 		super();
 		for(Class<?> type : types){
-			discover(type);
+			register(type);
 		}
 	}
 	
@@ -60,38 +100,25 @@ public class XML_Context {
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
-	public void discover(Class<?> type) throws Exception {
-		TypeHandler typeHandler = new TypeHandler(type);
-		if(!deserialMap.containsKey(typeHandler.getDeserialName())){
-
-			serialMap.put(typeHandler.getSerialName(), typeHandler);
-
-			deserialMap.put(typeHandler.getDeserialName(), typeHandler);
-
+	public void register(Class<?> type) throws XML_TypeCompilationException {
+		
+		if(!isRegistered(type)){
 			try {
-				typeHandler.initialize(this);
-			} catch (NoSuchMethodException | SecurityException e) {
-				throw new Exception("Failed to initialize "+type.getName()+" due to "+e.getMessage());
+				TypeHandler typeHandler = new TypeHandler(type, this);
+				typeMap.put(typeHandler.getClassName(), typeHandler);
+				
+			} catch (SecurityException e) {
+				throw new XML_TypeCompilationException(type, "Failed to initialize due to "+e.getMessage());
 			}
 		}
 	}
 
-	public boolean isRegistered(String name){
-		return serialMap.containsKey(name);
+	public boolean isRegistered(Class<?> type){
+		return typeMap.containsKey(type.getName());
 	}
 
-
-	/**
-	 * 
-	 * @param deserialName
-	 * @return
-	 */
-	public TypeHandler getBySerialName(String serialName){
-		return serialMap.get(serialName);
-	}
-
-	public TypeHandler getByDeserialName(String deserialName){
-		return deserialMap.get(deserialName);
+	public TypeHandler getTypeHandler(Class<?> type){
+		return typeMap.get(type.getName());
 	}
 
 	/**
@@ -101,24 +128,48 @@ public class XML_Context {
 	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public Object deserialize(Reader reader) throws XML_ParsingException, IOException {
-		XML_StreamReader streamReader = new XML_StreamReader(reader, isVerbose);
+	public Object deserialize(Reader reader, String filename) throws XML_ParsingException, IOException {
+		XML_StreamReader streamReader = new XML_StreamReader(reader, filename, isVerbose);
 		Object object = new XML_Parser(this, streamReader, isVerbose).parse();
 		streamReader.close();
 		return object;
 	}
 
-	public Object deserialize(InputStream inputStream) throws Exception{
-		return deserialize(new InputStreamReader(inputStream));
+	public Object deserialize(InputStream inputStream, String filename) throws Exception{
+		return deserialize(new InputStreamReader(inputStream), filename);
 	}
 	
 	public Object deserialize(File file) throws Exception{
 		try(BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))){
-			Object result = deserialize(inputStream);
+			Object result = deserialize(inputStream, file.getName());
 			inputStream.close();
 			return result;	
 		}
 	}
+	
+	/**
+	 * 
+	 * @param target the target class
+	 * @param name resource name
+	 * @throws IOException 
+	 * @throws XML_ParsingException 
+	 */
+	public Object deserializeResource(Class<?> target, String name) throws IOException, XML_ParsingException {
+		String filename = target.getName()+" resource: "+name;
+		try(InputStream inputStream = target.getResourceAsStream(name)){
+			if(inputStream!=null) {
+				InputStreamReader reader = new InputStreamReader(new BufferedInputStream(inputStream), StandardCharsets.UTF_8);
+				XML_StreamReader streamReader = new XML_StreamReader(reader, filename, isVerbose);
+				Object object = new XML_Parser(this, streamReader, isVerbose).parse();
+				streamReader.close();
+				return object;
+			}
+			else {
+				throw new IOException("Failed to read resource: "+filename);
+			}
+		}
+	}
+	
 
 	public void serialize(Object object, Writer writer) throws Exception{
 		XML_StreamWriter streamWriter = new XML_StreamWriter(writer);

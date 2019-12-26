@@ -5,24 +5,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.parser2.XML_ParsingException;
 
-public class ArrayParsedElement extends ParsedElement {
+public class OldArrayParsedElement extends OldElementParsing {
 
 	private Class<?> componentType;
 	
 	@SuppressWarnings("rawtypes")
 	private List list;
 	
-	public ArrayParsedElement(XML_Context context, ObjectParsedElement parent, String fieldName, Class<?> componentType) {
+	public OldArrayParsedElement(XML_Context context, ObjectParsing parent, String fieldName, Class<?> componentType) {
 		super(context, parent, fieldName);
 		this.componentType = componentType;
 		list = new ArrayList<>();
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws XML_ParsingException {
+	public OldElementParsing createField(String tag) throws XML_ParsingException {
 		String typeName = tag;
-		return new ObjectParsedElement(context, this, null, typeName);
+		return new ObjectParsing(context, this, null, typeName);
 	}
 	
 

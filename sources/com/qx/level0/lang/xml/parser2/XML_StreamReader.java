@@ -1,4 +1,4 @@
-package com.qx.level0.lang.xml.parser;
+package com.qx.level0.lang.xml.parser2;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -12,6 +12,8 @@ public class XML_StreamReader {
 
 	private Reader reader;
 
+	public String filename;
+	
 	public int line;
 
 	public int column;
@@ -28,9 +30,10 @@ public class XML_StreamReader {
 	 * @param reader
 	 * @param filename: for debugging purposes
 	 */
-	public XML_StreamReader(Reader reader, boolean isVerbose) {
+	public XML_StreamReader(Reader reader, String filename, boolean isVerbose) {
 		super();
 		this.reader = reader;
+		this.filename = filename;
 		this.isVerbose = isVerbose;
 		
 		line = 1;
@@ -50,8 +53,7 @@ public class XML_StreamReader {
 		int n=sequence.length();
 		for(int i=0; i<n; i++){
 			if(c!=sequence.charAt(i)){
-				throw new XML_ParsingException(line, column,
-						"Unexpected sequence encountered while deserializing");
+				throw new XML_ParsingException(this, "Unexpected sequence encountered while deserializing");
 			}
 			if(i<n-1){
 				readNext();	
@@ -67,7 +69,7 @@ public class XML_StreamReader {
 	 */
 	public void check(char c) throws XML_ParsingException {
 		if(this.c!=c){
-			throw new XML_ParsingException(line, column, "Unexpected sequence encountered while deserializing");
+			throw new XML_ParsingException(this, "Unexpected sequence encountered while deserializing");
 		}
 	}
 
@@ -80,7 +82,7 @@ public class XML_StreamReader {
 	 */
 	public void check(char... expectedChars) throws XML_ParsingException {
 		if(!isOneOf(expectedChars)){
-			throw new XML_ParsingException(line, column, "Unexpected sequence encountered while deserializing");
+			throw new XML_ParsingException(this, "Unexpected sequence encountered while deserializing");
 		}
 	}
 
@@ -102,8 +104,7 @@ public class XML_StreamReader {
 				return builder.toString();
 			}
 			else if(isOneOf(forbidden)){
-				throw new XML_ParsingException(line, column,
-						"Forbidden char has been found>"+((char)c)+"<");
+				throw new XML_ParsingException(this, "Forbidden char has been found>"+((char)c)+"<");
 			}
 			else if(isOneOf(ignored)){
 				// skipped
@@ -128,7 +129,7 @@ public class XML_StreamReader {
 			readNext();
 
 			if(isOneOf(forbidden)){
-				throw new XML_ParsingException(line, column, "Forbidden char has been found");
+				throw new XML_ParsingException(this, "Forbidden char has been found");
 			}
 			else if(isOneOf(ignored)){
 				// skipped
@@ -196,7 +197,7 @@ public class XML_StreamReader {
 			}	
 		}
 		else{
-			throw new XML_ParsingException(line, column, "Attempting to read closed stream");
+			throw new XML_ParsingException(this, "Attempting to read closed stream");
 		}
 	}
 
@@ -303,5 +304,23 @@ public class XML_StreamReader {
 
 	public boolean isFinished(){
 		return c==-1;
+	}
+	
+	
+	public static class Point {
+		public int line;
+		public int column;
+		public String filename;
+		
+		public Point(int line, int column, String filename) {
+			super();
+			this.line = line;
+			this.column = column;
+			this.filename = filename;
+		}
+	}
+	
+	public Point getPoint() {
+		return new Point(line, column, filename);
 	}
 }

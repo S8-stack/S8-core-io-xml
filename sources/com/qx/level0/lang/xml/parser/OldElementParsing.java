@@ -1,100 +1,33 @@
 package com.qx.level0.lang.xml.parser;
 
 import java.io.IOException;
-import java.util.Stack;
 
-import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.parser.ObjectParsing.State;
+import com.qx.level0.lang.xml.parser2.XML_ParsingException;
 
-public class XML_Parser {
-
-	private boolean isVerbose;
+/**
+ * <p>
+ * On why not recursive: "However, the textbook is incorrect in the context of
+ * Java. Current Java compilers do not implement tail-call optimization,
+ * apparently because it would interfere with the Java security implementation,
+ * and would alter the behaviour of applications that introspect on the call
+ * stack for various purposes."
+ * See <a href="https://stackoverflow.com/questions/105834/does-the-jvm-prevent-tail-call-optimizations">here</a>.
+ * </p>
+ * 
+ * @author pc
+ *
+ */
+public interface OldElementParsing {
 	
-	private XML_StreamReader reader;
-
-	protected State state;
-
-	private Stack<ParsedElement> stack;
-
-	private RootParsedElement rootBuilder;
-
-	public XML_Parser(XML_Context context, XML_StreamReader reader, boolean isVerbose) {
-		super();
-		this.isVerbose = isVerbose;
-		this.reader = reader;
-		rootBuilder = new RootParsedElement(context);
-		stack = new Stack<>();
-		state = readHeader;
-	}
-
-	/**
-	 * 
-	 * @return
-	 * @throws XML_ParsingException 
-	 * @throws IOException 
-	 * @throws Exception
-	 */
-	public Object parse() throws XML_ParsingException, IOException {
-		while(state!=null){
-			try {
-				state.parse();
-			}
-			catch (XML_ParsingException e) {
-				e.acquire(reader);
-				throw e;
-			}
-		}
-		return rootBuilder.getObject();
-	}
-
-
-	private void push(String tag) throws XML_ParsingException {
-		try {
-
-			if(stack.isEmpty()){
-				stack.push(rootBuilder.createField(tag));
-			}
-			else{
-				stack.push(stack.peek().createField(tag));
-
-			}
-		}
-		catch (XML_ParsingException e) {
-			throw new XML_ParsingException(e.getMessage()+", for tag: "+tag);
-		}
-	}
-
-
-	private void pop(String tag) throws XML_ParsingException {
-		if(!tag.equals(stack.peek().getTag())){
-			throw new XML_ParsingException("Tag is not matching");
-		}
-		pop();
-	}
-
-	private void pop() throws XML_ParsingException {
-		try {
-			stack.peek().close();
-		}
-		catch (XML_ParsingException e) {
-			e.acquire(reader);
-			e.printStackTrace();
-			throw e;
-		}
-		stack.pop();
-		if(stack.isEmpty()){
-			state = null;
-		}
-		else{
-			state = readContent;	
-		}
-	}
-
+	public abstract void parse(OldXML_Parser parser) throws XML_ParsingException;
+	
 	/**
 	 * 
 	 * @author pc
 	 *
 	 */
-	private abstract class State {
+	public abstract class State {
 
 		public abstract void parse() throws XML_ParsingException, IOException;
 
@@ -104,10 +37,10 @@ public class XML_Parser {
 	/**
 	 * read doc header
 	 */
-	private State readHeader = new State() {
+	public abstract class ReadHeader extends State {
 
 		@Override
-		public void parse() throws XML_ParsingException, IOException {
+		public void parse(XML_StreamReader reader, boolean isVerbose) throws XML_ParsingException, IOException {
 			reader.readNext();
 			reader.check("<?xml");
 			String value = reader.until(new char[]{'>'}, null, null);
@@ -282,21 +215,5 @@ public class XML_Parser {
 			// else: state = readAttribute
 		}
 	};
-
-
-	private static boolean isBlank(String str){
-		int n = str.length();
-		if(n>0){
-			for(int i=0; i<n; i++){
-				if(str.charAt(i)!=' '){
-					return false;
-				}
-			}
-			return true;	
-		}
-		else{
-			return true;
-		}	
-	}
 
 }

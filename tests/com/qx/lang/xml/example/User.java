@@ -36,7 +36,7 @@ public class User extends TestClass3 {
 		return password;
 	}
 	
-	@XML_SetElement(name="note")
+	@XML_SetElement(tag="note")
 	public void setNote(String note){
 		this.note = note;
 	}

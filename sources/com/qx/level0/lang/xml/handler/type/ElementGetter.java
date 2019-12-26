@@ -1,4 +1,4 @@
-package com.qx.level0.lang.xml.handler;
+package com.qx.level0.lang.xml.handler.type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

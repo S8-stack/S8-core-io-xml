@@ -1,19 +1,20 @@
 package com.qx.level0.lang.xml.parser;
 
 import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.parser2.XML_ParsingException;
 
-public class RootParsedElement extends ParsedElement {
+public class OldRootParsedElement extends OldElementParsing {
 
 	public static final String ROOT_FIELD_NAME = "root";
 	
 	private Object object;
 	
-	public RootParsedElement(XML_Context context) {
+	public OldRootParsedElement(XML_Context context) {
 		super(context, null, null);
 	}
 
 	@Override
-	public ParsedElement createField(String tag) throws XML_ParsingException {
+	public OldElementParsing createField(String tag) throws XML_ParsingException {
 		String[] fragments = tag.split(":");
 		if(fragments.length!=2){
 			throw new XML_ParsingException("Illegal tag formatting for root element");
@@ -24,7 +25,7 @@ public class RootParsedElement extends ParsedElement {
 		}
 		String typeName = fragments[1];
 		
-		return new ObjectParsedElement(context, this, "root", typeName);
+		return new ObjectParsing(context, this, "root", typeName);
 	}
 
 
