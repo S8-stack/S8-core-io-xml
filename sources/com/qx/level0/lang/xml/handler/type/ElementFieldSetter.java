@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.XML_Context;
 import com.qx.level0.lang.xml.annotation.XML_SetElement;
@@ -34,7 +33,9 @@ public abstract class ElementFieldSetter {
 			areContextualTagsEnabled = true;
 		}
 
-		public abstract String getStandardTag();
+		public String getFieldTag() {
+			return tag;
+		}
 
 		public abstract boolean hasContextualTags();
 
@@ -72,14 +73,15 @@ public abstract class ElementFieldSetter {
 
 
 
-		public abstract ElementFieldSetter getStandardSetter();
+		public abstract void getStandardSetters(TypeHandler.Putter putter) throws XML_TypeCompilationException;
 
 
 		/**
 		 * 
 		 * @param setters
+		 * @throws XML_TypeCompilationException 
 		 */
-		public abstract void getContextualSetters(Consumer<ElementFieldSetter> consumer);
+		public abstract void getContextualSetters(TypeHandler.Putter putter) throws XML_TypeCompilationException;
 	}
 
 

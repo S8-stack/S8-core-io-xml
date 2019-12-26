@@ -82,6 +82,7 @@ public class ParsedDocument implements Parsed {
 
 		@Override
 		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+			reader.readNext();
 			reader.skip(' ', '\t' , '\n');
 			reader.check('<');
 			reader.readNext();

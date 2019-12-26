@@ -3,14 +3,13 @@ package com.qx.level0.lang.xml.handler.type;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.XML_Context;
 import com.qx.level0.lang.xml.parser.ParsedObjectElement;
 import com.qx.level0.lang.xml.parser.PrimitiveParsedElement;
+import com.qx.level0.lang.xml.parser.PrimitiveParsedElement.Callback;
 import com.qx.level0.lang.xml.parser.XML_ParsingException;
 import com.qx.level0.lang.xml.parser.XML_StreamReader;
-import com.qx.level0.lang.xml.parser.PrimitiveParsedElement.Callback;
 
 public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 
@@ -57,10 +56,6 @@ public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 			this.method = method;
 		}
 
-		@Override
-		public String getStandardTag() {
-			return tag;
-		}
 
 		@Override
 		public boolean hasContextualTags() {
@@ -72,11 +67,17 @@ public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 			return null;
 		}
 
-		@Override
+		
 		public abstract ElementFieldSetter getStandardSetter();
+		
 
 		@Override
-		public void getContextualSetters(Consumer<ElementFieldSetter> consumer) {
+		public void getStandardSetters(TypeHandler.Putter putter) throws XML_TypeCompilationException {
+			putter.put(getStandardSetter());
+		}
+
+		@Override
+		public void getContextualSetters(TypeHandler.Putter putter) {
 			// no contextual setter
 		}
 
@@ -109,6 +110,7 @@ public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 		public ElementFieldSetter getStandardSetter() {
 			return new PrimitiveElementFieldSetter.BooleanElementSetter(tag, method);
 		}
+
 	}
 
 	public static class BooleanElementSetter extends PrimitiveElementFieldSetter {

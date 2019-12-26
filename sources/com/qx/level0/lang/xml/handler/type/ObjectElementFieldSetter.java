@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.parser.Parsed;
 import com.qx.level0.lang.xml.parser.ParsedObjectElement;
@@ -19,8 +18,6 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 		
 		private TypeHandler handler;
 
-		private String standardTag;
-
 		private Set<String> contextualTags;
 
 		public Generator(String tag, Method method, TypeHandler handler) {
@@ -28,19 +25,11 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 			this.method = method;
 			this.handler = handler;
 
-			// standard
-			standardTag = tag+':'+handler.getXmlTag();
-
 			// contextual
 			contextualTags = new HashSet<>();
 			if(handler.getSubTypes().isEmpty()) { // no override
-				contextualTags.add(handler.getXmlTag());
+				contextualTags.add(tag);
 			}
-		}
-
-		@Override
-		public String getStandardTag() {
-			return standardTag;
 		}
 
 		@Override
@@ -54,17 +43,20 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 		}
 		
 		@Override
-		public ElementFieldSetter getStandardSetter() {
-			return new ObjectElementFieldSetter(standardTag, method, handler);
+		public void getStandardSetters(TypeHandler.Putter putter) throws XML_TypeCompilationException {
+			putter.put(new ObjectElementFieldSetter(tag+':'+handler.getXmlTag(), method, handler));
+			for(TypeHandler handler : handler.getSubTypes()) {
+				putter.put(new ObjectElementFieldSetter(tag+':'+handler.getXmlTag(), method, handler));
+			}
 		}
 
 		@Override
-		public void getContextualSetters(Consumer<ElementFieldSetter> consumer) {
+		public void getContextualSetters(TypeHandler.Putter putter) throws XML_TypeCompilationException {
 			
 			// contextual
 			if(!contextualTags.isEmpty() && areContextualTagsEnabled()) { // no override
 				for(String tag : contextualTags) {
-					consumer.accept(new ObjectElementFieldSetter(tag, method, handler));
+					putter.put(new ObjectElementFieldSetter(tag, method, handler));
 				}
 			}
 		}

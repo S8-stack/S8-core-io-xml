@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.handler.list.ListHandler;
 import com.qx.level0.lang.xml.parser.ParsedListElement;
@@ -56,16 +55,11 @@ public abstract class CollectionElementFieldSetter extends ElementFieldSetter {
 		}
 
 		@Override
-		public String getStandardTag() {
-			return tag;
-		}
-
-		@Override
 		public boolean hasContextualTags() {
 			return true;
 		}
 		
-		@Override
+		
 		public abstract CollectionElementFieldSetter getStandardSetter();
 
 		@Override
@@ -79,12 +73,21 @@ public abstract class CollectionElementFieldSetter extends ElementFieldSetter {
 		}
 
 		@Override
-		public void getContextualSetters(Consumer<ElementFieldSetter> consumer) {
+		public void getStandardSetters(TypeHandler.Putter putter) throws XML_TypeCompilationException {
+			putter.put(getStandardSetter());
+		}
+		
+		@Override
+		public void getContextualSetters(TypeHandler.Putter putter) {
 			if(areContextualTagsEnabled()) {
 				ListHandler listHandler = entry.getListHandler();
 				CollectionElementFieldSetter standardSetter = getStandardSetter();
 				listHandler.traverseTypeHandler(typeHandler -> {
-					consumer.accept(new DirectItemSetter(standardSetter, typeHandler));
+					try {
+						putter.put(new DirectItemSetter(standardSetter, typeHandler));
+					} catch (XML_TypeCompilationException e) {
+						e.printStackTrace();
+					}
 				});
 			}
 		}

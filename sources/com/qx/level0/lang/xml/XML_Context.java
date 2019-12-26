@@ -106,8 +106,14 @@ public class XML_Context {
 		
 		if(!isRegistered(type)){
 			try {
-				TypeHandler typeHandler = new TypeHandler(type, this);
+				TypeHandler typeHandler = new TypeHandler(type);
+				
+				// regsiter
 				typeMap.put(typeHandler.getClassName(), typeHandler);
+				
+				// then initialize
+				typeHandler.initialize(this);
+				
 				if(typeHandler.isRoot()) {
 					String tag = typeHandler.getXmlTag();
 					xmlRoots.put(tag, typeHandler);

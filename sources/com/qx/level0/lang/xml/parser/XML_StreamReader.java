@@ -191,6 +191,9 @@ public class XML_StreamReader {
 				else if(c==65279){
 					// skipped
 				}
+				else if(c==0){
+					// skipped
+				}
 				else{
 					isNext = true;
 				}

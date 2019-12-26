@@ -7,7 +7,7 @@ import com.qx.level0.lang.xml.annotation.XML_SetAttribute;
 import com.qx.level0.lang.xml.annotation.XML_SetElement;
 import com.qx.level0.lang.xml.annotation.XML_Type;
 
-@XML_Type(name="test", sub={TestClass2.class})
+@XML_Type(name="test", sub={TestClass2.class}, isRoot=true)
 public class Wrapper {
 
 	private double a = 5.0;

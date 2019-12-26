@@ -38,7 +38,7 @@ public class PrimitiveParsedElement implements Parsed {
 	private Callback callback;
 	
 	private boolean isClosed;
-	private boolean isActive;
+	private boolean isParsing;
 	
 	private State state;
 	
@@ -70,8 +70,8 @@ public class PrimitiveParsedElement implements Parsed {
 		if(isClosed) {
 			throw new XML_ParsingException(reader, "This scope has already been closed");
 		}
-		isActive = true;
-		while(isActive){
+		isParsing = true;
+		while(isParsing){
 			state.parse(parser, reader);
 		}
 	}
@@ -129,11 +129,11 @@ public class PrimitiveParsedElement implements Parsed {
 					/* forbid */ new char[]{',', '=', '"', '/'});
 			
 			// check closing tag
-			if(PrimitiveParsedElement.this.tag.equals(tag)) {
+			if(!PrimitiveParsedElement.this.tag.equals(tag)) {
 				throw new XML_ParsingException(reader, "Closing tag is not matching: "+tag+ "instead of "
 						+PrimitiveParsedElement.this.tag+".");
 			}
-			reader.readNext();
+			//reader.readNext();
 			state = new CloseScope();
 		}
 	};
@@ -146,7 +146,7 @@ public class PrimitiveParsedElement implements Parsed {
 		@Override
 		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
 			callback.set(value);
-			state = null;
+			isParsing = false;
 			// never returning to this scope parser.
 			isClosed = true;
 			parser.scope = parent;

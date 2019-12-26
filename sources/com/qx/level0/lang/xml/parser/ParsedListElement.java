@@ -122,6 +122,7 @@ public class ParsedListElement implements Parsed {
 
 		@Override
 		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+			reader.readNext();
 			reader.skip(' ', '\t' , '\n');
 			reader.check('<');
 			reader.readNext();
@@ -169,7 +170,7 @@ public class ParsedListElement implements Parsed {
 					/* forbid */ new char[]{',', '=', '"', '/'});
 
 			// check closing tag
-			if(ParsedListElement.this.tag.equals(tag)) {
+			if(!ParsedListElement.this.tag.equals(tag)) {
 				throw new XML_ParsingException(reader, "Closing tag is not matching: "+tag+ "instead of "
 						+ParsedListElement.this.tag+".");
 			}

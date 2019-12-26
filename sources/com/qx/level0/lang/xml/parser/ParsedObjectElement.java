@@ -83,6 +83,8 @@ public class ParsedObjectElement implements Parsed {
 			XML_StreamReader.Point point) throws XML_ParsingException {
 		super();
 		this.parent = parent;
+		this.callback = callback;
+		
 		this.tag = tag;
 		this.typeHandler = handler;
 		this.object = handler.create(point);
@@ -100,7 +102,9 @@ public class ParsedObjectElement implements Parsed {
 	}
 
 	private void setValue(String value, XML_StreamReader.Point point) throws XML_ParsingException {
-		typeHandler.setValue(object, value, point);
+		if(typeHandler.hasValueSetter()) {
+			typeHandler.setValue(object, value, point);	
+		}
 	}
 
 
@@ -165,7 +169,7 @@ public class ParsedObjectElement implements Parsed {
 			else if(reader.isCurrent('/')){
 				reader.readNext();
 				reader.check('>');
-				reader.readNext();
+				//reader.readNext();
 				state = new CloseScope();
 			}
 		}
@@ -243,12 +247,12 @@ public class ParsedObjectElement implements Parsed {
 					/* forbid */ new char[]{',', '=', '"', '/'});
 
 			// check closing tag
-			if(ParsedObjectElement.this.tag.equals(tag)) {
+			if(!ParsedObjectElement.this.tag.equals(tag)) {
 				throw new XML_ParsingException(reader, "Closing tag is not matching: "+tag+ "instead of "
 						+ParsedObjectElement.this.tag+".");
 			}
 
-			reader.readNext();
+			//reader.readNext();
 			state = new CloseScope();
 		}
 	}
@@ -294,8 +298,11 @@ public class ParsedObjectElement implements Parsed {
 
 		if(!isClosed) {
 			int nLists = lists.length;
+			ParsedListElement listElement;
 			for(int index=0; index<nLists; index++) {
-				lists[index].close(); // flush data
+				if((listElement = lists[index])!=null) {
+					listElement.close(); // flush data
+				}
 			}
 
 			callback.set(object);

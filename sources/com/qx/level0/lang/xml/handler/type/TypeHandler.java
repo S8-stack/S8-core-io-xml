@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.XML_Context;
 import com.qx.level0.lang.xml.annotation.XML_GetAttribute;
@@ -81,10 +80,19 @@ public class TypeHandler {
 	/**
 	 * 
 	 */
-	public TypeHandler(Class<?> type, XML_Context context) throws XML_TypeCompilationException {
+	public TypeHandler(Class<?> type) {
 		super();
 		this.type = type;
+		this.className = type.getName();
+	}
 
+	
+	
+	public interface Putter {
+		public void put(ElementFieldSetter setter) throws XML_TypeCompilationException;
+	}
+	
+	public void initialize(XML_Context context) throws XML_TypeCompilationException {
 
 		try {
 
@@ -93,7 +101,6 @@ public class TypeHandler {
 				throw new Exception("Missing type declaration for type: "+type.getName());
 			}
 			this.xmlName = typeAnnotation.name();
-			this.className = type.getName();
 			this.isRoot = typeAnnotation.isRoot();
 
 
@@ -164,42 +171,48 @@ public class TypeHandler {
 			}
 
 
-			// check contextual level
-			for(ElementFieldSetter.Generator gen : elementSetterGenerators) {
-				ElementFieldSetter setter = gen.getStandardSetter();
-				if(elementSetters.containsKey(setter.getTag())) {
-					throw new XML_TypeCompilationException(type,
-							"Conflict in standard element setter mapping, for field tag: "+setter.getTag());
+
+			Putter putter = new Putter() {
+				public @Override void put(ElementFieldSetter setter) throws XML_TypeCompilationException {
+					if(elementSetters.containsKey(setter.getTag())) {
+						throw new XML_TypeCompilationException(type,
+								"Conflict in standard element setter mapping, for field tag: "+setter.getTag());
+					}
+					elementSetters.put(setter.getTag(), setter);
 				}
-				elementSetters.put(setter.getTag(), setter);
+			};
+			
+			// check non-contextual level
+			for(ElementFieldSetter.Generator gen : elementSetterGenerators) {
+				gen.getStandardSetters(putter);
 			}
 
 
 			int nGen = elementSetterGenerators.size();
-			for(int i0=0; i0<nGen; i0++) {
-				ElementFieldSetter.Generator gen0 = elementSetterGenerators.get(i0);
-				int i1=0;
-				while(gen0.areContextualTagsEnabled() && i1++<nGen) {
-					ElementFieldSetter.Generator gen1 = elementSetterGenerators.get(i1);
-					if(gen1.areContextualTagsEnabled()) {
-						if(gen0.isContextuallyConflictingWith(gen1)) {
-							gen0.disableContextualTags();
-							gen1.disableContextualTags();
+			if(nGen>1) {
+				for(int i0=0; i0<nGen; i0++) {
+					ElementFieldSetter.Generator gen0 = elementSetterGenerators.get(i0);
+					int i1=0;
+					while(gen0.areContextualTagsEnabled() && i1<nGen) {
+						if(i1!=i0) {
+							ElementFieldSetter.Generator gen1 = elementSetterGenerators.get(i1);
+							if(gen1.areContextualTagsEnabled()) {
+								if(gen0.isContextuallyConflictingWith(gen1)) {
+									gen0.disableContextualTags();
+									gen1.disableContextualTags();
+								}
+							}
 						}
+						i1++;
 					}
-				}
+				}	
 			}
-
-			Consumer<ElementFieldSetter> consumer = new Consumer<ElementFieldSetter>() {
-				public @Override void accept(ElementFieldSetter setter) {
-					elementSetters.put(setter.getTag(), setter);
-				}
-			};
+			
 
 			for(int i=0; i<nGen; i++) {
 				ElementFieldSetter.Generator gen = elementSetterGenerators.get(i);
 				if(gen.areContextualTagsEnabled()) {
-					gen.getContextualSetters(consumer);
+					gen.getContextualSetters(putter);
 				}
 			}
 
@@ -207,6 +220,7 @@ public class TypeHandler {
 
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new XML_TypeCompilationException(type, e.getMessage());
 		}
 	}
@@ -304,11 +318,13 @@ public class TypeHandler {
 	public List<AttributeGetter> getAttributeGetters() {
 		return attributeGetters;
 	}
+	
+	
+	public boolean hasValueSetter() {
+		return valueSetter!=null;
+	}
 
 	public void setValue(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException{
-		if(valueSetter==null){
-			throw new XML_ParsingException(point, "No value can be set in type "+this.xmlName);
-		}
 		valueSetter.set(object, value, point);
 	}
 
