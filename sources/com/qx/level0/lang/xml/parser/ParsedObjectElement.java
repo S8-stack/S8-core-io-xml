@@ -1,4 +1,4 @@
-package com.qx.level0.lang.xml.parser2;
+package com.qx.level0.lang.xml.parser;
 
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import com.qx.level0.lang.xml.handler.type.TypeHandler;
  * @author pc
  *
  */
-public class ParsedObjectElement implements ParsedElement {
+public class ParsedObjectElement implements Parsed {
 
 	/**
 	 * Callback method for the Object element
@@ -28,7 +28,7 @@ public class ParsedObjectElement implements ParsedElement {
 	/**
 	 * <b>Callback #1</b>: for returning to the parent scope when done
 	 */
-	private ParsedElement parent;
+	private Parsed parent;
 
 	/**
 	 * <b>Callback #2</b>: for setting the object when done
@@ -49,26 +49,26 @@ public class ParsedObjectElement implements ParsedElement {
 	 * the object currently built
 	 */
 	private Object object;
-	
-	
+
+
 
 	/**
 	 * current parsing state
 	 */
 	private State state;
-	
-	
-	private boolean isActive;
+
+
+	private boolean isParsing;
 
 	private boolean isClosed;
-	
-	
+
+
 	/**
 	 * sub-scopes
 	 */
 	public ParsedListElement[] lists;
 
-	
+
 	/**
 	 * 
 	 * @param tag
@@ -76,7 +76,7 @@ public class ParsedObjectElement implements ParsedElement {
 	 * @param handler
 	 * @throws XML_ParsingException
 	 */
-	public ParsedObjectElement(ParsedElement parent, 
+	public ParsedObjectElement(Parsed parent, 
 			Callback callback, 
 			String tag, 
 			TypeHandler handler,
@@ -86,10 +86,10 @@ public class ParsedObjectElement implements ParsedElement {
 		this.tag = tag;
 		this.typeHandler = handler;
 		this.object = handler.create(point);
-		
+
 		// initialize
 		state = new ReadAttributes();
-		
+
 		int nLists = typeHandler.getNumberOfLists();
 		lists = new ParsedListElement[nLists];
 	}
@@ -99,22 +99,21 @@ public class ParsedObjectElement implements ParsedElement {
 		return object;
 	}
 
+	private void setValue(String value, XML_StreamReader.Point point) throws XML_ParsingException {
+		typeHandler.setValue(object, value, point);
+	}
+
+
 	@Override
 	public void parse(XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException {
 		if(isClosed) {
 			throw new XML_ParsingException(reader, "This scope has already been closed");
 		}
-		isActive = true;
-		while(isActive){
+		isParsing = true;
+		while(isParsing){
 			state.parse(parser, reader);
 		}
 	}
-
-
-	private void setValue(String value, XML_StreamReader.Point point) throws XML_ParsingException {
-		typeHandler.setValue(object, value, point);
-	}
-
 
 
 
@@ -123,12 +122,12 @@ public class ParsedObjectElement implements ParsedElement {
 	 * @author pc
 	 *
 	 */
-	public interface State {
+	private interface State {
 
 		public abstract void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException;
 
 	}
-	
+
 	private class ReadAttributes implements State {
 
 		@Override
@@ -186,7 +185,7 @@ public class ParsedObjectElement implements ParsedElement {
 					/* forbid */ null);	
 
 			// set value if any
-			if(!ParsedElement.isBlank(value)){
+			if(!Parsed.isBlank(value)){
 				setValue(value, reader.getPoint());
 			}
 			state = new ReadOpeningTag();
@@ -225,8 +224,8 @@ public class ParsedObjectElement implements ParsedElement {
 				parser.scope = typeHandler.createParsedElement(ParsedObjectElement.this, tag, reader.getPoint());
 
 				// and escape this scope...
-				isActive = false;
-				
+				isParsing = false;
+
 				// ...and come back as reading content
 				state = new ReadContent();
 			}
@@ -242,13 +241,13 @@ public class ParsedObjectElement implements ParsedElement {
 					/* stop at */ new char[]{'>'},
 					/* ignore */ new char[]{' '},
 					/* forbid */ new char[]{',', '=', '"', '/'});
-			
+
 			// check closing tag
 			if(ParsedObjectElement.this.tag.equals(tag)) {
 				throw new XML_ParsingException(reader, "Closing tag is not matching: "+tag+ "instead of "
 						+ParsedObjectElement.this.tag+".");
 			}
-			
+
 			reader.readNext();
 			state = new CloseScope();
 		}
@@ -270,18 +269,41 @@ public class ParsedObjectElement implements ParsedElement {
 		}
 	}
 
-	
+
 	private class CloseScope implements State {
 
 
 		@Override
 		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
-			callback.set(object);
-			state = null;
-			// never returning to this scope parser.
-			isClosed = true;
+			// close
+			close();
+
+			// stop
+			isParsing = false;
+
+			// and go back to parent
 			parser.scope = parent;
 		}
 	}
-	
+
+	/**
+	 * close and flush data with callback 2 (setter)
+	 * @throws XML_ParsingException 
+	 */
+	public void close() throws XML_ParsingException {
+
+		if(!isClosed) {
+			int nLists = lists.length;
+			for(int index=0; index<nLists; index++) {
+				lists[index].close(); // flush data
+			}
+
+			callback.set(object);
+			
+
+			// never returning to this scope parser.
+			isClosed = true;
+		}
+	}
+
 }

@@ -1,4 +1,4 @@
-package com.qx.level0.lang.xml.parser2;
+package com.qx.level0.lang.xml.parser;
 
 public class XML_ParsingException extends Exception {
 

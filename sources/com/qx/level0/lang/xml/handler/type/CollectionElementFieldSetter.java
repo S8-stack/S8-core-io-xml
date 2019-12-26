@@ -7,10 +7,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.handler.list.ListHandler;
-import com.qx.level0.lang.xml.parser2.ParsedListElement;
-import com.qx.level0.lang.xml.parser2.ParsedObjectElement;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader.Point;
+import com.qx.level0.lang.xml.parser.ParsedListElement;
+import com.qx.level0.lang.xml.parser.ParsedObjectElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader.Point;
 
 public abstract class CollectionElementFieldSetter extends ElementFieldSetter {
 

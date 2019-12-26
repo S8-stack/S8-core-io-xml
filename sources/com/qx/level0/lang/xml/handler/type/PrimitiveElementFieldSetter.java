@@ -6,11 +6,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.XML_Context;
-import com.qx.level0.lang.xml.parser2.ParsedObjectElement;
-import com.qx.level0.lang.xml.parser2.PrimitiveParsedElement;
-import com.qx.level0.lang.xml.parser2.PrimitiveParsedElement.Callback;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader;
+import com.qx.level0.lang.xml.parser.ParsedObjectElement;
+import com.qx.level0.lang.xml.parser.PrimitiveParsedElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader;
+import com.qx.level0.lang.xml.parser.PrimitiveParsedElement.Callback;
 
 public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 

@@ -19,10 +19,10 @@ import com.qx.level0.lang.xml.annotation.XML_SetValue;
 import com.qx.level0.lang.xml.annotation.XML_Type;
 import com.qx.level0.lang.xml.handler.list.ListHandler;
 import com.qx.level0.lang.xml.handler.type.CollectionElementFieldSetter.Entry;
-import com.qx.level0.lang.xml.parser2.ParsedElement;
-import com.qx.level0.lang.xml.parser2.ParsedObjectElement;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader;
+import com.qx.level0.lang.xml.parser.Parsed;
+import com.qx.level0.lang.xml.parser.ParsedObjectElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader;
 
 /**
  * 
@@ -75,6 +75,9 @@ public class TypeHandler {
 	private Map<String, ElementFieldSetter> elementSetters = new HashMap<>();
 
 
+	private boolean isRoot;
+
+
 	/**
 	 * 
 	 */
@@ -91,6 +94,7 @@ public class TypeHandler {
 			}
 			this.xmlName = typeAnnotation.name();
 			this.className = type.getName();
+			this.isRoot = typeAnnotation.isRoot();
 
 
 			/* <sub-types> */
@@ -216,7 +220,7 @@ public class TypeHandler {
 	 * 
 	 * @return tag displayed in XML
 	 */
-	public String getXmlName() {
+	public String getXmlTag() {
 		return xmlName;
 	}
 
@@ -284,7 +288,7 @@ public class TypeHandler {
 			throws XML_ParsingException {
 		AttributeSetter setter = attributeSetters.get(name);
 		if(setter==null){
-			throw new XML_ParsingException(point, "No field with name "+name+" in type "+getXmlName());
+			throw new XML_ParsingException(point, "No field with name "+name+" in type "+getXmlTag());
 		}
 		setter.set(object, value, point);
 	}
@@ -356,7 +360,7 @@ public class TypeHandler {
 	 * @return
 	 * @throws XML_ParsingException
 	 */
-	public ParsedElement createParsedElement(ParsedObjectElement parent, String tag, XML_StreamReader.Point point) 
+	public Parsed createParsedElement(ParsedObjectElement parent, String tag, XML_StreamReader.Point point) 
 			throws XML_ParsingException {
 		ElementFieldSetter setter = elementSetters.get(tag);
 		if(setter==null) {
@@ -367,6 +371,11 @@ public class TypeHandler {
 
 	public Class<?> getType() {
 		return type;
+	}
+
+
+	public boolean isRoot() {
+		return isRoot;
 	}
 
 

@@ -6,10 +6,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import com.qx.level0.lang.xml.parser2.ParsedElement;
-import com.qx.level0.lang.xml.parser2.ParsedObjectElement;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader;
+import com.qx.level0.lang.xml.parser.Parsed;
+import com.qx.level0.lang.xml.parser.ParsedObjectElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader;
 
 public class ObjectElementFieldSetter extends ElementFieldSetter {
 
@@ -29,12 +29,12 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 			this.handler = handler;
 
 			// standard
-			standardTag = tag+':'+handler.getXmlName();
+			standardTag = tag+':'+handler.getXmlTag();
 
 			// contextual
 			contextualTags = new HashSet<>();
 			if(handler.getSubTypes().isEmpty()) { // no override
-				contextualTags.add(handler.getXmlName());
+				contextualTags.add(handler.getXmlTag());
 			}
 		}
 
@@ -90,7 +90,7 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 	 * 
 	 */
 	@Override
-	public ParsedElement getParsedElement(ParsedObjectElement parent, XML_StreamReader.Point point) throws XML_ParsingException {
+	public Parsed getParsedElement(ParsedObjectElement parent, XML_StreamReader.Point point) throws XML_ParsingException {
 
 		// retrieve parentObject
 		Object parentObject = parent.getObject();

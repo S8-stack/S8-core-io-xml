@@ -41,10 +41,10 @@ public class ObjectComposableElement extends ComposableElement {
 
 			// start tag
 			if(fieldName!=null){
-				writer.startTag(fieldName+':'+typeHandler.getXmlName());	
+				writer.startTag(fieldName+':'+typeHandler.getXmlTag());	
 			}
 			else{
-				writer.startTag(typeHandler.getXmlName());	
+				writer.startTag(typeHandler.getXmlTag());	
 			}
 
 			// write attributes
@@ -80,10 +80,10 @@ public class ObjectComposableElement extends ComposableElement {
 
 		case END:
 			if(fieldName!=null){
-				writer.appendClosingTag(fieldName+':'+typeHandler.getXmlName());
+				writer.appendClosingTag(fieldName+':'+typeHandler.getXmlTag());
 			}
 			else{
-				writer.appendClosingTag(typeHandler.getXmlName());
+				writer.appendClosingTag(typeHandler.getXmlTag());
 			}
 			break;
 		}

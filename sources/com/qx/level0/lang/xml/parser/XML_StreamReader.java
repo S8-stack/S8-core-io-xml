@@ -1,4 +1,4 @@
-package com.qx.level0.lang.xml.parser2;
+package com.qx.level0.lang.xml.parser;
 
 import java.io.IOException;
 import java.io.Reader;

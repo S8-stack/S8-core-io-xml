@@ -1,10 +1,10 @@
 package com.qx.level0.lang.xml.handler.list;
 
 import com.qx.level0.lang.xml.handler.type.TypeHandler;
-import com.qx.level0.lang.xml.parser2.ParsedListElement;
-import com.qx.level0.lang.xml.parser2.ParsedObjectElement;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader;
+import com.qx.level0.lang.xml.parser.ParsedListElement;
+import com.qx.level0.lang.xml.parser.ParsedObjectElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader;
 
 
 /**
@@ -31,7 +31,7 @@ public class ElementItemSetter {
 	 * @return
 	 */
 	public String getTag() {
-		return handler.getXmlName();
+		return handler.getXmlTag();
 	}
 	
 	

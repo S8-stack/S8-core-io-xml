@@ -19,9 +19,9 @@ import com.qx.level0.lang.xml.composer.XML_Composer;
 import com.qx.level0.lang.xml.composer.XML_StreamWriter;
 import com.qx.level0.lang.xml.handler.type.TypeHandler;
 import com.qx.level0.lang.xml.handler.type.XML_TypeCompilationException;
-import com.qx.level0.lang.xml.parser2.XML_Parser;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader;
+import com.qx.level0.lang.xml.parser.XML_Parser;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader;
 
 /**
  * <h1>XML Context</h1>
@@ -71,6 +71,8 @@ public class XML_Context {
 
 	private boolean isVerbose = false;
 
+	
+	private Map<String, TypeHandler> xmlRoots = new HashMap<>();
 
 	private Map<String, TypeHandler> typeMap = new HashMap<>();
 
@@ -106,6 +108,11 @@ public class XML_Context {
 			try {
 				TypeHandler typeHandler = new TypeHandler(type, this);
 				typeMap.put(typeHandler.getClassName(), typeHandler);
+				if(typeHandler.isRoot()) {
+					String tag = typeHandler.getXmlTag();
+					xmlRoots.put(tag, typeHandler);
+					xmlRoots.put("root:"+tag, typeHandler);
+				}
 				
 			} catch (SecurityException e) {
 				throw new XML_TypeCompilationException(type, "Failed to initialize due to "+e.getMessage());
@@ -117,10 +124,27 @@ public class XML_Context {
 		return typeMap.containsKey(type.getName());
 	}
 
+	
+	/**
+	 * 
+	 * @param type
+	 * @return
+	 */
 	public TypeHandler getTypeHandler(Class<?> type){
 		return typeMap.get(type.getName());
 	}
+	
+	
+	/**
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public TypeHandler getXmlRootTypeHandler(String tag) {
+		return xmlRoots.get(tag);
+	}
 
+	
 	/**
 	 * 
 	 * @param reader

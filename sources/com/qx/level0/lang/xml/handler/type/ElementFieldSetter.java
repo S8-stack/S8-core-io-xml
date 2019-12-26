@@ -8,10 +8,10 @@ import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.XML_Context;
 import com.qx.level0.lang.xml.annotation.XML_SetElement;
-import com.qx.level0.lang.xml.parser2.ParsedElement;
-import com.qx.level0.lang.xml.parser2.ParsedObjectElement;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader;
+import com.qx.level0.lang.xml.parser.Parsed;
+import com.qx.level0.lang.xml.parser.ParsedObjectElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader;
 
 
 public abstract class ElementFieldSetter {
@@ -97,7 +97,7 @@ public abstract class ElementFieldSetter {
 	}
 
 
-	public abstract ParsedElement getParsedElement(ParsedObjectElement parent, XML_StreamReader.Point point) 
+	public abstract Parsed getParsedElement(ParsedObjectElement parent, XML_StreamReader.Point point) 
 			throws XML_ParsingException;
 
 

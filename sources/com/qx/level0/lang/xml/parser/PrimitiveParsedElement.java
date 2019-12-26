@@ -1,4 +1,4 @@
-package com.qx.level0.lang.xml.parser2;
+package com.qx.level0.lang.xml.parser;
 
 import java.io.IOException;
 
@@ -7,7 +7,7 @@ import java.io.IOException;
  * @author pc
  *
  */
-public class PrimitiveParsedElement implements ParsedElement {
+public class PrimitiveParsedElement implements Parsed {
 	
 	
 	/**
@@ -33,7 +33,7 @@ public class PrimitiveParsedElement implements ParsedElement {
 	}
 	
 	
-	private ParsedElement parent;
+	private Parsed parent;
 	
 	private Callback callback;
 	
@@ -54,7 +54,7 @@ public class PrimitiveParsedElement implements ParsedElement {
 	 * @param object
 	 * @throws Exception 
 	 */
-	public PrimitiveParsedElement(String tag, ParsedElement parent, Callback callback){
+	public PrimitiveParsedElement(String tag, Parsed parent, Callback callback){
 		super();
 		this.parent = parent;
 		this.callback = callback;

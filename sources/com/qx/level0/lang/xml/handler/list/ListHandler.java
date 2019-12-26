@@ -1,12 +1,15 @@
 package com.qx.level0.lang.xml.handler.list;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import com.qx.level0.lang.xml.handler.type.TypeHandler;
+import com.qx.level0.lang.xml.parser.Parsed;
+import com.qx.level0.lang.xml.parser.ParsedListElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader.Point;
 
 /**
  * 
@@ -38,10 +41,10 @@ public class ListHandler {
 		setters = new HashMap<>();
 		
 		// root types
-		setters.put(handler.getXmlName(), new ElementItemSetter(handler));
+		setters.put(handler.getXmlTag(), new ElementItemSetter(handler));
 		
 		for(TypeHandler subTypeHanlder : handler.getSubTypes()) {
-			setters.put(subTypeHanlder.getXmlName(), new ElementItemSetter(subTypeHanlder));
+			setters.put(subTypeHanlder.getXmlTag(), new ElementItemSetter(subTypeHanlder));
 		}
 	}
 	
@@ -63,6 +66,16 @@ public class ListHandler {
 	
 	public ElementItemSetter getElementSetter(String tag) {
 		return setters.get(tag);	
+	}
+
+
+	public Parsed createParsedElement(ParsedListElement parent, String tag, Point point) 
+			throws XML_ParsingException {
+		ElementItemSetter setter = setters.get(tag);
+		if(setter==null) {
+			throw new XML_ParsingException(point, "Failed to match tag");
+		}
+		return setter.createParseElement(parent, point);
 	}
 	
 	

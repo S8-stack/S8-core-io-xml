@@ -1,10 +1,10 @@
 package com.qx.level0.lang.xml.handler.type;
 
-import com.qx.level0.lang.xml.parser2.ParsedElement;
-import com.qx.level0.lang.xml.parser2.ParsedListElement;
-import com.qx.level0.lang.xml.parser2.ParsedObjectElement;
-import com.qx.level0.lang.xml.parser2.XML_ParsingException;
-import com.qx.level0.lang.xml.parser2.XML_StreamReader.Point;
+import com.qx.level0.lang.xml.parser.Parsed;
+import com.qx.level0.lang.xml.parser.ParsedListElement;
+import com.qx.level0.lang.xml.parser.ParsedObjectElement;
+import com.qx.level0.lang.xml.parser.XML_ParsingException;
+import com.qx.level0.lang.xml.parser.XML_StreamReader.Point;
 
 public class DirectItemSetter extends ElementFieldSetter {
 
@@ -19,14 +19,14 @@ public class DirectItemSetter extends ElementFieldSetter {
 	 * @param tag
 	 */
 	public DirectItemSetter(CollectionElementFieldSetter arraySetter, TypeHandler typehandler) {
-		super(typehandler.getXmlName());
+		super(typehandler.getXmlTag());
 		this.collectionSetter = arraySetter;
 		this.typehandler = typehandler;
 	}
 	
 	
 	@Override
-	public ParsedElement getParsedElement(ParsedObjectElement parent, Point point) throws XML_ParsingException {
+	public Parsed getParsedElement(ParsedObjectElement parent, Point point) throws XML_ParsingException {
 		
 		ParsedObjectElement.Callback callback = new ParsedObjectElement.Callback() {
 			
