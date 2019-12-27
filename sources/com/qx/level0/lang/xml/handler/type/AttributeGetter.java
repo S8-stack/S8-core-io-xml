@@ -57,7 +57,7 @@ public abstract class AttributeGetter {
 		super();
 		this.method = method;
 		XML_GetAttribute getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
-		this.name = getAttributeAnnotation.name();
+		this.name = getAttributeAnnotation.tag();
 		
 	}
 	

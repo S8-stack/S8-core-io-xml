@@ -16,12 +16,12 @@ public class Wrapper {
 	
 	public TestClass3[] array;
 	
-	@XML_SetAttribute(name="factor")
+	@XML_SetAttribute(tag="factor")
 	public void setFactor(double a){
 		this.a = a;
 	}
 	
-	@XML_GetAttribute(name="factor")
+	@XML_GetAttribute(tag="factor")
 	public double getFactor(){
 		return a;
 	}
@@ -31,7 +31,7 @@ public class Wrapper {
 		this.field = field;
 	}
 	
-	@XML_GetElement(name="field")
+	@XML_GetElement(tag="field")
 	public TestClass3 getField(){
 		return field;
 	}
@@ -41,7 +41,7 @@ public class Wrapper {
 		this.array = array;
 	}
 	
-	@XML_GetElement(name="items")
+	@XML_GetElement(tag="items")
 	public TestClass3[] getArray(){
 		return array;
 	}

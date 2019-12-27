@@ -64,7 +64,7 @@ public abstract class ElementGetter {
 		}
 		
 		XML_GetElement getElementAnnotation = method.getAnnotation(XML_GetElement.class);
-		this.name = getElementAnnotation.name();
+		this.name = getElementAnnotation.tag();
 	}
 	
 	

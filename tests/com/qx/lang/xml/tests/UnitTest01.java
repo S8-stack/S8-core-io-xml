@@ -15,7 +15,7 @@ public class UnitTest01 {
 		Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("input/test02.xml"))));
 		XML_Context context = new XML_Context(Wrapper.class);
 		
-		Object object = context.deserialize(reader, "input/test02.xml");
+		Object object = context.deserialize(reader);
 		System.out.println("done: "+object);
 	}
 

@@ -73,7 +73,7 @@ public class ParsedListElement implements Parsed {
 	@Override
 	public void parse(XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException {
 		if(isClosed) {
-			throw new XML_ParsingException(reader, "This scope has already been closed");
+			throw new XML_ParsingException(reader.getPoint(), "This scope has already been closed");
 		}
 		isParsing = true;
 		while(isParsing){
@@ -136,7 +136,7 @@ public class ParsedListElement implements Parsed {
 				state = new ReadComment();
 			}
 			else if(reader.isCurrent('?')){
-				throw new XML_ParsingException(reader, "Illegal header position within an element");
+				throw new XML_ParsingException(reader.getPoint(), "Illegal header position within an element");
 				//state = new ReadElementHeader();
 			}
 			else{
@@ -171,7 +171,7 @@ public class ParsedListElement implements Parsed {
 
 			// check closing tag
 			if(!ParsedListElement.this.tag.equals(tag)) {
-				throw new XML_ParsingException(reader, "Closing tag is not matching: "+tag+ "instead of "
+				throw new XML_ParsingException(reader.getPoint(), "Closing tag is not matching: "+tag+ "instead of "
 						+ParsedListElement.this.tag+".");
 			}
 

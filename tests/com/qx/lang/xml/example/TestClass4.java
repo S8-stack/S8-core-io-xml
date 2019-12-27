@@ -14,12 +14,12 @@ public class TestClass4 extends TestClass3 {
 	
 	public User[] users;
 	
-	@XML_SetAttribute(name="b")
+	@XML_SetAttribute(tag="b")
 	public void setToto2(int b){
 		this.b = b;
 	}
 	
-	@XML_GetAttribute(name="b")
+	@XML_GetAttribute(tag="b")
 	public int getToto2(){
 		return b;
 	}
@@ -29,7 +29,7 @@ public class TestClass4 extends TestClass3 {
 		this.users = users;
 	}
 	
-	@XML_GetElement(name="users")
+	@XML_GetElement(tag="users")
 	public User[] getUsers(){
 		return users;
 	}

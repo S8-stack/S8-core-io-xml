@@ -57,7 +57,7 @@ public class ParsedDocument implements Parsed {
 	@Override
 	public void parse(XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException {
 		if(isClosed) {
-			throw new XML_ParsingException(reader, "This scope has already been closed");
+			throw new XML_ParsingException(reader.getPoint(), "This scope has already been closed");
 		}
 		isParsing = true;
 		while(isParsing){

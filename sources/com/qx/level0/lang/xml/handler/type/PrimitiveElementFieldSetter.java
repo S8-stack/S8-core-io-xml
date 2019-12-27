@@ -19,7 +19,7 @@ public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 	}
 
 	public static ElementFieldSetter.Generator create(XML_Context context, Method method, 
-			Class<?> fieldType, String tag) throws Exception {
+			Class<?> fieldType, String tag) throws XML_TypeCompilationException {
 		if(fieldType==boolean.class){
 			return new BooleanElementSetterGenerator(tag, method);
 		}
@@ -42,7 +42,7 @@ public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 			return new StringElementSetterGenerator(tag, method);
 		}
 		else {
-			throw new Exception("Primitive type not supported");
+			throw new XML_TypeCompilationException("Primitive type not supported");
 		}
 	}
 

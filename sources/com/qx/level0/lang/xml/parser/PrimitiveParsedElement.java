@@ -68,7 +68,7 @@ public class PrimitiveParsedElement implements Parsed {
 	@Override
 	public void parse(XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException {
 		if(isClosed) {
-			throw new XML_ParsingException(reader, "This scope has already been closed");
+			throw new XML_ParsingException(reader.getPoint(), "This scope has already been closed");
 		}
 		isParsing = true;
 		while(isParsing){
@@ -90,7 +90,7 @@ public class PrimitiveParsedElement implements Parsed {
 				state = new ReadValue();
 			}
 			else {
-				throw new XML_ParsingException(reader, "Expecting char \'>\' at this point");
+				throw new XML_ParsingException(reader.getPoint(), "Expecting char \'>\' at this point");
 			}
 		}
 	};
@@ -120,7 +120,7 @@ public class PrimitiveParsedElement implements Parsed {
 		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
 			reader.readNext();
 			if(!reader.isCurrent('/')) {
-				throw new XML_ParsingException(reader, "Excpect '\' at this point");
+				throw new XML_ParsingException(reader.getPoint(), "Excpect '\' at this point");
 			}
 			reader.readNext();
 			String tag = reader.until(
@@ -130,7 +130,7 @@ public class PrimitiveParsedElement implements Parsed {
 			
 			// check closing tag
 			if(!PrimitiveParsedElement.this.tag.equals(tag)) {
-				throw new XML_ParsingException(reader, "Closing tag is not matching: "+tag+ "instead of "
+				throw new XML_ParsingException(reader.getPoint(), "Closing tag is not matching: "+tag+ "instead of "
 						+PrimitiveParsedElement.this.tag+".");
 			}
 			//reader.readNext();

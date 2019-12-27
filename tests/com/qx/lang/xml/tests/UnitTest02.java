@@ -19,7 +19,7 @@ public class UnitTest02 {
 		Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("input/test02.xml"))));
 		XML_Context context = new XML_Context(Wrapper.class);
 		context.setVerbosity(true);
-		Object object = context.deserialize(reader, "test02.xml");
+		Object object = context.deserialize(reader);
 		reader.close();
 		
 		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("output/test03.xml"))));

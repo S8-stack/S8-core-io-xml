@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 public @interface XML_GetAttribute {
 
-	public String name();
+	public String tag();
 	
 	
 }

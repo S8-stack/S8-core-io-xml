@@ -111,14 +111,14 @@ public abstract class ElementFieldSetter {
 	public static ElementFieldSetter.Generator create(
 			XML_Context context, 
 			Method method, 
-			CollectionElementFieldSetter.Factory factory) throws Exception {
+			CollectionElementFieldSetter.Factory factory) throws XML_TypeCompilationException {
 
 		XML_SetElement setElementAnnotation = method.getAnnotation(XML_SetElement.class);
 		String tag = setElementAnnotation.tag();
 
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=1){
-			throw new Exception("Illegal number of parameters for a setter");
+			throw new XML_TypeCompilationException("Illegal number of parameters for a setter");
 		}
 
 		Class<?> fieldType = parameters[0];
@@ -133,7 +133,7 @@ public abstract class ElementFieldSetter {
 			context.register(componentType);
 			TypeHandler subTypeHandler = context.getTypeHandler(componentType);
 			if(subTypeHandler==null) {
-				throw new Exception("Cannot find component type: "+fieldType);
+				throw new XML_TypeCompilationException("Cannot find component type: "+fieldType);
 			}
 			return new ArrayElementFieldSetter.Generator(tag, method, factory.createEntry(subTypeHandler));
 		}
@@ -143,7 +143,7 @@ public abstract class ElementFieldSetter {
 			context.register(componentType);
 			TypeHandler subTypeHandler = context.getTypeHandler(componentType);
 			if(subTypeHandler==null) {
-				throw new Exception("Cannot find component type: "+fieldType);
+				throw new XML_TypeCompilationException("Cannot find component type: "+fieldType);
 			}
 			return new ListElementFieldSetter.Generator(tag, method, factory.createEntry(subTypeHandler));
 		}
@@ -151,7 +151,7 @@ public abstract class ElementFieldSetter {
 			context.register(fieldType);
 			TypeHandler typeHandler = context.getTypeHandler(fieldType);
 			if(typeHandler==null) {
-				throw new Exception("Cannot find type: "+fieldType);
+				throw new XML_TypeCompilationException("Cannot find type: "+fieldType);
 			}
 			return new ObjectElementFieldSetter.Generator(tag, method, context.getTypeHandler(fieldType));
 		}

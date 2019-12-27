@@ -20,18 +20,18 @@ public class User extends TestClass3 {
 		return name;
 	}
 
-	@XML_SetAttribute(name="name")
+	@XML_SetAttribute(tag="name")
 	public void setName(String name) {
 		this.name = name;
 	}
 
 
-	@XML_SetAttribute(name="password")
+	@XML_SetAttribute(tag="password")
 	public void setPassword(String password) {
 		this.password = password;
 	}
 	
-	@XML_GetAttribute(name="password")
+	@XML_GetAttribute(tag="password")
 	public String getPassword() {
 		return password;
 	}
@@ -41,7 +41,7 @@ public class User extends TestClass3 {
 		this.note = note;
 	}
 	
-	@XML_GetElement(name="note")
+	@XML_GetElement(tag="note")
 	public String getNote(){
 		return note;
 	}

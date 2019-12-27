@@ -120,8 +120,9 @@ public class XML_Context {
 					xmlRoots.put("root:"+tag, typeHandler);
 				}
 				
-			} catch (SecurityException e) {
-				throw new XML_TypeCompilationException(type, "Failed to initialize due to "+e.getMessage());
+			}
+			catch (SecurityException e) {
+				throw new XML_TypeCompilationException("Failed to initialize due to "+e.getMessage());
 			}
 		}
 	}
@@ -158,20 +159,20 @@ public class XML_Context {
 	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public Object deserialize(Reader reader, String filename) throws XML_ParsingException, IOException {
-		XML_StreamReader streamReader = new XML_StreamReader(reader, filename, isVerbose);
+	public Object deserialize(Reader reader) throws XML_ParsingException, IOException {
+		XML_StreamReader streamReader = new XML_StreamReader(reader, isVerbose);
 		Object object = new XML_Parser(this, streamReader, isVerbose).parse();
 		streamReader.close();
 		return object;
 	}
 
-	public Object deserialize(InputStream inputStream, String filename) throws Exception{
-		return deserialize(new InputStreamReader(inputStream), filename);
+	public Object deserialize(InputStream inputStream) throws XML_ParsingException, IOException {
+		return deserialize(new InputStreamReader(inputStream));
 	}
 	
-	public Object deserialize(File file) throws Exception{
+	public Object deserialize(File file) throws XML_ParsingException, IOException {
 		try(BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))){
-			Object result = deserialize(inputStream, file.getName());
+			Object result = deserialize(inputStream);
 			inputStream.close();
 			return result;	
 		}
@@ -189,7 +190,7 @@ public class XML_Context {
 		try(InputStream inputStream = target.getResourceAsStream(name)){
 			if(inputStream!=null) {
 				InputStreamReader reader = new InputStreamReader(new BufferedInputStream(inputStream), StandardCharsets.UTF_8);
-				XML_StreamReader streamReader = new XML_StreamReader(reader, filename, isVerbose);
+				XML_StreamReader streamReader = new XML_StreamReader(reader, isVerbose);
 				Object object = new XML_Parser(this, streamReader, isVerbose).parse();
 				streamReader.close();
 				return object;

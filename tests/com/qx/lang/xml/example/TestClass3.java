@@ -10,12 +10,12 @@ public class TestClass3 {
 
 	private int toto = -1;
 	
-	@XML_SetAttribute(name="toto")
+	@XML_SetAttribute(tag="toto")
 	public void setToto(int b){
 		this.toto = b;
 	}
 	
-	@XML_GetAttribute(name="toto")
+	@XML_GetAttribute(tag="toto")
 	public int getToto(){
 		return toto;
 	}
