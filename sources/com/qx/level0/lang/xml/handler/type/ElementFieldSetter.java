@@ -63,10 +63,12 @@ public abstract class ElementFieldSetter {
 		public boolean isContextuallyConflictingWith(ElementFieldSetter.Generator right) {
 			Set<String> leftSet = getContextualTags();
 			Set<String> rightSet = right.getContextualTags();
-			for(String tag : rightSet) {
-				if(leftSet.contains(tag)) {
-					return true;
-				}
+			if(leftSet!=null && rightSet!=null) {
+				for(String tag : rightSet) {
+					if(leftSet.contains(tag)) {
+						return true;
+					}
+				}	
 			}
 			return false;
 		}
