@@ -76,6 +76,7 @@ public class TypeHandler {
 
 	private boolean isRoot;
 
+	private boolean isInitialized;
 
 	/**
 	 * 
@@ -84,6 +85,7 @@ public class TypeHandler {
 		super();
 		this.type = type;
 		this.className = type.getName();
+		isInitialized = false;
 	}
 
 
@@ -94,129 +96,132 @@ public class TypeHandler {
 
 	public void initialize(XML_Context context) throws XML_TypeCompilationException {
 
-		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
-		if(typeAnnotation==null){
-			throw new XML_TypeCompilationException("Missing type declaration for type: "+type.getName());
-		}
-		this.xmlName = typeAnnotation.name();
-		this.isRoot = typeAnnotation.isRoot();
+		if(!isInitialized) {
 
 
-		/* <sub-types> */
-
-		subTypes = new ArrayList<>();
-		listSubTypes(context, subTypes);
-
-		/* </sub-types> */
-
-
-
-		/* <constructor> */
-
-		try {
-			constructor = type.getConstructor(new Class<?>[]{});
-		} 
-		catch (NoSuchMethodException | SecurityException e) {
-			throw new XML_TypeCompilationException("Failed to find defualt constructor");
-		}
-
-		/* </constructor> */
-
-		/* <fields> */
-
-		XML_GetAttribute getAttributeAnnotation;
-		XML_SetAttribute setAttributeAnnotation;
-		XML_GetValue getValueAnnotation;
-		XML_SetValue setValueAnnotation;
-		XML_GetElement getElementAnnotation;
-		XML_SetElement setElementAnnotation;
-
-		List<ElementFieldSetter.Generator> elementSetterGenerators = new ArrayList<>();
-
-		CollectionElementFieldSetter.Factory factory = new CollectionElementFieldSetter.Factory() {
-			public @Override Entry createEntry(TypeHandler handler) {
-				return new Entry(nLists++, new ListHandler(handler));
+			XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
+			if(typeAnnotation==null){
+				throw new XML_TypeCompilationException("Missing type declaration for type: "+type.getName());
 			}
-		};
+			this.xmlName = typeAnnotation.name();
+			this.isRoot = typeAnnotation.isRoot();
 
 
-		for(Method method : type.getMethods()){
-			getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
-			setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
-			getValueAnnotation = method.getAnnotation(XML_GetValue.class);
-			setValueAnnotation = method.getAnnotation(XML_SetValue.class);
-			getElementAnnotation = method.getAnnotation(XML_GetElement.class);
-			setElementAnnotation = method.getAnnotation(XML_SetElement.class);
+			/* <sub-types> */
 
-			if(getAttributeAnnotation!=null){
-				attributeGetters.add(AttributeGetter.create(method));	
-			}
-			else if(setAttributeAnnotation!=null){
-				attributeSetters.put(setAttributeAnnotation.tag(), AttributeSetter.create(method));	
-			}
-			if(getValueAnnotation!=null){
-				valueGetter = AttributeGetter.create(method);
-			}
-			else if(setValueAnnotation!=null){
-				valueSetter = AttributeSetter.create(method);
-			}
-			else if(getElementAnnotation!=null){
-				elementGetters.add(ElementGetter.create(method));	
-			}
-			else if(setElementAnnotation!=null){
-				elementSetterGenerators.add(ElementFieldSetter.create(context, method, factory));
-			}
-		}
+			subTypes = new ArrayList<>();
+			listSubTypes(context, subTypes);
+
+			/* </sub-types> */
 
 
 
-		Putter putter = new Putter() {
-			public @Override void put(ElementFieldSetter setter) throws XML_TypeCompilationException {
-				if(elementSetters.containsKey(setter.getTag())) {
-					throw new XML_TypeCompilationException(
-							"Conflict in standard element setter mapping, for field tag: "+setter.getTag());
+			/* <constructor> */
+
+			try {
+				constructor = type.getConstructor(new Class<?>[]{});
+			} 
+			catch (NoSuchMethodException | SecurityException e) {
+				throw new XML_TypeCompilationException("Failed to find defualt constructor");
+			}
+
+			/* </constructor> */
+
+			/* <fields> */
+
+			XML_GetAttribute getAttributeAnnotation;
+			XML_SetAttribute setAttributeAnnotation;
+			XML_GetValue getValueAnnotation;
+			XML_SetValue setValueAnnotation;
+			XML_GetElement getElementAnnotation;
+			XML_SetElement setElementAnnotation;
+
+			List<ElementFieldSetter.Generator> elementSetterGenerators = new ArrayList<>();
+
+			CollectionElementFieldSetter.Factory factory = new CollectionElementFieldSetter.Factory() {
+				public @Override Entry createEntry(TypeHandler handler) throws XML_TypeCompilationException {
+					return new Entry(nLists++, new ListHandler(context, handler));
 				}
-				elementSetters.put(setter.getTag(), setter);
+			};
+
+
+			for(Method method : type.getMethods()){
+				getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
+				setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
+				getValueAnnotation = method.getAnnotation(XML_GetValue.class);
+				setValueAnnotation = method.getAnnotation(XML_SetValue.class);
+				getElementAnnotation = method.getAnnotation(XML_GetElement.class);
+				setElementAnnotation = method.getAnnotation(XML_SetElement.class);
+
+				if(getAttributeAnnotation!=null){
+					attributeGetters.add(AttributeGetter.create(method));	
+				}
+				else if(setAttributeAnnotation!=null){
+					attributeSetters.put(setAttributeAnnotation.tag(), AttributeSetter.create(method));	
+				}
+				if(getValueAnnotation!=null){
+					valueGetter = AttributeGetter.create(method);
+				}
+				else if(setValueAnnotation!=null){
+					valueSetter = AttributeSetter.create(method);
+				}
+				else if(getElementAnnotation!=null){
+					elementGetters.add(ElementGetter.create(method));	
+				}
+				else if(setElementAnnotation!=null){
+					elementSetterGenerators.add(ElementFieldSetter.create(context, method, factory));
+				}
 			}
-		};
-
-		// check non-contextual level
-		for(ElementFieldSetter.Generator gen : elementSetterGenerators) {
-			gen.getStandardSetters(putter);
-		}
 
 
-		int nGen = elementSetterGenerators.size();
-		if(nGen>1) {
-			for(int i0=0; i0<nGen; i0++) {
-				ElementFieldSetter.Generator gen0 = elementSetterGenerators.get(i0);
-				int i1=0;
-				while(gen0.areContextualTagsEnabled() && i1<nGen) {
-					if(i1!=i0) {
-						ElementFieldSetter.Generator gen1 = elementSetterGenerators.get(i1);
-						if(gen1.areContextualTagsEnabled()) {
-							if(gen0.isContextuallyConflictingWith(gen1)) {
-								gen0.disableContextualTags();
-								gen1.disableContextualTags();
+
+			Putter putter = new Putter() {
+				public @Override void put(ElementFieldSetter setter) throws XML_TypeCompilationException {
+					if(elementSetters.containsKey(setter.getTag())) {
+						throw new XML_TypeCompilationException(
+								"Conflict in standard element setter mapping, for field tag: "+setter.getTag());
+					}
+					elementSetters.put(setter.getTag(), setter);
+				}
+			};
+
+			// check non-contextual level
+			for(ElementFieldSetter.Generator gen : elementSetterGenerators) {
+				gen.getStandardSetters(putter);
+			}
+
+
+			int nGen = elementSetterGenerators.size();
+			if(nGen>1) {
+				for(int i0=0; i0<nGen; i0++) {
+					ElementFieldSetter.Generator gen0 = elementSetterGenerators.get(i0);
+					int i1=0;
+					while(gen0.areContextualTagsEnabled() && i1<nGen) {
+						if(i1!=i0) {
+							ElementFieldSetter.Generator gen1 = elementSetterGenerators.get(i1);
+							if(gen1.areContextualTagsEnabled()) {
+								if(gen0.isContextuallyConflictingWith(gen1)) {
+									gen0.disableContextualTags();
+									gen1.disableContextualTags();
+								}
 							}
 						}
+						i1++;
 					}
-					i1++;
-				}
-			}	
-		}
-
-
-		for(int i=0; i<nGen; i++) {
-			ElementFieldSetter.Generator gen = elementSetterGenerators.get(i);
-			if(gen.areContextualTagsEnabled()) {
-				gen.getContextualSetters(putter);
+				}	
 			}
+
+
+			for(int i=0; i<nGen; i++) {
+				ElementFieldSetter.Generator gen = elementSetterGenerators.get(i);
+				if(gen.areContextualTagsEnabled()) {
+					gen.getContextualSetters(putter);
+				}
+			}
+
+			/* </fields> */
+			isInitialized = true;
 		}
-
-		/* </fields> */
-
-
 	}
 
 

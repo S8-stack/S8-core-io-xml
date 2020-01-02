@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -178,28 +177,7 @@ public class XML_Context {
 		}
 	}
 	
-	/**
-	 * 
-	 * @param target the target class
-	 * @param name resource name
-	 * @throws IOException 
-	 * @throws XML_ParsingException 
-	 */
-	public Object deserializeResource(Class<?> target, String name) throws IOException, XML_ParsingException {
-		String filename = target.getName()+" resource: "+name;
-		try(InputStream inputStream = target.getResourceAsStream(name)){
-			if(inputStream!=null) {
-				InputStreamReader reader = new InputStreamReader(new BufferedInputStream(inputStream), StandardCharsets.UTF_8);
-				XML_StreamReader streamReader = new XML_StreamReader(reader, isVerbose);
-				Object object = new XML_Parser(this, streamReader, isVerbose).parse();
-				streamReader.close();
-				return object;
-			}
-			else {
-				throw new IOException("Failed to read resource: "+filename);
-			}
-		}
-	}
+
 	
 
 	public void serialize(Object object, Writer writer) throws Exception{

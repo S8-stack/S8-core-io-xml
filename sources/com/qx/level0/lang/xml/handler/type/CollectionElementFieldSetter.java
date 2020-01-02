@@ -16,7 +16,7 @@ public abstract class CollectionElementFieldSetter extends ElementFieldSetter {
 	
 	public static interface Factory {
 		
-		public Entry createEntry(TypeHandler handler);
+		public Entry createEntry(TypeHandler handler) throws XML_TypeCompilationException;
 		
 	}
 	

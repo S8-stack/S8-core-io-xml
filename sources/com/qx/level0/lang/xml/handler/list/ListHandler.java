@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import com.qx.level0.lang.xml.XML_Context;
 import com.qx.level0.lang.xml.handler.type.TypeHandler;
+import com.qx.level0.lang.xml.handler.type.XML_TypeCompilationException;
 import com.qx.level0.lang.xml.parser.Parsed;
 import com.qx.level0.lang.xml.parser.ParsedListElement;
 import com.qx.level0.lang.xml.parser.XML_ParsingException;
@@ -32,11 +34,13 @@ public class ListHandler {
 	private Map<String, ElementItemSetter> setters;
 	
 	/**
+	 * @throws XML_TypeCompilationException 
 	 * 
 	 */
-	public ListHandler(TypeHandler handler){
+	public ListHandler(XML_Context context, TypeHandler handler) throws XML_TypeCompilationException{
 		super();
 		this.handler = handler;
+		handler.initialize(context);
 		
 		setters = new HashMap<>();
 		
@@ -73,7 +77,7 @@ public class ListHandler {
 			throws XML_ParsingException {
 		ElementItemSetter setter = setters.get(tag);
 		if(setter==null) {
-			throw new XML_ParsingException(point, "Failed to match tag");
+			throw new XML_ParsingException(point, "Failed to find field matching tag: "+tag);
 		}
 		return setter.createParseElement(parent, point);
 	}
