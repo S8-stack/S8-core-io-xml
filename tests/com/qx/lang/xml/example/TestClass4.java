@@ -14,7 +14,7 @@ public class TestClass4 extends TestClass3 {
 	
 	public User[] users;
 	
-	@XML_SetAttribute(tag="b")
+	@XML_SetAttribute(name="b")
 	public void setToto2(int b){
 		this.b = b;
 	}

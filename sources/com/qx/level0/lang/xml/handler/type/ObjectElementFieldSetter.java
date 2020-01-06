@@ -24,13 +24,12 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 			super(tag);
 			this.method = method;
 			this.handler = handler;
-
-			// contextual
 			contextualTags = new HashSet<>();
 			if(handler.getSubTypes().isEmpty()) { // no override
 				contextualTags.add(tag);
-			}
+			}	
 		}
+		
 
 		@Override
 		public boolean hasContextualTags() {
@@ -52,8 +51,6 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 
 		@Override
 		public void getContextualSetters(TypeHandler.Putter putter) throws XML_TypeCompilationException {
-			
-			// contextual
 			if(!contextualTags.isEmpty() && areContextualTagsEnabled()) { // no override
 				for(String tag : contextualTags) {
 					putter.put(new ObjectElementFieldSetter(tag, method, handler));

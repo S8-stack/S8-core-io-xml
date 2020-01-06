@@ -12,7 +12,7 @@ public class TestClass2 extends Wrapper {
 	
 	private double b = 5.0;
 	
-	@XML_SetAttribute(tag="b2")
+	@XML_SetAttribute(name="b2")
 	public void setFactor2(double b){
 		this.b = b;
 	}

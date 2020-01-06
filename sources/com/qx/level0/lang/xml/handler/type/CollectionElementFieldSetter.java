@@ -51,9 +51,9 @@ public abstract class CollectionElementFieldSetter extends ElementFieldSetter {
 		public Generator(String tag, Entry entry) {
 			super(tag);
 			this.entry = entry;
-			contextualTags = entry.getListHandler().getElementTags();
 		}
 
+		
 		@Override
 		public boolean hasContextualTags() {
 			return true;
@@ -64,6 +64,9 @@ public abstract class CollectionElementFieldSetter extends ElementFieldSetter {
 
 		@Override
 		public Set<String> getContextualTags() {
+			if(contextualTags==null) {
+				contextualTags = entry.getListHandler().getElementTags();
+			}
 			return contextualTags;
 		}
 		

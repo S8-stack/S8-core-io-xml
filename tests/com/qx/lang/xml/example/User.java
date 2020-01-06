@@ -20,13 +20,13 @@ public class User extends TestClass3 {
 		return name;
 	}
 
-	@XML_SetAttribute(tag="name")
+	@XML_SetAttribute(name="name")
 	public void setName(String name) {
 		this.name = name;
 	}
 
 
-	@XML_SetAttribute(tag="password")
+	@XML_SetAttribute(name="password")
 	public void setPassword(String password) {
 		this.password = password;
 	}

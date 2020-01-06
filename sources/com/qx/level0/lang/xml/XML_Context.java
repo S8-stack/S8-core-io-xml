@@ -11,11 +11,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.qx.level0.lang.xml.composer.XML_Composer;
 import com.qx.level0.lang.xml.composer.XML_StreamWriter;
+import com.qx.level0.lang.xml.handler.Initializable;
 import com.qx.level0.lang.xml.handler.type.TypeHandler;
 import com.qx.level0.lang.xml.handler.type.XML_TypeCompilationException;
 import com.qx.level0.lang.xml.parser.XML_Parser;
@@ -84,10 +87,25 @@ public class XML_Context {
 	 */
 	public XML_Context(Class<?>... types) throws XML_TypeCompilationException {
 		super();
+		discover(types);
+	}
+	
+	
+	public void discover(Class<?>... types) throws XML_TypeCompilationException {
+		ArrayDeque<Initializable> lateInitializations = new ArrayDeque<>();
 		for(Class<?> type : types){
-			register(type);
+			register(type, lateInitializations);
+		}
+		
+		// resolve late inits
+		while(!lateInitializations.isEmpty()) {
+			Initializable initializable = lateInitializations.poll();
+			if(!initializable.initialize(this)) {
+				lateInitializations.add(initializable);
+			}
 		}
 	}
+	
 	
 	public void setVerbosity(boolean isVerbose) {
 		this.isVerbose = isVerbose;
@@ -101,17 +119,17 @@ public class XML_Context {
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
-	public void register(Class<?> type) throws XML_TypeCompilationException {
+	public void register(Class<?> type, Collection<Initializable> initializables) throws XML_TypeCompilationException {
 		
 		if(!isRegistered(type)){
 			try {
 				TypeHandler typeHandler = new TypeHandler(type);
 				
-				// regsiter
+				// register
 				typeMap.put(typeHandler.getClassName(), typeHandler);
 				
 				// then initialize
-				typeHandler.initialize(this);
+				typeHandler.initialize(this, initializables);
 				
 				if(typeHandler.isRoot()) {
 					String tag = typeHandler.getXmlTag();

@@ -10,7 +10,7 @@ public class TestClass3 {
 
 	private int toto = -1;
 	
-	@XML_SetAttribute(tag="toto")
+	@XML_SetAttribute(name="toto")
 	public void setToto(int b){
 		this.toto = b;
 	}

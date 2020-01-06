@@ -16,7 +16,7 @@ public class Wrapper {
 	
 	public TestClass3[] array;
 	
-	@XML_SetAttribute(tag="factor")
+	@XML_SetAttribute(name="factor")
 	public void setFactor(double a){
 		this.a = a;
 	}
