@@ -107,7 +107,8 @@ public class ParsedDocument implements Parsed {
 
 				TypeHandler handler = context.getXmlRootTypeHandler(tag);
 				if(handler==null) {
-					throw new XML_ParsingException(reader.getPoint(), "Failed to find root type for tag: "+tag);
+					throw new XML_ParsingException(reader.getPoint(), "Failed to find root type for tag: "+tag
+							+", have you declared this type as root (isRoot = true in annotation)?");
 				}
 				
 				// switch to new scope
