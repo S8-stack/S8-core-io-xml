@@ -2,24 +2,11 @@ package com.qx.level0.lang.xml.handler.type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.qx.level0.lang.xml.XML_Context;
-import com.qx.level0.lang.xml.annotation.XML_GetAttribute;
-import com.qx.level0.lang.xml.annotation.XML_GetElement;
-import com.qx.level0.lang.xml.annotation.XML_GetValue;
-import com.qx.level0.lang.xml.annotation.XML_SetAttribute;
-import com.qx.level0.lang.xml.annotation.XML_SetElement;
-import com.qx.level0.lang.xml.annotation.XML_SetValue;
-import com.qx.level0.lang.xml.annotation.XML_Type;
-import com.qx.level0.lang.xml.handler.Initializable;
-import com.qx.level0.lang.xml.handler.list.ListHandler;
-import com.qx.level0.lang.xml.handler.type.CollectionElementFieldSetter.Entry;
 import com.qx.level0.lang.xml.parser.Parsed;
 import com.qx.level0.lang.xml.parser.ParsedObjectElement;
 import com.qx.level0.lang.xml.parser.XML_ParsingException;
@@ -38,7 +25,7 @@ public class TypeHandler {
 	/**
 	 * declared name in XML. Go in tag. (XML side)
 	 */
-	private String xmlName;
+	String xmlName;
 
 	/**
 	 * declared name in Class<?> (JAVA side)
@@ -48,39 +35,44 @@ public class TypeHandler {
 
 	/**
 	 * mapping of all subclasses
+	 * (package-private for external construction)
 	 */
-	private List<TypeHandler> subTypes;
-
-
-	private int nLists;
+	TypeHandler[] subTypes;
 
 
 	/**
-	 * 
+	 * Intentionally left package private
 	 */
-	private Constructor<?> constructor;
+	int nLists;
 
-	private AttributeGetter valueGetter;
 
-	private AttributeSetter valueSetter;
+	/** ready for ext construction */
+	Constructor<?> constructor;
 
-	private List<AttributeGetter> attributeGetters = new ArrayList<>();
+	/** ready for ext construction */
+	AttributeGetter valueGetter;
 
-	private Map<String, AttributeSetter> attributeSetters = new HashMap<>();
+	/** ready for ext construction */
+	AttributeSetter valueSetter;
 
-	private List<ElementGetter> elementGetters = new ArrayList<>();
+	/** ready for ext construction */
+	List<AttributeGetter> attributeGetters = new ArrayList<>();
+
+	/** ready for ext construction */
+	Map<String, AttributeSetter> attributeSetters = new HashMap<>();
+
+	/** ready for ext construction */
+	List<ElementGetter> elementGetters = new ArrayList<>();
 
 	/**
 	 * Mapping of all possible ways of settings field (with element setters)
 	 */
-	private Map<String, ElementFieldSetter> elementSetters = new HashMap<>();
+	Map<String, ElementFieldSetter> elementSetters = new HashMap<>();
 
 
-	private boolean isRoot;
+	boolean isRoot;
 
-	private boolean isInheritanceDiscovered;
 	
-	private boolean isInitialized;
 
 	/**
 	 * 
@@ -89,204 +81,20 @@ public class TypeHandler {
 		super();
 		this.type = type;
 		this.className = type.getName();
-		isInitialized = false;
 	}
+
 
 	
-	public void initialize(XML_Context context, Collection<Initializable> initializables) throws XML_TypeCompilationException {
-		
-		/* <sub-types> */
-		subTypes = new ArrayList<>();
-		listSubTypes(context, initializables, subTypes);
-		isInheritanceDiscovered = true;
-		/* </sub-types> */
-		
-		isInheritanceDiscovered = true;
-		
-		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
-		if(typeAnnotation==null){
-			throw new XML_TypeCompilationException("Missing type declaration for type: "+type.getName());
-		}
-		xmlName = typeAnnotation.name();
-		isRoot = typeAnnotation.isRoot();
-
-
-		/* <constructor> */
-
-		try {
-			constructor = type.getConstructor(new Class<?>[]{});
-		} 
-		catch (NoSuchMethodException | SecurityException e) {
-			throw new XML_TypeCompilationException("Failed to find default constructor");
-		}
-
-		/* </constructor> */
-		
-		
-		Initializable initializable = new FieldsInitializable(context, initializables);
-		if(!initializable.initialize(context)) {
-			initializables.add(initializable);
-		}
-	}
-	
-	public boolean isInheritanceDiscovered() {
-		return isInheritanceDiscovered;
-	}
-
 
 	public interface Putter {
 		public void put(ElementFieldSetter setter) throws XML_TypeCompilationException;
 	}
 
-	
-	private class FieldsInitializable implements Initializable {
-		
-		private List<TypeHandler> dependencies;
-		
-		public FieldsInitializable(
-				XML_Context context, 
-				Collection<Initializable> initializables) throws XML_TypeCompilationException {
-			super();
-			
-			// build dependencies
-			this.dependencies = new ArrayList<>(8);
-			
-			/* <fields> */
-			XML_SetElement setElementAnnotation;
-
-			for(Method method : type.getMethods()){
-				setElementAnnotation = method.getAnnotation(XML_SetElement.class);
-				if(setElementAnnotation!=null){
-					ElementFieldSetter.listDependencies(context, method, initializables, dependencies);
-				}
-			}
-		}
-		
-		/**
-		 * 
-		 * @return
-		 */
-		private boolean isDependenciesInitialized() {
-			for(TypeHandler dependency : dependencies) {
-				if(!dependency.isInheritanceDiscovered()) {
-					return false;
-				}
-			}
-			return true;
-		}
-		
-
-		@Override
-		public boolean initialize(XML_Context context) throws XML_TypeCompilationException {
-			if(!isInitialized && isDependenciesInitialized()) {
-
-	
-				/* <fields> */
-
-				XML_GetAttribute getAttributeAnnotation;
-				XML_SetAttribute setAttributeAnnotation;
-				XML_GetValue getValueAnnotation;
-				XML_SetValue setValueAnnotation;
-				XML_GetElement getElementAnnotation;
-				XML_SetElement setElementAnnotation;
-
-				List<ElementFieldSetter.Generator> elementSetterGenerators = new ArrayList<>();
-
-				CollectionElementFieldSetter.Factory factory = new CollectionElementFieldSetter.Factory() {
-					public @Override Entry createEntry(TypeHandler handler) throws XML_TypeCompilationException {
-						
-						/*
-						 * Note that at this point, all handlers have been resolved as dependencies
-						 */
-						ListHandler listHandler = new ListHandler(handler);
-						return new Entry(nLists++, listHandler);
-					}
-				};
-
-
-				for(Method method : type.getMethods()){
-					getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
-					setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
-					getValueAnnotation = method.getAnnotation(XML_GetValue.class);
-					setValueAnnotation = method.getAnnotation(XML_SetValue.class);
-					getElementAnnotation = method.getAnnotation(XML_GetElement.class);
-					setElementAnnotation = method.getAnnotation(XML_SetElement.class);
-
-					if(getAttributeAnnotation!=null){
-						attributeGetters.add(AttributeGetter.create(method));	
-					}
-					else if(setAttributeAnnotation!=null){
-						attributeSetters.put(setAttributeAnnotation.name(), AttributeSetter.create(method));	
-					}
-					if(getValueAnnotation!=null){
-						valueGetter = AttributeGetter.create(method);
-					}
-					else if(setValueAnnotation!=null){
-						valueSetter = AttributeSetter.create(method);
-					}
-					else if(getElementAnnotation!=null){
-						elementGetters.add(ElementGetter.create(method));	
-					}
-					else if(setElementAnnotation!=null){
-						elementSetterGenerators.add(ElementFieldSetter.create(context, method, factory));
-					}
-				}
-
-				Putter putter = new Putter() {
-					public @Override void put(ElementFieldSetter setter) throws XML_TypeCompilationException {
-						if(elementSetters.containsKey(setter.getTag())) {
-							throw new XML_TypeCompilationException(
-									"Conflict in standard element setter mapping, for field tag: "+setter.getTag()
-									+" in type "+type.getName());
-						}
-						elementSetters.put(setter.getTag(), setter);
-					}
-				};
-
-				// check non-contextual level
-				for(ElementFieldSetter.Generator gen : elementSetterGenerators) {
-					gen.getStandardSetters(putter);
-				}
-
-
-				int nGen = elementSetterGenerators.size();
-				if(nGen>1) {
-					for(int i0=0; i0<nGen; i0++) {
-						ElementFieldSetter.Generator gen0 = elementSetterGenerators.get(i0);
-						int i1=0;
-						while(gen0.areContextualTagsEnabled() && i1<nGen) {
-							if(i1!=i0) {
-								ElementFieldSetter.Generator gen1 = elementSetterGenerators.get(i1);
-								if(gen1.areContextualTagsEnabled()) {
-									if(gen0.isContextuallyConflictingWith(gen1)) {
-										gen0.disableContextualTags();
-										gen1.disableContextualTags();
-									}
-								}
-							}
-							i1++;
-						}
-					}	
-				}
-
-				for(int i=0; i<nGen; i++) {
-					ElementFieldSetter.Generator gen = elementSetterGenerators.get(i);
-					if(gen.areContextualTagsEnabled()) {
-						gen.getContextualSetters(putter);
-					}
-				}
-
-				/* </fields> */
-				
-				isInitialized = true;
-			}
-			return isInitialized;
-		}
-	}
-	
+	/*
 	public boolean isInitialized() {
 		return isInitialized;
 	}
+	 */
 
 	public int getNumberOfLists() {
 		return nLists;
@@ -308,50 +116,21 @@ public class TypeHandler {
 		return className;
 	}
 
+	
+	public boolean hasSubTypes() {
+		return subTypes.length > 0;
+	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public List<TypeHandler> getSubTypes() {
+	public TypeHandler[] getSubTypes() {
 		return subTypes;
 	}
 
 
-	/**
-	 * 
-	 * @param context
-	 * @param initializables
-	 * @param subTypes
-	 * @throws XML_TypeCompilationException
-	 */
-	private void listSubTypes(
-			XML_Context context,
-			Collection<Initializable> initializables, 
-			List<TypeHandler> subTypes) throws XML_TypeCompilationException {
 
-		
-		// typeAnnotation has already been checked before
-				XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
-
-				/* <sub-types> */
-				if(typeAnnotation.sub()!=null){
-					TypeHandler subTypeHandler;
-					for(Class<?> subType : typeAnnotation.sub()) {
-
-						// register type (if not already done)
-						context.register(subType, initializables);
-
-						// test inheritance
-						if(type.isAssignableFrom(subType)) {
-							if((subTypeHandler = context.getTypeHandler(subType))!=null) {
-								subTypes.add(subTypeHandler);
-								subTypeHandler.listSubTypes(context, initializables, subTypes);
-							}	
-						}
-					}
-				}
-	}
 
 
 	public Object create(XML_StreamReader.Point point) throws XML_ParsingException {
@@ -467,7 +246,5 @@ public class TypeHandler {
 	public boolean isRoot() {
 		return isRoot;
 	}
-
-
 
 }

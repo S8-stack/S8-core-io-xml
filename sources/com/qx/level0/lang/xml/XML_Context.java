@@ -11,14 +11,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.qx.level0.lang.xml.composer.XML_Composer;
 import com.qx.level0.lang.xml.composer.XML_StreamWriter;
-import com.qx.level0.lang.xml.handler.Initializable;
 import com.qx.level0.lang.xml.handler.type.TypeHandler;
 import com.qx.level0.lang.xml.handler.type.XML_TypeCompilationException;
 import com.qx.level0.lang.xml.parser.XML_Parser;
@@ -72,12 +69,19 @@ import com.qx.level0.lang.xml.parser.XML_StreamReader;
 public class XML_Context {
 
 	private boolean isVerbose = false;
-
 	
-	private Map<String, TypeHandler> xmlRoots = new HashMap<>();
+	Map<String, TypeHandler> xmlRoots = new HashMap<>();
 
-	private Map<String, TypeHandler> typeMap = new HashMap<>();
+	Map<String, TypeHandler> typeMap = new HashMap<>();
 
+	public XML_Context(Class<?>... types) throws XML_TypeCompilationException {
+		super();
+		//discover(types);
+
+		XML_ContextBuilder builder = new XML_ContextBuilder(this, types, null);
+		builder.build();
+	}
+	
 	/**
 	 * 
 	 * @param types
@@ -85,70 +89,27 @@ public class XML_Context {
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	public XML_Context(Class<?>... types) throws XML_TypeCompilationException {
+	public XML_Context(Class<?>[] types, Class<?>[] extensions) throws XML_TypeCompilationException {
 		super();
-		discover(types);
+		//discover(types);
+
+		XML_ContextBuilder builder = new XML_ContextBuilder(this, types, extensions);
+		builder.build();
 	}
 	
 	
-	public void discover(Class<?>... types) throws XML_TypeCompilationException {
-		ArrayDeque<Initializable> lateInitializations = new ArrayDeque<>();
-		for(Class<?> type : types){
-			register(type, lateInitializations);
-		}
-		
-		// resolve late inits
-		while(!lateInitializations.isEmpty()) {
-			Initializable initializable = lateInitializations.poll();
-			if(!initializable.initialize(this)) {
-				lateInitializations.add(initializable);
-			}
-		}
-	}
+
+
 	
-	
+
+
 	public void setVerbosity(boolean isVerbose) {
 		this.isVerbose = isVerbose;
 	}
-	
 
-	/**
-	 * 
-	 * @param type
-	 * @throws Exception 
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	public void register(Class<?> type, Collection<Initializable> initializables) throws XML_TypeCompilationException {
-		
-		if(!isRegistered(type)){
-			try {
-				TypeHandler typeHandler = new TypeHandler(type);
-				
-				// register
-				typeMap.put(typeHandler.getClassName(), typeHandler);
-				
-				// then initialize
-				typeHandler.initialize(this, initializables);
-				
-				if(typeHandler.isRoot()) {
-					String tag = typeHandler.getXmlTag();
-					xmlRoots.put(tag, typeHandler);
-					xmlRoots.put("root:"+tag, typeHandler);
-				}
-				
-			}
-			catch (SecurityException e) {
-				throw new XML_TypeCompilationException("Failed to initialize due to "+e.getMessage());
-			}
-		}
-	}
 
-	public boolean isRegistered(Class<?> type){
-		return typeMap.containsKey(type.getName());
-	}
 
-	
+
 	/**
 	 * 
 	 * @param type
@@ -157,8 +118,8 @@ public class XML_Context {
 	public TypeHandler getTypeHandler(Class<?> type){
 		return typeMap.get(type.getName());
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param tag
@@ -168,7 +129,7 @@ public class XML_Context {
 		return xmlRoots.get(tag);
 	}
 
-	
+
 	/**
 	 * 
 	 * @param reader
@@ -186,7 +147,7 @@ public class XML_Context {
 	public Object deserialize(InputStream inputStream) throws XML_ParsingException, IOException {
 		return deserialize(new InputStreamReader(inputStream));
 	}
-	
+
 	public Object deserialize(File file) throws XML_ParsingException, IOException {
 		try(BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))){
 			Object result = deserialize(inputStream);
@@ -194,20 +155,20 @@ public class XML_Context {
 			return result;	
 		}
 	}
-	
 
-	
+
+
 
 	public void serialize(Object object, Writer writer) throws Exception{
 		XML_StreamWriter streamWriter = new XML_StreamWriter(writer);
 		new XML_Composer(this, streamWriter).compose(object);
 		streamWriter.close();
 	}
-	
+
 	public void serialize(Object object, OutputStream outputStream) throws Exception{
 		serialize(object, new OutputStreamWriter(outputStream));
 	}
-	
+
 	public void serialize(Object object, File file) throws Exception{
 		serialize(object, new FileOutputStream(file));
 	}

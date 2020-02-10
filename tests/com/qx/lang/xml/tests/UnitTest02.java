@@ -17,7 +17,7 @@ public class UnitTest02 {
 
 	public static void main(String[] args) throws Exception {
 		Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("input/test02.xml"))));
-		XML_Context context = new XML_Context(Wrapper.class);
+		XML_Context context = new XML_Context(new Class<?>[] { Wrapper.class });
 		context.setVerbosity(true);
 		Object object = context.deserialize(reader);
 		reader.close();

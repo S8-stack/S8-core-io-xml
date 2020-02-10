@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.XML_ContextBuilder;
 import com.qx.level0.lang.xml.parser.ParsedObjectElement;
 import com.qx.level0.lang.xml.parser.PrimitiveParsedElement;
 import com.qx.level0.lang.xml.parser.PrimitiveParsedElement.Callback;
@@ -18,7 +18,7 @@ public abstract class PrimitiveElementFieldSetter extends ElementFieldSetter {
 		return type.isPrimitive() || type==String.class;
 	}
 
-	public static ElementFieldSetter.Generator create(XML_Context context, Method method, 
+	public static ElementFieldSetter.Generator create(XML_ContextBuilder context, Method method, 
 			Class<?> fieldType, String tag) throws XML_TypeCompilationException {
 		if(fieldType==boolean.class){
 			return new BooleanElementSetterGenerator(tag, method);

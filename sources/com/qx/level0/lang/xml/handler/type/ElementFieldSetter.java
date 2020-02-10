@@ -2,13 +2,11 @@ package com.qx.level0.lang.xml.handler.type;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.XML_ContextBuilder;
 import com.qx.level0.lang.xml.annotation.XML_SetElement;
-import com.qx.level0.lang.xml.handler.Initializable;
 import com.qx.level0.lang.xml.parser.Parsed;
 import com.qx.level0.lang.xml.parser.ParsedObjectElement;
 import com.qx.level0.lang.xml.parser.XML_ParsingException;
@@ -114,11 +112,8 @@ public abstract class ElementFieldSetter {
 
 
 
-	public static void listDependencies(
-			XML_Context context, 
-			Method method, 
-			Collection<Initializable> initializables,
-			List<TypeHandler> dependencies) throws XML_TypeCompilationException {
+	public static void listDependencies(XML_ContextBuilder contextBuilder, Method method, 
+			List<TypeBuilder> dependencies) throws XML_TypeCompilationException {
 
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=1){
@@ -132,8 +127,8 @@ public abstract class ElementFieldSetter {
 		}
 		else if(fieldType.isArray()){
 			Class<?> componentType = fieldType.getComponentType();
-			context.register(componentType, initializables);
-			TypeHandler subTypeHandler = context.getTypeHandler(componentType);
+			contextBuilder.register(componentType);
+			TypeBuilder subTypeHandler = contextBuilder.getTypeBuilder(componentType);
 			if(subTypeHandler==null) {
 				throw new XML_TypeCompilationException("Cannot find component type: "+fieldType);
 			}
@@ -142,16 +137,16 @@ public abstract class ElementFieldSetter {
 		else if(List.class.isAssignableFrom(fieldType)){
 			Class<?> componentType =
 					(Class<?>) ((ParameterizedType) fieldType.getGenericSuperclass()).getActualTypeArguments()[0];
-			context.register(componentType, initializables);
-			TypeHandler subTypeHandler = context.getTypeHandler(componentType);
+			contextBuilder.register(componentType);
+			TypeBuilder subTypeHandler = contextBuilder.getTypeBuilder(componentType);
 			if(subTypeHandler==null) {
 				throw new XML_TypeCompilationException("Cannot find component type: "+fieldType);
 			}
 			dependencies.add(subTypeHandler);
 		}
 		else{
-			context.register(fieldType, initializables);
-			TypeHandler subTypeHandler = context.getTypeHandler(fieldType);
+			contextBuilder.register(fieldType);
+			TypeBuilder subTypeHandler = contextBuilder.getTypeBuilder(fieldType);
 			if(subTypeHandler==null) {
 				throw new XML_TypeCompilationException("Cannot find type: "+fieldType);
 			}
@@ -170,7 +165,7 @@ public abstract class ElementFieldSetter {
 	 * @throws XML_TypeCompilationException
 	 */
 	public static ElementFieldSetter.Generator create(
-			XML_Context context, 
+			XML_ContextBuilder context, 
 			Method method, 
 			CollectionElementFieldSetter.Factory factory) throws XML_TypeCompilationException {
 
@@ -189,18 +184,18 @@ public abstract class ElementFieldSetter {
 		}
 		else if(fieldType.isArray()){
 			Class<?> componentType = fieldType.getComponentType();
-			TypeHandler subTypeHandler = context.getTypeHandler(componentType);
-			return new ArrayElementFieldSetter.Generator(tag, method, factory.createEntry(subTypeHandler));
+			TypeBuilder subTypeHandler = context.getTypeBuilder(componentType);
+			return new ArrayElementFieldSetter.Generator(tag, method, factory.createEntry(subTypeHandler.getHandler()));
 		}
 		else if(List.class.isAssignableFrom(fieldType)){
 			Class<?> componentType = 
 					(Class<?>) ((ParameterizedType) fieldType.getGenericSuperclass()).getActualTypeArguments()[0];
-			TypeHandler subTypeHandler = context.getTypeHandler(componentType);
-			return new ListElementFieldSetter.Generator(tag, method, factory.createEntry(subTypeHandler));
+			TypeBuilder subTypeHandler = context.getTypeBuilder(componentType);
+			return new ListElementFieldSetter.Generator(tag, method, factory.createEntry(subTypeHandler.getHandler()));
 		}
 		else{
-			TypeHandler subTypeHandler = context.getTypeHandler(fieldType);
-			return new ObjectElementFieldSetter.Generator(tag, method, subTypeHandler);
+			TypeBuilder subTypeHandler = context.getTypeBuilder(fieldType);
+			return new ObjectElementFieldSetter.Generator(tag, method, subTypeHandler.getHandler());
 		}
 	}
 }
