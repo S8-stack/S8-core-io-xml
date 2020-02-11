@@ -179,11 +179,9 @@ public abstract class AttributeSetter {
 		@Override
 		public void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException {
 			try{
-
-
 				method.invoke(object, value);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method.getName()+" due to "
+				throw new XML_ParsingException(point, "Cannot set value: "+value+" with method "+method+" due to "
 						+e.getMessage());
 			}
 		}

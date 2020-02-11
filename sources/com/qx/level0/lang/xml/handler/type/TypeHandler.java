@@ -233,7 +233,7 @@ public class TypeHandler {
 			throws XML_ParsingException {
 		ElementFieldSetter setter = elementSetters.get(tag);
 		if(setter==null) {
-			throw new XML_ParsingException(point, "Failed to retreive element setter for tag: "+tag);
+			throw new XML_ParsingException(point, "Failed to retrieve element setter for tag: "+tag);
 		}
 		return setter.getParsedElement(parent, point);
 	}
