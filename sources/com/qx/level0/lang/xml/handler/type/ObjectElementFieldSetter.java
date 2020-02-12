@@ -25,7 +25,7 @@ public class ObjectElementFieldSetter extends ElementFieldSetter {
 			this.method = method;
 			this.handler = handler;
 			contextualTags = new HashSet<>();
-			if(handler.hasSubTypes()) { // no override
+			if(!handler.hasSubTypes()) { // no override
 				contextualTags.add(tag);
 			}
 		}
