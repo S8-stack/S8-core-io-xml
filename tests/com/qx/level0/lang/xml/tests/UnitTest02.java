@@ -1,4 +1,4 @@
-package com.qx.lang.xml.tests;
+package com.qx.level0.lang.xml.tests;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,8 +10,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-import com.qx.lang.xml.example.Wrapper;
 import com.qx.level0.lang.xml.XML_Context;
+import com.qx.level0.lang.xml.examples.Wrapper;
 
 public class UnitTest02 {
 

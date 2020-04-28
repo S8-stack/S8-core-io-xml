@@ -1,4 +1,4 @@
-package com.qx.lang.xml.tests;
+package com.qx.level0.lang.xml.tests;
 
 import com.qx.level0.lang.xml.XML_Syntax;
 
