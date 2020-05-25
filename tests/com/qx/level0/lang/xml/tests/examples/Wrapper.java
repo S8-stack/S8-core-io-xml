@@ -1,11 +1,11 @@
 package com.qx.level0.lang.xml.tests.examples;
 
 
-import com.qx.level0.lang.xml.annotation.XML_GetAttribute;
-import com.qx.level0.lang.xml.annotation.XML_GetElement;
-import com.qx.level0.lang.xml.annotation.XML_SetAttribute;
-import com.qx.level0.lang.xml.annotation.XML_SetElement;
-import com.qx.level0.lang.xml.annotation.XML_Type;
+import com.s8.lang.xml.annotation.XML_GetAttribute;
+import com.s8.lang.xml.annotation.XML_GetElement;
+import com.s8.lang.xml.annotation.XML_SetAttribute;
+import com.s8.lang.xml.annotation.XML_SetElement;
+import com.s8.lang.xml.annotation.XML_Type;
 
 @XML_Type(name="test", sub={TestClass2.class}, isRoot=true)
 public class Wrapper {
