@@ -1,9 +1,9 @@
 package com.qx.level0.lang.xml.tests.examples;
 
 
-import com.s8.lang.xml.annotation.XML_GetAttribute;
-import com.s8.lang.xml.annotation.XML_SetAttribute;
-import com.s8.lang.xml.annotation.XML_Type;
+import com.s8.lang.xml.api.XML_GetAttribute;
+import com.s8.lang.xml.api.XML_SetAttribute;
+import com.s8.lang.xml.api.XML_Type;
 
 @XML_Type(name="ee", sub={TestClass4.class})
 public class TestClass3 {

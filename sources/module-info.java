@@ -2,14 +2,24 @@ module com.s8.lang.xml {
 	
 	exports com.s8.lang.xml;
 
-	exports com.s8.lang.xml.annotation;
+	exports com.s8.lang.xml.api;
 	
 	exports com.s8.lang.xml.parser;
 
 	exports com.s8.lang.xml.composer;
 	
 	exports com.s8.lang.xml.handler;
-	exports com.s8.lang.xml.handler.list;
+	
+	// type
 	exports com.s8.lang.xml.handler.type;
+	
+	// attributes
+	exports com.s8.lang.xml.handler.type.attributes.getters;
+	exports com.s8.lang.xml.handler.type.attributes.setters;
+	
+	// elements
+	exports com.s8.lang.xml.handler.type.elements.getters;
+	exports com.s8.lang.xml.handler.type.elements.setters;
+	
 	
 }

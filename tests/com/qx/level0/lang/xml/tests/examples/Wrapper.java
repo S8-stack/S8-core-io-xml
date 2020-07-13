@@ -1,13 +1,13 @@
 package com.qx.level0.lang.xml.tests.examples;
 
 
-import com.s8.lang.xml.annotation.XML_GetAttribute;
-import com.s8.lang.xml.annotation.XML_GetElement;
-import com.s8.lang.xml.annotation.XML_SetAttribute;
-import com.s8.lang.xml.annotation.XML_SetElement;
-import com.s8.lang.xml.annotation.XML_Type;
+import com.s8.lang.xml.api.XML_GetAttribute;
+import com.s8.lang.xml.api.XML_GetElement;
+import com.s8.lang.xml.api.XML_SetAttribute;
+import com.s8.lang.xml.api.XML_SetElement;
+import com.s8.lang.xml.api.XML_Type;
 
-@XML_Type(name="test", sub={TestClass2.class}, isRoot=true)
+@XML_Type(name="test", sub={TestClass2.class})
 public class Wrapper {
 
 	private double a = 5.0;
@@ -36,12 +36,12 @@ public class Wrapper {
 		return field;
 	}
 	
-	@XML_SetElement(tag="items")
+	@XML_SetElement(tag="item")
 	public void setArray(TestClass3[] array){
 		this.array = array;
 	}
 	
-	@XML_GetElement(tag="items")
+	@XML_GetElement(tag="item")
 	public TestClass3[] getArray(){
 		return array;
 	}

@@ -1,120 +1,202 @@
 package com.s8.lang.xml.composer;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Stack;
+
+import com.s8.lang.xml.handler.XML_Context;
 
 /**
  * 
  * @author pc
  *
  */
-public abstract class PrimitiveComposableElement extends ComposableElement {
+public abstract class PrimitiveComposableElement extends ComposableScope {
 	
 	
-	protected Object fieldValue;
+	protected String tag;
 	
 	/**
 	 * 
 	 * @param context
 	 * @param object
 	 */
-	public PrimitiveComposableElement(XML_Composer composer, String fieldName, Object fieldValue){
-		super(composer, fieldName);
-		this.fieldValue = fieldValue;
+	public PrimitiveComposableElement(String tag){
+		super();
+		this.tag = tag;
 	}
 
-	
+
 	@Override
-	public abstract void compose(XML_StreamWriter writer) throws Exception;
+	public boolean compose(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+			throws Exception {
+		return false;
+	}
 	
-	
+	/**
+	 * boolean
+	 * 
+	 * @author pierreconvert
+	 *
+	 */
 	public static class BooleanComposableElement extends PrimitiveComposableElement {
 
-		public BooleanComposableElement(XML_Composer composer, String fieldName, Object object) {
-			super(composer, fieldName, object);
+		private boolean value;
+		
+		public BooleanComposableElement(String tag, boolean value) {
+			super(tag);
+			this.value = value;
 		}
 
+
 		@Override
-		public void compose(XML_StreamWriter writer) throws Exception {
-			writer.writeValueElement(fieldName, Boolean.toString((boolean) fieldValue));
+		public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException,
+				Exception {
+			writer.writeValueElement(tag, Boolean.toString(value));
+			
+			// no content to be stacked
+			return false;
 		}
-		
+
 	}
 	
+	
+	/**
+	 * short
+	 * 
+	 * @author pierreconvert
+	 *
+	 */
 	public static class ShortComposableElement extends PrimitiveComposableElement {
 
-		public ShortComposableElement(XML_Composer composer, String fieldName, Object object) {
-			super(composer, fieldName, object);
+		private short value;
+		
+		public ShortComposableElement(String tag, short value) {
+			super(tag);
+			this.value = value;
 		}
 
 		@Override
-		public void compose(XML_StreamWriter writer) throws Exception {
-			writer.writeValueElement(fieldName, Short.toString((short) fieldValue));
+		public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+			writer.writeValueElement(tag, Short.toString(value));
+			return false;
 		}
-		
 	}
 	
+	
+	/**
+	 * int
+	 * 
+	 * @author pierreconvert
+	 *
+	 */
 	public static class IntegerComposableElement extends PrimitiveComposableElement {
 
-		public IntegerComposableElement(XML_Composer composer, String fieldName, Object object) {
-			super(composer, fieldName, object);
+		private int value;
+		
+		public IntegerComposableElement(String tag, int value) {
+			super(tag);
+			this.value = value;
 		}
 
 		@Override
-		public void compose(XML_StreamWriter writer) throws Exception {
-			writer.writeValueElement(fieldName, Integer.toString((int) fieldValue));
+		public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+			writer.writeValueElement(tag, Integer.toString(value));
+			return false;
 		}
-		
 	}
 	
+	
+	/**
+	 * long 
+	 * 
+	 * @author pierreconvert
+	 *
+	 */
 	public static class LongComposableElement extends PrimitiveComposableElement {
 
-		public LongComposableElement(XML_Composer composer, String fieldName, Object object) {
-			super(composer, fieldName, object);
+		private long value;
+		
+		public LongComposableElement(String tag, long value) {
+			super(tag);
+			this.value = value;
 		}
 
 		@Override
-		public void compose(XML_StreamWriter writer) throws Exception {
-			writer.writeValueElement(fieldName, Long.toString((long) fieldValue));
+		public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+			writer.writeValueElement(tag, Long.toString(value));
+			return false;
 		}
-		
 	}
 	
+	
+	
+	/**
+	 * float
+	 * 
+	 * @author pierreconvert
+	 *
+	 */
 	public static class FloatComposableElement extends PrimitiveComposableElement {
 
-		public FloatComposableElement(XML_Composer composer, String fieldName, Object object) {
-			super(composer, fieldName, object);
+		private float value;
+		
+		public FloatComposableElement(String tag, float value) {
+			super(tag);
+			this.value = value;
 		}
 
 		@Override
-		public void compose(XML_StreamWriter writer) throws Exception {
-			writer.writeValueElement(fieldName, Float.toString((float) fieldValue));
+		public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+			writer.writeValueElement(tag, Float.toString(value));
+			return false;
 		}
-		
 	}
 	
+	
+	
+	/**
+	 * double
+	 * 
+	 * @author pierreconvert
+	 *
+	 */
 	public static class DoubleComposableElement extends PrimitiveComposableElement {
 
-		public DoubleComposableElement(XML_Composer composer, String fieldName, Object object) {
-			super(composer, fieldName, object);
+		private double value;
+		
+		public DoubleComposableElement(String tag, double value) {
+			super(tag);
+			this.value = value;
 		}
 
 		@Override
-		public void compose(XML_StreamWriter writer) throws Exception {
-			writer.writeValueElement(fieldName, Double.toString((double) fieldValue));
+		public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+			writer.writeValueElement(tag, Double.toString(value));
+			return false;
 		}
-		
 	}
 	
+	
+	
+	/**
+	 * string
+	 */
 	public static class StringComposableElement extends PrimitiveComposableElement {
 
-		public StringComposableElement(XML_Composer composer, String fieldName, Object object) {
-			super(composer, fieldName, object);
+		private String value;
+		
+		public StringComposableElement(String tag, String value) {
+			super(tag);
+			this.value = value;
 		}
 
 		@Override
-		public void compose(XML_StreamWriter writer) throws Exception {
-			writer.writeValueElement(fieldName, (String) fieldValue);
+		public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+			writer.writeValueElement(tag, value);
+			return false;
 		}
-		
 	}
 	
 }

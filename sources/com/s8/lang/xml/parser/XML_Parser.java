@@ -2,7 +2,7 @@ package com.s8.lang.xml.parser;
 
 import java.io.IOException;
 
-import com.s8.lang.xml.XML_Context;
+import com.s8.lang.xml.handler.XML_Context;
 
 /**
  * 
@@ -13,16 +13,19 @@ public class XML_Parser {
 
 	public boolean isVerbose;
 	
+	private XML_Context context;
+	
 	private XML_StreamReader reader;
 
-	private ParsedDocument rootScope;
-	public Parsed scope;
+	private RootParsedElement rootScope;
+	public ParsedScope scope;
 
 	public XML_Parser(XML_Context context, XML_StreamReader reader, boolean isVerbose) {
 		super();
-		this.isVerbose = isVerbose;
+		this.context = context;
 		this.reader = reader;
-		rootScope = new ParsedDocument(context);
+		this.isVerbose = isVerbose;
+		rootScope = new RootParsedElement(context);
 	}
 
 	/**
@@ -35,7 +38,7 @@ public class XML_Parser {
 	public Object parse() throws XML_ParsingException, IOException {
 		scope = rootScope;
 		while(scope!=null){
-			scope.parse(this, reader);
+			scope.parse(context, this, reader);
 		}
 		return rootScope.getRootObject();
 	}

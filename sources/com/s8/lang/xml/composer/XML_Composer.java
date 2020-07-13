@@ -1,19 +1,17 @@
 package com.s8.lang.xml.composer;
 
-import java.util.List;
 import java.util.Stack;
 
-import com.s8.lang.xml.XML_Context;
-import com.s8.lang.xml.XML_Syntax;
-import com.s8.lang.xml.handler.type.TypeHandler;
+import com.s8.lang.xml.handler.XML_Context;
 
 public class XML_Composer {
 
 	private XML_Context context;
-
-	private Stack<ComposableElement> stack = new Stack<>(); 
 	
 	private XML_StreamWriter writer;
+	
+	private Stack<ComposableScope> stack = new Stack<>(); 
+	
 
 	public XML_Composer(XML_Context context, XML_StreamWriter writer) {
 		super();
@@ -23,39 +21,14 @@ public class XML_Composer {
 	
 	public void compose(Object object) throws Exception{
 		
-		writer.append(XML_Syntax.HEADER+"\n");
-		add(new ObjectComposableElement(this, "root", object));
+		ComposableScope scope = new DocumentComposableScope(object);
 		
-		while(!stack.isEmpty()){
-			stack.pop().compose(writer);
+		scope.insert(context, stack, writer);
+		while(!stack.isEmpty()) {
+			boolean hasStacked = scope.compose(context, stack, writer);
+			if(!hasStacked) {
+				stack.pop();
+			}
 		}
 	}
-	
-	
-	/**
-	 * 
-	 * @param element
-	 */
-	public void add(ComposableElement element){
-		stack.push(element);
-	}
-	
-	
-	public void add(List<ComposableElement> elements){
-		int n = elements.size();
-		for(int i=n-1; i>=0; i--){
-			stack.push(elements.get(i));
-		}
-	}
-
-	
-	/**
-	 * 
-	 * @param typeName
-	 * @return
-	 */
-	public TypeHandler getTypeHandler(Class<?> type){
-		return context.getTypeHandler(type);
-	}
-	
 }

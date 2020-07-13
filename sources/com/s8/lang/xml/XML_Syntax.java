@@ -13,6 +13,9 @@ public class XML_Syntax {
 	public static final char WHITE_SPACE = ' ';
 
 	public static final char ATTRIBUTE_DEFINITION = '=';
+	
+	
+	public static final String TYPE_KEYWORD = "Xt";
 
 	public static final char[] KEY_CHARS = {
 			START_OF_TAG,

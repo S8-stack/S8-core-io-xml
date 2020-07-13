@@ -7,8 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.s8.lang.xml.parser.Parsed;
-import com.s8.lang.xml.parser.ParsedObjectElement;
+import com.s8.lang.xml.api.XML_Type;
+import com.s8.lang.xml.handler.XML_Context;
+import com.s8.lang.xml.handler.type.attributes.getters.AttributeGetter;
+import com.s8.lang.xml.handler.type.attributes.setters.AttributeSetter;
+import com.s8.lang.xml.handler.type.elements.getters.ElementGetter;
+import com.s8.lang.xml.handler.type.elements.setters.ElementSetter;
+import com.s8.lang.xml.parser.ObjectParsedScope;
+import com.s8.lang.xml.parser.ParsedScope;
 import com.s8.lang.xml.parser.XML_ParsingException;
 import com.s8.lang.xml.parser.XML_StreamReader;
 
@@ -19,7 +25,9 @@ import com.s8.lang.xml.parser.XML_StreamReader;
  */
 public class TypeHandler {
 
-	private Class<?> type;
+
+
+	Class<?> type;
 
 
 	/**
@@ -30,7 +38,7 @@ public class TypeHandler {
 	/**
 	 * declared name in Class<?> (JAVA side)
 	 */
-	private String className;
+	//private String className;
 
 
 	/**
@@ -38,13 +46,6 @@ public class TypeHandler {
 	 * (package-private for external construction)
 	 */
 	TypeHandler[] subTypes;
-
-
-	/**
-	 * Intentionally left package private
-	 */
-	int nLists;
-
 
 	/** ready for ext construction */
 	Constructor<?> constructor;
@@ -67,39 +68,37 @@ public class TypeHandler {
 	/**
 	 * Mapping of all possible ways of settings field (with element setters)
 	 */
-	Map<String, ElementFieldSetter> elementSetters = new HashMap<>();
+	Map<String, ElementSetter> elementSetters = new HashMap<>();
 
 
-	boolean isRoot;
+	//boolean isRoot;
 
-	
+
 
 	/**
+	 * @throws XML_TypeCompilationException 
 	 * 
 	 */
-	public TypeHandler(Class<?> type) {
+	public TypeHandler(Class<?> type) throws XML_TypeCompilationException {
 		super();
 		this.type = type;
-		this.className = type.getName();
+
+		// pre-initialize
+		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
+		if(typeAnnotation==null){
+			throw new XML_TypeCompilationException("Missing type declaration for type: "+type.getName());
+		}
+		xmlName = typeAnnotation.name();
 	}
 
 
-	
+
 
 	public interface Putter {
-		public void put(ElementFieldSetter setter) throws XML_TypeCompilationException;
+		public void put(ElementSetter setter) throws XML_TypeCompilationException;
 	}
 
-	/*
-	public boolean isInitialized() {
-		return isInitialized;
-	}
-	 */
-
-	public int getNumberOfLists() {
-		return nLists;
-	}
-
+	
 	/**
 	 * 
 	 * @return tag displayed in XML
@@ -112,18 +111,20 @@ public class TypeHandler {
 	 * 
 	 * @return JAVA name
 	 */
+	/*
 	public String getClassName(){
 		return className;
 	}
+	 */
 
-	
+
 	public boolean hasSubTypes() {
 		return subTypes.length > 0;
 	}
 
 	/**
 	 * 
-	 * @return
+	 * @return subTypes, including this one
 	 */
 	public TypeHandler[] getSubTypes() {
 		return subTypes;
@@ -161,16 +162,6 @@ public class TypeHandler {
 	}
 
 
-	/**
-	 * 
-	 * @param object
-	 * @param name
-	 * @return
-	 * @throws Exception 
-	 */
-	public List<AttributeGetter> getAttributeGetters() {
-		return attributeGetters;
-	}
 
 
 	public boolean hasValueSetter() {
@@ -199,8 +190,8 @@ public class TypeHandler {
 	 * @throws XML_ParsingException 
 	 * @throws Exception
 	 */
-	public ElementFieldSetter getElementSetter(String name, XML_StreamReader.Point point) throws XML_ParsingException {
-		ElementFieldSetter setter = elementSetters.get(name);
+	public ElementSetter getElementSetter(String name, XML_StreamReader.Point point) throws XML_ParsingException {
+		ElementSetter setter = elementSetters.get(name);
 		if(setter==null){
 			throw new XML_ParsingException(point, "No field with name "+name+" in type "+this.xmlName);
 		}
@@ -208,6 +199,10 @@ public class TypeHandler {
 	}
 
 
+	
+	public List<AttributeGetter> getAttributeGetters(){
+		return attributeGetters;
+	}
 	/**
 	 * 
 	 * @param object
@@ -215,7 +210,7 @@ public class TypeHandler {
 	 * @return
 	 * @throws Exception 
 	 */
-	public List<ElementGetter> getElementGetters() throws Exception{
+	public List<ElementGetter> getElementGetters() {
 		return elementGetters;
 	}
 
@@ -229,22 +224,31 @@ public class TypeHandler {
 	 * @return
 	 * @throws XML_ParsingException
 	 */
-	public Parsed createParsedElement(ParsedObjectElement parent, String tag, XML_StreamReader.Point point) 
+	public ParsedScope createParsedElement(XML_Context context, ObjectParsedScope parent, String tag, XML_StreamReader.Point point) 
 			throws XML_ParsingException {
-		ElementFieldSetter setter = elementSetters.get(tag);
+		ElementSetter setter = elementSetters.get(tag);
 		if(setter==null) {
 			throw new XML_ParsingException(point, "Failed to retrieve element setter for tag: "+tag);
 		}
-		return setter.getParsedElement(parent, point);
+
+
+		return setter.createParsedElement(context, parent, point);
 	}
 
 	public Class<?> getType() {
 		return type;
 	}
 
+	@Override
+	public String toString() {
+		return "handler ["+xmlName+"] for "+type;
+	}
 
+
+	/*
 	public boolean isRoot() {
 		return isRoot;
 	}
+	 */
 
 }
