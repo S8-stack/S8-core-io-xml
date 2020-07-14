@@ -6,6 +6,7 @@ import com.s8.lang.xml.api.XML_GetElement;
 import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
 public abstract class ElementGetter {
@@ -21,11 +22,16 @@ public abstract class ElementGetter {
 
 	public static abstract class Builder {
 
-		Method method;
+		protected Method method;
+		
+		protected String fieldTag;
 
 		public Builder(Method method) {
 			super();
 			this.method = method;
+			
+			XML_GetElement getElementAnnotation = method.getAnnotation(XML_GetElement.class);
+			this.fieldTag = getElementAnnotation.tag();
 		}
 
 		/**
@@ -37,10 +43,50 @@ public abstract class ElementGetter {
 		
 		
 		/**
+		 * @throws XML_TypeCompilationException 
 		 * 
 		 */
-		public abstract void build(TypeBuilder typeBuilder);
+		public abstract boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException;
 
+		public abstract boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException;
+
+		
+		/**
+		 *  check collision
+		 * @param contextBuilder
+		 * @param typeBuilder
+		 * @return true if colliding, false otherwise
+		 */
+		public boolean isFieldTypeTagColliding(TypeBuilder typeBuilder, TypeBuilder fieldTypeBuilder) {
+			boolean isColliding = false;
+			TypeHandler[] subTypes = fieldTypeBuilder.getHandler().getSubTypes();
+			int n = subTypes.length, i=0;
+			while(!isColliding && i<n) {
+				TypeHandler subType = subTypes[i++];
+				if(typeBuilder.isGetElementColliding(subType.getXmlTag())) {
+					isColliding = true;
+				}
+			}
+			return isColliding;
+		}
+		
+		
+		/**
+		 * 
+		 * @param typeBuilder
+		 * @param fieldTypeBuilder
+		 * @throws XML_TypeCompilationException
+		 */
+		public void fillFieldTypeTags(TypeBuilder typeBuilder, TypeBuilder fieldTypeBuilder) throws XML_TypeCompilationException {
+			boolean isColliding = false;
+			TypeHandler[] subTypes = fieldTypeBuilder.getHandler().getSubTypes();
+			int n = subTypes.length, i=0;
+			while(!isColliding && i<n) {
+				TypeHandler subType = subTypes[i++];
+				typeBuilder.putElementGetterTag(subType.getXmlTag());
+			}
+		}
+					
 	}
 
 
@@ -76,24 +122,21 @@ public abstract class ElementGetter {
 
 
 
+	protected String fieldTag;
+	
 	protected Method method;
 
-	protected String tag;
 
-	public ElementGetter(Method method) {
+	public ElementGetter(String tag, Method method) {
 		super();
+		this.fieldTag = tag;
 		this.method = method;
-
-		
-
-		XML_GetElement getElementAnnotation = method.getAnnotation(XML_GetElement.class);
-		this.tag = getElementAnnotation.tag();
 	}
 
 
 
 	public String getTag(){
-		return tag;
+		return fieldTag;
 	}
 
 
@@ -106,6 +149,14 @@ public abstract class ElementGetter {
 	 * @throws Exception 
 	 */
 	public abstract <T> void createComposableElement(ObjectComposableScope scope) throws Exception;
+
+
+
+	/**
+	 * 
+	 * @return underlying method
+	 */
+	public abstract Method getMethod();
 
 
 

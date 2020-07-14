@@ -6,6 +6,7 @@ import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.IntegerComposableElement;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
 
 /**
@@ -13,7 +14,7 @@ import com.s8.lang.xml.handler.type.TypeBuilder;
  * @author pierreconvert
  *
  */
-public class IntegerElementGetter extends ElementGetter {
+public class IntegerElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {
 		
@@ -35,33 +36,26 @@ public class IntegerElementGetter extends ElementGetter {
 	};
 	
 	
-	public static class Builder extends ElementGetter.Builder {
+	public static class Builder extends PrimitiveElementGetter.Builder {
 
 		public Builder(Method method) {
 			super(method);
 		}
 
 		@Override
-		public void build(TypeBuilder typeBuilder) {
-			typeBuilder.putElementGetter(new IntegerElementGetter(method));
-		}
-
-		/**
-		 * 
-		 * @param contextBuilder
-		 */
-		public void explore(XML_ContextBuilder contextBuilder) {
-			// nothing to explore
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			typeBuilder.putElementGetter(new IntegerElementGetter(fieldTag, method));
+			return false;
 		}
 	}
 	
-	public IntegerElementGetter(Method method) {
-		super(method);
+	public IntegerElementGetter(String tag, Method method) {
+		super(tag, method);
 	}
 
 	@Override
 	public void createComposableElement(ObjectComposableScope scope) throws Exception {
 		int value = (int) method.invoke(scope.getObject(), new Object[]{});
-		scope.append(new IntegerComposableElement(tag, value));
+		scope.append(new IntegerComposableElement(fieldTag, value));
 	}
 }

@@ -6,14 +6,13 @@ import java.util.Stack;
 
 import com.s8.lang.xml.XML_Syntax;
 import com.s8.lang.xml.handler.XML_Context;
-import com.s8.lang.xml.handler.type.TypeHandler;
 
 public class DocumentComposableScope extends ComposableScope {
 	
 	private Object object;
 
 	
-	private ObjectComposableScope rootScope;
+	private ObjectComposableScope rootObjectScope;
 
 	private boolean isHeaderWritten;
 	
@@ -31,10 +30,8 @@ public class DocumentComposableScope extends ComposableScope {
 			// write header
 			writer.append(XML_Syntax.HEADER+"\n");
 			
-			Class<?> type = object.getClass();
-			TypeHandler typeHandler = context.getTypeHandlerByClass(type);
 			
-			rootScope = new ObjectComposableScope(typeHandler.getXmlTag(), object);
+			rootObjectScope = new ObjectComposableScope.TypeTagged(object);
 			stack.push(this);
 			isHeaderWritten = true;
 			
@@ -49,7 +46,7 @@ public class DocumentComposableScope extends ComposableScope {
 	@Override
 	public boolean compose(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws Exception {
-		return rootScope.insert(context, stack, writer);
+		return rootObjectScope.insert(context, stack, writer);
 	}
 
 }

@@ -198,5 +198,10 @@ public class ObjectElementSetter extends ElementSetter {
 			return new ObjectParsedScope(context, parent, callback, tag, point);
 		}
 	}
+	
+	@Override
+	public Method getMethod() {
+		return method;
+	}
 
 }

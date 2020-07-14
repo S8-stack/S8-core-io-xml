@@ -57,18 +57,38 @@ public class ObjectElementGetter extends ElementGetter {
 		}
 
 		@Override
-		public void build(TypeBuilder typeBuilder) {
-			typeBuilder.putElementGetter(new ObjectElementGetter(method));
+		public boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			typeBuilder.putElementGetterTag(fieldTag);
+			return false;
+		}
+		
+		@Override
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			Class<?> fieldType =  method.getReturnType();
+			TypeBuilder fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
+			if(!fieldTypeBuilder.isInheritanceDiscovered()) {
+				return true;
+			}
+			
+			boolean isTypeTagPreferred = !isFieldTypeTagColliding(typeBuilder, fieldTypeBuilder);	
+			if(isTypeTagPreferred) {
+				fillFieldTypeTags(typeBuilder, fieldTypeBuilder);
+			}
+			typeBuilder.putElementGetter(new ObjectElementGetter(fieldTag, method, isTypeTagPreferred));
+			return false;
 		}
 	}
 
+	
+	private boolean isTypeTagPreferred;
 	
 	/**
 	 * 
 	 * @param method
 	 */
-	public ObjectElementGetter(Method method) {
-		super(method);
+	public ObjectElementGetter(String tag, Method method, boolean isTypeTagPreferred) {
+		super(tag, method);
+		this.isTypeTagPreferred = isTypeTagPreferred;
 	}
 
 
@@ -77,6 +97,16 @@ public class ObjectElementGetter extends ElementGetter {
 
 		// invoke consumer on parent object
 		Object subObject = method.invoke(scope.getObject());
-		scope.append(new ObjectComposableScope(tag, subObject));
+		if(isTypeTagPreferred) {
+			scope.append(new ObjectComposableScope.TypeTagged(subObject));
+		}
+		else {
+			scope.append(new ObjectComposableScope.FieldTagged(fieldTag, subObject));
+		}
+	}
+
+	@Override
+	public Method getMethod() {
+		return method;
 	}
 }

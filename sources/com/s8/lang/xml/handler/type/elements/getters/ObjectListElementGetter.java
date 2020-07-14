@@ -48,28 +48,60 @@ public class ObjectListElementGetter extends ElementGetter {
 		public Builder(Method method) {
 			super(method);
 		}
+		
 
 		@Override
 		public void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
-			Parameter[] parameters = method.getParameters();
-			ParameterizedType argType = (ParameterizedType) parameters[0].getParameterizedType();
-			Class<?> componentType = (Class<?>) (argType.getActualTypeArguments())[0];
-			contextBuilder.register(componentType);
+			contextBuilder.register(getTargetType(contextBuilder));
+		}
+		
+		@Override
+		public boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			typeBuilder.putElementGetterTag(fieldTag);
+			return false;
 		}
 
 		@Override
-		public void build(TypeBuilder typeBuilder) {
-			typeBuilder.putElementGetter(new ObjectListElementGetter(method));
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			Class<?> fieldType =  getTargetType(contextBuilder);
+			TypeBuilder fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
+			if(!fieldTypeBuilder.isInheritanceDiscovered()) {
+				return true;
+			}
+			
+			boolean isTypeTagPreferred = !isFieldTypeTagColliding(typeBuilder, fieldTypeBuilder);
+			if(isTypeTagPreferred) {
+				fillFieldTypeTags(typeBuilder, fieldTypeBuilder);
+			}
+			typeBuilder.putElementGetter(new ObjectListElementGetter(fieldTag, method, isTypeTagPreferred));
+			return false;
+		}
+		
+		
+		/**
+		 * 
+		 * @param contextBuilder
+		 * @return
+		 */
+		public Class<?> getTargetType(XML_ContextBuilder contextBuilder) {
+			Parameter[] parameters = method.getParameters();
+			ParameterizedType argType = (ParameterizedType) parameters[0].getParameterizedType();
+			Class<?> componentType = (Class<?>) (argType.getActualTypeArguments())[0];
+			return componentType;
 		}
 	}
 
 
+	
+	private boolean isTypeTagPreferred;
+	
 	/**
 	 * 
 	 * @param method
 	 */
-	public ObjectListElementGetter(Method method) {
-		super(method);
+	public ObjectListElementGetter(String fieldTag, Method method, boolean isTypeTagPreferred) {
+		super(fieldTag, method);
+		this.isTypeTagPreferred = isTypeTagPreferred;
 	}
 
 
@@ -81,12 +113,24 @@ public class ObjectListElementGetter extends ElementGetter {
 			@Override
 			public void accept(T subObject) {
 				if(subObject!=null) {
-					scope.append(new ObjectComposableScope(tag, subObject));
+					if(isTypeTagPreferred) {
+						scope.append(new ObjectComposableScope.TypeTagged(subObject));
+					}
+					else {
+						scope.append(new ObjectComposableScope.FieldTagged(fieldTag, subObject));
+					}
 				}
 			}
 		};
 
 		// invoke consumer on parent object
 		method.invoke(scope.getObject(), new Object[]{ consumer });
+	}
+	
+	
+
+	@Override
+	public Method getMethod() {
+		return method;
 	}
 }

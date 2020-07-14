@@ -6,9 +6,10 @@ import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.StringComposableElement;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
 
-public class StringElementGetter extends ElementGetter {
+public class StringElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {
 		
@@ -30,33 +31,29 @@ public class StringElementGetter extends ElementGetter {
 	};
 	
 	
-	public static class Builder extends ElementGetter.Builder {
+	public static class Builder extends PrimitiveElementGetter.Builder {
 
 		public Builder(Method method) {
 			super(method);
 		}
 
 		@Override
-		public void build(TypeBuilder typeBuilder) {
-			typeBuilder.putElementGetter(new StringElementGetter(method));
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			typeBuilder.putElementGetter(new StringElementGetter(fieldTag, method));
+			return false;
 		}
 
-		/**
-		 * 
-		 * @param contextBuilder
-		 */
-		public void explore(XML_ContextBuilder contextBuilder) {
-			// nothing to explore
-		}
 	}
 	
-	public StringElementGetter(Method method) {
-		super(method);
+	public StringElementGetter(String tag, Method method) {
+		super(tag, method);
 	}
 
 	@Override
 	public void createComposableElement(ObjectComposableScope scope) throws Exception {
 		String value = (String) method.invoke(scope.getObject(), new Object[]{});
-		scope.append(new StringComposableElement(tag, value));
+		if(value!=null) {
+			scope.append(new StringComposableElement(fieldTag, value));	
+		}
 	}
 }

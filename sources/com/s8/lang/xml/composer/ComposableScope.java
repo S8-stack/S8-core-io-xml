@@ -46,7 +46,7 @@ public abstract class ComposableScope {
 	 * @param context
 	 * @param composer
 	 * @param writer
-	 * @return
+	 * @return is Interrupted
 	 * @throws Exception
 	 */
 	public abstract boolean compose(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)

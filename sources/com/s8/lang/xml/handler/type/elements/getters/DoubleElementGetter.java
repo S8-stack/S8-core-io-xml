@@ -6,6 +6,7 @@ import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.DoubleComposableElement;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
 
 /**
@@ -13,7 +14,7 @@ import com.s8.lang.xml.handler.type.TypeBuilder;
  * @author pierre convert
  *
  */
-public class DoubleElementGetter extends ElementGetter {
+public class DoubleElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {
 
@@ -35,23 +36,16 @@ public class DoubleElementGetter extends ElementGetter {
 	};
 
 	
-	public static class Builder extends ElementGetter.Builder {
+	public static class Builder extends PrimitiveElementGetter.Builder {
 
 		public Builder(Method method) {
 			super(method);
 		}
 
 		@Override
-		public void build(TypeBuilder typeBuilder) {
-			typeBuilder.putElementGetter(new DoubleElementGetter(method));
-		}
-
-		/**
-		 * 
-		 * @param contextBuilder
-		 */
-		public void explore(XML_ContextBuilder contextBuilder) {
-			// nothing to explore
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			typeBuilder.putElementGetter(new DoubleElementGetter(fieldTag, method));
+			return false;
 		}
 	}
 
@@ -60,13 +54,13 @@ public class DoubleElementGetter extends ElementGetter {
 	 * 
 	 * @param method
 	 */
-	public DoubleElementGetter(Method method) {
-		super(method);
+	public DoubleElementGetter(String tag, Method method) {
+		super(tag, method);
 	}
 
 	@Override
 	public void createComposableElement(ObjectComposableScope scope) throws Exception {
 		double value = (double) method.invoke(scope.getObject(), new Object[]{});
-		scope.append(new DoubleComposableElement(tag, value));
+		scope.append(new DoubleComposableElement(fieldTag, value));
 	}
 }

@@ -6,8 +6,9 @@ import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.FloatComposableElement;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
-public class FloatElementGetter extends ElementGetter {
+public class FloatElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {
 
@@ -34,34 +35,27 @@ public class FloatElementGetter extends ElementGetter {
 	 * @author pierreconvert
 	 *
 	 */
-	public static class Builder extends ElementGetter.Builder {
+	public static class Builder extends PrimitiveElementGetter.Builder {
 
 		public Builder(Method method) {
 			super(method);
 		}
 
 		@Override
-		public void build(TypeBuilder typeBuilder) {
-			typeBuilder.putElementGetter(new FloatElementGetter(method));
-		}
-
-		/**
-		 * 
-		 * @param contextBuilder
-		 */
-		public void explore(XML_ContextBuilder contextBuilder) {
-			// nothing to explore
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			typeBuilder.putElementGetter(new FloatElementGetter(fieldTag, method));
+			return false;
 		}
 	}
 
 
-	public FloatElementGetter(Method method) {
-		super(method);
+	public FloatElementGetter(String tag, Method method) {
+		super(tag, method);
 	}
 
 	@Override
 	public void createComposableElement(ObjectComposableScope scope) throws Exception {
 		float value = (float) method.invoke(scope.getObject(), new Object[]{});
-		scope.append(new FloatComposableElement(tag, value));
+		scope.append(new FloatComposableElement(fieldTag, value));
 	}
 }

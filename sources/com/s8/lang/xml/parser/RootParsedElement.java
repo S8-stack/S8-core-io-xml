@@ -34,7 +34,7 @@ public class RootParsedElement implements ParsedScope {
 
 	/**
 	 * 
-	 * @param tag
+	 * @param fieldTag
 	 * @param callback
 	 * @param handler
 	 * @throws XML_ParsingException

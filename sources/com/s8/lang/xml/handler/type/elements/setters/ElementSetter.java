@@ -130,4 +130,7 @@ public abstract class ElementSetter {
 		
 		throw new XML_TypeCompilationException("Failed to match setter for: "+method);
 	}
+
+
+	public abstract Method getMethod();
 }

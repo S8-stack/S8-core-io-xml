@@ -26,7 +26,9 @@ public class TypeBuilder {
 
 	private boolean isInheritanceBuilt;
 
-	private boolean isGettersBuilt;
+	private boolean isGettersBuilt0;
+
+	private boolean isGettersBuilt1;
 
 	private boolean isSettersBuilt0;
 
@@ -167,6 +169,8 @@ public class TypeBuilder {
 	 */
 	public boolean build(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
 		if(!isBuilt) {
+			
+			boolean hasMissingBuilds = false, isBuildMissingDependencies = false;
 
 			/* <inheritance> */
 			if(!isInheritanceBuilt) {
@@ -177,21 +181,38 @@ public class TypeBuilder {
 				typeHandler.subTypes = map.values().stream().map(t -> t.getHandler()).toArray(size -> new TypeHandler[size]);
 				isInheritanceBuilt = true;	
 			}
-
+			
+		
 			/* <getters> */
-			if(!isGettersBuilt) {
+			if(!isGettersBuilt0) {
+				hasMissingBuilds = false;
 				for(ElementGetter.Builder builder : elementGetBuilders) {
-					builder.build(this);
+					isBuildMissingDependencies = builder.build0(this);
+					if(isBuildMissingDependencies) {
+						hasMissingBuilds = true;
+					}
 				}
-				isGettersBuilt = true;
+				isGettersBuilt0 = !hasMissingBuilds;
+			}
+			
+			if(!isGettersBuilt1 && isGettersBuilt0) {
+				hasMissingBuilds = false;
+				for(ElementGetter.Builder builder : elementGetBuilders) {
+					isBuildMissingDependencies = builder.build1(contextBuilder, this);
+					if(isBuildMissingDependencies) {
+						hasMissingBuilds = true;
+					}
+				}
+				isGettersBuilt1 = !hasMissingBuilds;
 			}
 			/* </getters> */
 
 			/* <setters> */
 			if(!isSettersBuilt0) {
-				boolean hasMissingBuilds = false;
+				
+				hasMissingBuilds = false;
 				for(ElementSetter.Builder builder : elementSetBuilders) {
-					boolean isBuildMissingDependencies = builder.build0(contextBuilder, this);
+					isBuildMissingDependencies = builder.build0(contextBuilder, this);
 					if(isBuildMissingDependencies) {
 						hasMissingBuilds = true;
 					}
@@ -200,9 +221,9 @@ public class TypeBuilder {
 			}
 
 			if(isSettersBuilt0 && !isSettersBuilt1) {
-				boolean hasMissingBuilds = false;
+				hasMissingBuilds = false;
 				for(ElementSetter.Builder builder : elementSetBuilders) {
-					boolean isBuildMissingDependencies = builder.build1(contextBuilder, this);
+					isBuildMissingDependencies = builder.build1(contextBuilder, this);
 					if(isBuildMissingDependencies) {
 						hasMissingBuilds = true;
 					}
@@ -212,7 +233,7 @@ public class TypeBuilder {
 
 			/* </setters> */
 
-			isBuilt = isSettersBuilt1;
+			isBuilt = isSettersBuilt1 && isGettersBuilt1;
 		}
 		return isBuilt;
 	}
@@ -314,18 +335,33 @@ private boolean isDependenciesInitialized() {
 
 
 
-
-
+	
+	public void putElementGetterTag(String tag) throws XML_TypeCompilationException {
+		if(typeHandler.elementGettersTagSet.contains(tag)) {
+			throw new XML_TypeCompilationException("Try to override element getter tag: "+tag);
+		}
+		typeHandler.elementGettersTagSet.add(tag);
+	}
+	
+	public boolean isGetElementColliding(String tag) {
+		return typeHandler.elementGettersTagSet.contains(tag);
+	}
+	
+	public void putElementGetter(ElementGetter elementGetter) throws XML_TypeCompilationException {
+		typeHandler.elementGetters.add(elementGetter);
+	}
+	
 	public boolean isSetElementColliding(String tag) {
 		return typeHandler.elementSetters.containsKey(tag);
 	}
 
-	public void putElementGetter(ElementGetter elementGetter) {
-		typeHandler.elementGetters.add(elementGetter);
-	}
 
-	public void putElementSetter(ElementSetter elementSetter) {
-		typeHandler.elementSetters.put(elementSetter.getTag(), elementSetter);
+	public void putElementSetter(ElementSetter elementSetter) throws XML_TypeCompilationException {
+		String tag = elementSetter.getTag();
+		if(typeHandler.elementSetters.containsKey(tag)) {
+			throw new XML_TypeCompilationException("Try to override element setter tag: "+tag+", for method: "+elementSetter.getMethod());
+		}
+		typeHandler.elementSetters.put(tag, elementSetter);
 	}
 	
 	@Override

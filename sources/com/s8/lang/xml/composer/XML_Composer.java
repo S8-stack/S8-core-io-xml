@@ -25,6 +25,7 @@ public class XML_Composer {
 		
 		scope.insert(context, stack, writer);
 		while(!stack.isEmpty()) {
+			scope = stack.peek();
 			boolean hasStacked = scope.compose(context, stack, writer);
 			if(!hasStacked) {
 				stack.pop();

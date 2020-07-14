@@ -6,8 +6,9 @@ import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.LongComposableElement;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
-public class LongElementGetter extends ElementGetter {
+public class LongElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {
 		
@@ -29,37 +30,31 @@ public class LongElementGetter extends ElementGetter {
 	};
 	
 	
-	public static class Builder extends ElementGetter.Builder {
+	public static class Builder extends PrimitiveElementGetter.Builder {
 
 		public Builder(Method method) {
 			super(method);
 		}
 
 		@Override
-		public void build(TypeBuilder typeBuilder) {
-			typeBuilder.putElementGetter(new LongElementGetter(method));
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			typeBuilder.putElementGetter(new LongElementGetter(fieldTag, method));
+			return false;
 		}
 
-		/**
-		 * 
-		 * @param contextBuilder
-		 */
-		public void explore(XML_ContextBuilder contextBuilder) {
-			// nothing to explore
-		}
 	}
 	
 	/**
 	 * 
 	 * @param method
 	 */
-	public LongElementGetter(Method method) {
-		super(method);
+	public LongElementGetter(String tag, Method method) {
+		super(tag, method);
 	}
 
 	@Override
 	public void createComposableElement(ObjectComposableScope scope) throws Exception {
 		long value = (long) method.invoke(scope.getObject(), new Object[]{});
-		scope.append(new LongComposableElement(tag, value));
+		scope.append(new LongComposableElement(fieldTag, value));
 	}
 }

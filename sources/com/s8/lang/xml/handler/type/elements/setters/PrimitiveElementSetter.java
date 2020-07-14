@@ -70,7 +70,10 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 	protected abstract PrimitiveParsedScope.Callback getCallback(Object object, XML_StreamReader.Point point);
 
 
-
+	@Override
+	public Method getMethod() {
+		return method;
+	}
 
 
 }
