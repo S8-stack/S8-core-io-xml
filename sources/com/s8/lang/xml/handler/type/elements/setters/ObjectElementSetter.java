@@ -1,5 +1,7 @@
 package com.s8.lang.xml.handler.type.elements.setters;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -16,14 +18,14 @@ import com.s8.lang.xml.parser.XML_StreamReader;
 
 public class ObjectElementSetter extends ElementSetter {
 
-	
+
 	public final static Prototype PROTOTYPE = new Prototype() {
-		
+
 		@Override
 		public boolean matches(Class<?> fieldType) {
 			return !fieldType.isPrimitive() && !fieldType.equals(String.class);
 		}
-		
+
 		@Override
 		public ElementSetter.Builder create(Method method) {
 			XML_SetElement setElementAnnotation = method.getAnnotation(XML_SetElement.class);
@@ -31,7 +33,7 @@ public class ObjectElementSetter extends ElementSetter {
 			return new ObjectElementSetter.Builder(tag, method, method.getParameterTypes()[0]);
 		}
 	};
-	
+
 	public static class Builder extends ElementSetter.Builder {
 
 
@@ -40,9 +42,10 @@ public class ObjectElementSetter extends ElementSetter {
 		private Method method;
 
 		private Class<?> fieldType;
-		
+
 		private TypeBuilder fieldTypeBuilder;
 
+		
 		public Builder(String tag, Method method, Class<?> fieldType) {
 			super(tag);
 			this.fieldTag = tag;
@@ -55,79 +58,91 @@ public class ObjectElementSetter extends ElementSetter {
 		public void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
 			contextBuilder.register(fieldType);
 		}
-		
+
 
 		@Override
 		public boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) {
+			if(!isBuilt0) {
 
-			if(fieldTypeBuilder==null) {
-				fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
+				if(fieldTypeBuilder==null) {
+					fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
+				}
+
+				if(!fieldTypeBuilder.isInheritanceDiscovered()) {
+					return true; // not done, still need to discover field type inheritance
+				}
+
+				TypeHandler fieldTypeHandler = fieldTypeBuilder.getHandler();
+
+
+				if(fieldTypeHandler.hasSubTypes()) { // is polymorphic
+					/* use field tag, put untyped setter */
+					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, true, method));	
+				}
+				else { 
+					/* suse field tag, put single allowed type -> put pre-typed*/
+					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, true, method, fieldTypeHandler));
+				}
+
+				isBuilt0 = true;
+				return false;
 			}
-			
-			if(!fieldTypeBuilder.isInheritanceDiscovered()) {
-				return true; // not done, still need to discover field type inheritance
+			else {
+				return false;
 			}
-
-			TypeHandler fieldTypeHandler = fieldTypeBuilder.getHandler();
-
-
-			if(fieldTypeHandler.hasSubTypes()) { // is polymorphic
-				/* use field tag, put untyped setter */
-				typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, method));	
-			}
-			else { 
-				/* suse field tag, put single allowed type -> put pre-typed*/
-				typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, method, fieldTypeHandler));
-			}
-
-			return false;
 		}
 
 
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) {
-			
-			//TypeHandler typeHandler = typeBuilder.getHandler();
-			TypeHandler fieldTypeHandler = fieldTypeBuilder.getHandler();
-			
-			/* search for collisions */
-			boolean isSubstitutionGroupColliding = false;
-			
-			// check main type
-			if(typeBuilder.isSetElementColliding(fieldTypeHandler.getXmlTag())) {
-				isSubstitutionGroupColliding = true;
-			}
-			
-			// 
-			TypeHandler[] subTypes = fieldTypeHandler.getSubTypes();
-			int n = subTypes.length;
-			int i=0;
-			TypeHandler subType;
-			while(!isSubstitutionGroupColliding && i<n) {
-				subType = subTypes[i++];
-				if(typeBuilder.isSetElementColliding(subType.getXmlTag())){
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) {			
+			if(!isBuilt1) {
+
+				//TypeHandler typeHandler = typeBuilder.getHandler();
+				TypeHandler fieldTypeHandler = fieldTypeBuilder.getHandler();
+
+				/* search for collisions */
+				boolean isSubstitutionGroupColliding = false;
+
+				// check main type
+				if(typeBuilder.isSetElementColliding(fieldTypeHandler.getXmlTag())) {
 					isSubstitutionGroupColliding = true;
 				}
-			}
-			
-			/* if no collision, expand */
-			if(!isSubstitutionGroupColliding) {
-				typeBuilder.setElementSetter(new ObjectElementSetter(fieldTypeHandler.getXmlTag(), method, fieldTypeHandler));
-				for(TypeHandler handler : fieldTypeHandler.getSubTypes()) {
-					String typeTag = handler.getXmlTag();
-					typeBuilder.setElementSetter(new ObjectElementSetter(typeTag, method, handler));
+
+				// 
+				TypeHandler[] subTypes = fieldTypeHandler.getSubTypes();
+				int n = subTypes.length;
+				int i=0;
+				TypeHandler subType;
+				while(!isSubstitutionGroupColliding && i<n) {
+					subType = subTypes[i++];
+					if(typeBuilder.isSetElementColliding(subType.getXmlTag())){
+						isSubstitutionGroupColliding = true;
+					}
 				}
-			}
+
+				/* if no collision, expand */
+				if(!isSubstitutionGroupColliding) {
+					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTypeHandler.getXmlTag(), false, method, fieldTypeHandler));
+					for(TypeHandler fieldSubTypeHandler : fieldTypeHandler.getSubTypes()) {
+						String typeTag = fieldSubTypeHandler.getXmlTag();
+						typeBuilder.setElementSetter(new ObjectElementSetter(typeTag, false, method, fieldSubTypeHandler));
+					}
+				}
 			
-			return false;
+				isBuilt1 = true;
+				return false;
+			}
+			else {
+				return false;
+			}			
 		}
 
 
 	}
 
-	
-	private Method method;
 
+	private Method method;
+	
 	private boolean isTypeDefined;
 
 	private TypeHandler handler;
@@ -138,8 +153,8 @@ public class ObjectElementSetter extends ElementSetter {
 	 * @param tag
 	 * @param method
 	 */
-	public ObjectElementSetter(String tag, Method method) {
-		super(tag);
+	public ObjectElementSetter(String tag, boolean isFieldTag, Method method) {
+		super(tag, isFieldTag);
 		this.method = method;
 		isTypeDefined = false;
 	}
@@ -150,9 +165,10 @@ public class ObjectElementSetter extends ElementSetter {
 	 * @param tag
 	 * @param method
 	 * @param handler
+	 * @param isFieldTag 
 	 */
-	public ObjectElementSetter(String tag, Method method, TypeHandler handler) {
-		super(tag);
+	public ObjectElementSetter(String tag, boolean isFieldTag, Method method, TypeHandler handler) {
+		super(tag, isFieldTag);
 		this.method = method;
 		this.handler = handler;
 		isTypeDefined = true;
@@ -192,16 +208,33 @@ public class ObjectElementSetter extends ElementSetter {
 		};
 
 		if(isTypeDefined) {
-			return new ObjectParsedScope(context, parent, callback, tag, handler, point);
+			return new ObjectParsedScope(context, parent, callback, getTag(), handler, point);
 		}
 		else {
-			return new ObjectParsedScope(context, parent, callback, tag, point);
+			return new ObjectParsedScope(context, parent, callback, getTag(), point);
 		}
 	}
-	
+
 	@Override
 	public Method getMethod() {
 		return method;
 	}
+	
+	@Override
+	public void DTD_writeHeader(Writer writer) throws IOException {
+		writer.append(getTag());
+		writer.append("*");
+	}
 
+
+	@Override
+	public void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException {
+		if(isFieldTag()) {
+			/*
+			writer.append("\n<!ELEMENT  ");
+			writer.append(getTag());
+			writer.append(" (#PCDATA)>");	
+			*/
+		}
+	}
 }

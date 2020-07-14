@@ -1,10 +1,13 @@
 package com.s8.lang.xml.handler.type.attributes.setters;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.s8.lang.xml.api.XML_SetAttribute;
 import com.s8.lang.xml.parser.XML_ParsingException;
 import com.s8.lang.xml.parser.XML_StreamReader;
 
@@ -53,10 +56,48 @@ public abstract class AttributeSetter {
 	}
 
 	protected Method method;
-
+	
+	private String name;
+	
+	private boolean isRequired;
+	
 	public AttributeSetter(Method method) {
 		super();
 		this.method = method;
+		
+		XML_SetAttribute attributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
+		name = attributeAnnotation.name();
+		isRequired = attributeAnnotation.isRequired();
+	}
+	
+	
+	public boolean isRequired() {
+		return isRequired;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * 
+	 * @param writer
+	 * @throws IOException
+	 */
+	public void writeDTD(Writer writer) throws IOException {
+		//b  CDATA  #IMPLIED
+		writer.append(name);
+		writer.append(' ');
+		
+		writer.append("CDATA");
+		writer.append(' ');
+		
+		if(isRequired) {
+			writer.append("#REQUIRED");	
+		}
+		else {
+			writer.append("#IMPLIED");	
+		}
 	}
 
 	public abstract void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException;

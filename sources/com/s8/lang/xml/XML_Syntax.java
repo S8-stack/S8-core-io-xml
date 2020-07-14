@@ -3,7 +3,7 @@ package com.s8.lang.xml;
 public class XML_Syntax {
 	
 	public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-
+	
 	public static final char START_OF_TAG = '<';
 	
 	public static final char END_OF_TAG = '>';

@@ -1,10 +1,13 @@
 package com.s8.lang.xml.handler.type.elements.setters;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Method;
 
 import com.s8.lang.xml.handler.XML_Context;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 import com.s8.lang.xml.parser.ObjectParsedScope;
 import com.s8.lang.xml.parser.PrimitiveParsedScope;
@@ -41,8 +44,15 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 		@Override
 		public boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder)
 				throws XML_TypeCompilationException {
-			typeBuilder.setElementSetter(getStandardSetter());
-			return false;
+			if(!isBuilt0) {
+				typeBuilder.setElementSetter(getStandardSetter());
+				isBuilt0 = true;
+				return false;	
+			}
+			else {
+				return false;
+			}
+			
 		}
 
 		@Override
@@ -55,7 +65,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 	protected Method method;
 
 	public PrimitiveElementSetter(String tag, Method method) {
-		super(tag);
+		super(tag, true);
 		this.method = method;
 	}
 
@@ -63,7 +73,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 	public PrimitiveParsedScope createParsedElement(XML_Context context, 
 			ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException {
 		Object parentObject = parent.getObject();
-		return new PrimitiveParsedScope(tag, parent, getCallback(parentObject, point));
+		return new PrimitiveParsedScope(getTag(), parent, getCallback(parentObject, point));
 	}
 
 
@@ -76,4 +86,17 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 	}
 
 
+	@Override
+	public void DTD_writeHeader(Writer writer) throws IOException {
+		writer.append(getTag());
+		writer.append("*");
+	}
+	
+
+	@Override
+	public void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException {
+		writer.append("\n<!ELEMENT  ");
+		writer.append(getTag());
+		writer.append(" (#PCDATA)>");
+	}
 }

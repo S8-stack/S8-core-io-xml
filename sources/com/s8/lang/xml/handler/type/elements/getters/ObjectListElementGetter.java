@@ -93,7 +93,7 @@ public class ObjectListElementGetter extends ElementGetter {
 
 
 	
-	private boolean isTypeTagPreferred;
+	private final boolean isTypeTagPreferred;
 	
 	/**
 	 * 

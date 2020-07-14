@@ -14,6 +14,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.s8.lang.xml.XML_Syntax;
 import com.s8.lang.xml.composer.XML_Composer;
 import com.s8.lang.xml.composer.XML_StreamWriter;
 import com.s8.lang.xml.handler.type.TypeHandler;
@@ -185,6 +186,18 @@ public class XML_Context {
 
 	public void serialize(Object object, File file) throws Exception{
 		serialize(object, new FileOutputStream(file));
+	}
+	
+	/**
+	 * 
+	 * @param writer
+	 * @throws IOException 
+	 */
+	public void writeDTD(Writer writer) throws IOException {
+		writer.append(XML_Syntax.HEADER);
+		for(TypeHandler typeHandler : mapByTag.values()) {
+			typeHandler.writeDTD(writer);
+		}
 	}
 
 }

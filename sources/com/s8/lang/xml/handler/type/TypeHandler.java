@@ -1,5 +1,7 @@
 package com.s8.lang.xml.handler.type;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -105,7 +107,7 @@ public class TypeHandler {
 		public void put(ElementSetter setter) throws XML_TypeCompilationException;
 	}
 
-	
+
 	/**
 	 * 
 	 * @return tag displayed in XML
@@ -206,7 +208,7 @@ public class TypeHandler {
 	}
 
 
-	
+
 	public List<AttributeGetter> getAttributeGetters(){
 		return attributeGetters;
 	}
@@ -252,10 +254,72 @@ public class TypeHandler {
 	}
 
 
-	/*
-	public boolean isRoot() {
-		return isRoot;
-	}
+	/**
+	 * 
+	 * @param writer
+	 * @throws IOException
 	 */
+	public void writeDTD(Writer writer) throws IOException {
+
+		// declare element
+		writer.append("\n<!ELEMENT ");
+
+		// specify tag name
+		writer.append(xmlName);
+
+		// add all fields
+		writer.append(' ');
+		boolean hasPrevious = false;
+		for(ElementSetter elementSetter : elementSetters.values()) {
+			if(hasPrevious) {
+				writer.append(", ");
+			}
+			else {
+				writer.append('(');
+				hasPrevious = true;
+			}
+			elementSetter.DTD_writeHeader(writer);
+		}
+		
+		if(hasPrevious) {
+			writer.append(")*>");	
+		}
+		else {
+			writer.append("EMPTY>");
+		}
+		
+		// declare attributes
+
+		/*
+		<!ATTLIST  nom_élément
+	     nom_attribut_1  type_attribut_1  déclaration_de_défaut_1
+	     nom_attribut_2  type_attribut_2  déclaration_de_défaut_2
+	     ...
+	     >
+		 */
+		if(!attributeSetters.isEmpty()) {
+			writer.append("\n<!ATTLIST ");
+
+			// specify tag name
+			writer.append(xmlName);
+
+			hasPrevious = false;
+			for(AttributeSetter attributeSetter : attributeSetters.values()) {
+				if(hasPrevious) {
+					writer.append(" ");
+				}
+				else {
+					writer.append(" ");
+					hasPrevious = true;
+				}
+				attributeSetter.writeDTD(writer);
+			}
+			writer.append(">");		
+		}
+		
+		for(ElementSetter elementSetter : elementSetters.values()) {
+			elementSetter.DTD_writeFieldDefinition(this, writer);
+		}
+	}
 
 }

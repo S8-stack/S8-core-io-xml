@@ -21,6 +21,10 @@ public abstract class ElementGetter {
 	}
 
 	public static abstract class Builder {
+		
+		protected boolean isBuilt0;
+		
+		protected boolean isBuilt1;		
 
 		protected Method method;
 		

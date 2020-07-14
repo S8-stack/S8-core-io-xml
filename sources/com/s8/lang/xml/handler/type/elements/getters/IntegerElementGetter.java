@@ -4,9 +4,6 @@ import java.lang.reflect.Method;
 
 import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.IntegerComposableElement;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
-import com.s8.lang.xml.handler.type.TypeBuilder;
-import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
 
 /**
@@ -41,11 +38,10 @@ public class IntegerElementGetter extends PrimitiveElementGetter {
 		public Builder(Method method) {
 			super(method);
 		}
-
+		
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			typeBuilder.putElementGetter(new IntegerElementGetter(fieldTag, method));
-			return false;
+		public PrimitiveElementGetter createGetter() {
+			return new IntegerElementGetter(fieldTag, method);
 		}
 	}
 	

@@ -20,10 +20,30 @@ public abstract class PrimitiveElementGetter extends ElementGetter {
 			// nothing to explore since primitive type
 		}
 
+		public abstract PrimitiveElementGetter createGetter();
+		
 		@Override
 		public boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			typeBuilder.putElementGetterTag(fieldTag);
-			return false;
+			if(!isBuilt0) {
+				typeBuilder.putElementGetterTag(fieldTag);
+				isBuilt0 = true;
+				return false;		
+			}
+			else {
+				return false;
+			}
+		}
+		
+		@Override
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+			if(!isBuilt1) {
+				typeBuilder.putElementGetter(createGetter());
+				isBuilt1 = true;
+				return false;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 	

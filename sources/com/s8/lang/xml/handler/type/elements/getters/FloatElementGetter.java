@@ -4,9 +4,6 @@ import java.lang.reflect.Method;
 
 import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.FloatComposableElement;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
-import com.s8.lang.xml.handler.type.TypeBuilder;
-import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
 public class FloatElementGetter extends PrimitiveElementGetter {
 
@@ -42,9 +39,8 @@ public class FloatElementGetter extends PrimitiveElementGetter {
 		}
 
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			typeBuilder.putElementGetter(new FloatElementGetter(fieldTag, method));
-			return false;
+		public PrimitiveElementGetter createGetter() {
+			return new FloatElementGetter(fieldTag, method);
 		}
 	}
 

@@ -1,10 +1,13 @@
 package com.s8.lang.xml.handler.type.elements.setters;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Method;
 
 import com.s8.lang.xml.handler.XML_Context;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
+import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 import com.s8.lang.xml.parser.ObjectParsedScope;
 import com.s8.lang.xml.parser.ParsedScope;
@@ -27,7 +30,13 @@ public abstract class ElementSetter {
 		
 
 		protected String tag;
+		
+		protected boolean isBuilt0 = false;
 
+		protected boolean isBuilt1 = false;
+
+
+		
 		/**
 		 * 
 		 * @param method
@@ -38,9 +47,6 @@ public abstract class ElementSetter {
 			this.tag = tag;
 		}
 
-		public String getFieldTag() {
-			return tag;
-		}
 		
 		
 		/**
@@ -74,23 +80,32 @@ public abstract class ElementSetter {
 	/**
 	 *  the XML tag for mapping purposes
 	 */
-	protected String tag;
+	private final String tag;
+	
+
+	private final boolean isFieldTag;
 
 
-	public ElementSetter(String tag) {
+	public ElementSetter(String tag, boolean isFieldTag) {
 		super();
 		this.tag = tag;
+		this.isFieldTag = isFieldTag;
 	}
+	
+	public String getTag() {
+		return tag;
+	}
+	
+	public boolean isFieldTag() {
+		return isFieldTag;
+	}
+	
 
 
 	public abstract ParsedScope createParsedElement(XML_Context context, 
 			ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException;
 
 
-	public String getTag() {
-		return tag;
-	}
-	
 	
 	public final static ElementSetter.Prototype[] PROTOTYPES = new ElementSetter.Prototype[] {
 			BooleanElementSetter.PROTOTYPE,
@@ -133,4 +148,10 @@ public abstract class ElementSetter {
 
 
 	public abstract Method getMethod();
+	
+	
+	public abstract void DTD_writeHeader(Writer writer) throws IOException;
+	
+	public abstract void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException;
+	
 }

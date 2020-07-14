@@ -58,24 +58,36 @@ public class ObjectElementGetter extends ElementGetter {
 
 		@Override
 		public boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			typeBuilder.putElementGetterTag(fieldTag);
-			return false;
+			if(!isBuilt0) {
+				typeBuilder.putElementGetterTag(fieldTag);
+				isBuilt0 = true;
+				return false;
+			}
+			else {
+				return false;
+			}
 		}
 		
 		@Override
 		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			Class<?> fieldType =  method.getReturnType();
-			TypeBuilder fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
-			if(!fieldTypeBuilder.isInheritanceDiscovered()) {
-				return true;
+			if(!isBuilt1) {
+				Class<?> fieldType =  method.getReturnType();
+				TypeBuilder fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
+				if(!fieldTypeBuilder.isInheritanceDiscovered()) {
+					return true;
+				}
+				
+				boolean isTypeTagPreferred = !isFieldTypeTagColliding(typeBuilder, fieldTypeBuilder);	
+				if(isTypeTagPreferred) {
+					fillFieldTypeTags(typeBuilder, fieldTypeBuilder);
+				}
+				typeBuilder.putElementGetter(new ObjectElementGetter(fieldTag, method, isTypeTagPreferred));
+				isBuilt1 = true;
+				return false;	
 			}
-			
-			boolean isTypeTagPreferred = !isFieldTypeTagColliding(typeBuilder, fieldTypeBuilder);	
-			if(isTypeTagPreferred) {
-				fillFieldTypeTags(typeBuilder, fieldTypeBuilder);
+			else {
+				return false;
 			}
-			typeBuilder.putElementGetter(new ObjectElementGetter(fieldTag, method, isTypeTagPreferred));
-			return false;
 		}
 	}
 

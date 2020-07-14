@@ -12,5 +12,6 @@ public @interface XML_SetAttribute {
 
 	public String name();
 	
+	public boolean isRequired() default false;
 	
 }

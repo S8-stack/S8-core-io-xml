@@ -4,9 +4,6 @@ import java.lang.reflect.Method;
 
 import com.s8.lang.xml.composer.ObjectComposableScope;
 import com.s8.lang.xml.composer.PrimitiveComposableElement.BooleanComposableElement;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
-import com.s8.lang.xml.handler.type.TypeBuilder;
-import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
 public class BooleanElementGetter extends PrimitiveElementGetter {
 	
@@ -37,9 +34,8 @@ public class BooleanElementGetter extends PrimitiveElementGetter {
 		}
 
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			typeBuilder.putElementGetter(new BooleanElementGetter(fieldTag, method));
-			return false;
+		public PrimitiveElementGetter createGetter() {
+			return new BooleanElementGetter(fieldTag, method);
 		}
 	}
 	
