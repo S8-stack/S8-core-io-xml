@@ -2,8 +2,6 @@ package com.s8.lang.xml.parser;
 
 import java.io.IOException;
 
-import com.s8.lang.xml.handler.XML_Context;
-
 /**
  * 
  * @author pc
@@ -68,7 +66,7 @@ public class PrimitiveParsedScope implements ParsedScope {
 
 
 	@Override
-	public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) 
+	public void parse(XML_Parser parser, XML_StreamReader reader) 
 			throws IOException, XML_ParsingException {
 		
 		if(isClosed) {

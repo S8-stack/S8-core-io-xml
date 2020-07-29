@@ -3,8 +3,6 @@ package com.s8.lang.xml.parser;
 
 import java.io.IOException;
 
-import com.s8.lang.xml.XML_Syntax;
-import com.s8.lang.xml.handler.XML_Context;
 import com.s8.lang.xml.handler.type.TypeHandler;
 
 
@@ -27,13 +25,7 @@ public class ObjectParsedScope implements ParsedScope {
 	}
 
 
-	
-	/**
-	 * the parsing context
-	 */
-	private XML_Context context;
-	
-	
+
 	/**
 	 * <b>Callback #1</b>: for returning to the parent scope when done
 	 */
@@ -70,7 +62,7 @@ public class ObjectParsedScope implements ParsedScope {
 	/**
 	 * element creation point
 	 */
-	private XML_StreamReader.Point point;
+	//private XML_StreamReader.Point point;
 
 
 	private boolean isParsing;
@@ -78,62 +70,32 @@ public class ObjectParsedScope implements ParsedScope {
 	private boolean isClosed;
 
 	/**
-	 * CONSTRUCTOR #1: in this case, type is already known
+	 * CONSTRUCTOR: type is always known
 	 * @param tag
 	 * @param callback
 	 * @param handler
 	 * @throws XML_ParsingException
 	 */
-	public ObjectParsedScope(XML_Context context,
-			ParsedScope parent, 
+	public ObjectParsedScope(ParsedScope parent, 
 			Callback callback, 
 			String tag, 
 			TypeHandler handler,
 			XML_StreamReader.Point point) throws XML_ParsingException {
 		super();
-		this.context = context;
+		//this.context = context;
 		this.parent = parent;
 		this.callback = callback;
 		
 		this.tag = tag;
-		this.point = point;
+		//this.point = point;
 		
 		// initialize
 		state = new ReadAttributes();
 
-		setType(handler);
-	}
-	
-	
-	/**
-	 * CONSTRUCTOR #2: in this case, type is NOT known (and will be discovered later on)
-	 * @param tag
-	 * @param callback
-	 * @param handler
-	 * @throws XML_ParsingException
-	 */
-	public ObjectParsedScope(XML_Context context, 
-			ParsedScope parent, 
-			Callback callback, 
-			String tag, 
-			XML_StreamReader.Point point) {
-		super();
-		this.context = context;
-		this.parent = parent;
-		this.callback = callback;
-		
-		this.tag = tag;
-		
-
-		// initialize
-		state = new ReadAttributes();
-	}
-	
-	
-	private void setType(TypeHandler typeHandler) throws XML_ParsingException {
-		this.typeHandler = typeHandler;
+		this.typeHandler = handler;
 		this.object = typeHandler.create(point);
 	}
+	
 
 
 	public Object getObject() {
@@ -149,10 +111,14 @@ public class ObjectParsedScope implements ParsedScope {
 	 * @throws XML_ParsingException
 	 */
 	private void setAttribute(String name, String value, XML_StreamReader.Point point) throws XML_ParsingException {
+		typeHandler.setAttribute(object, name, value, point);
+	
+		/*
+		 * 
 		if(typeHandler!=null) {
 			typeHandler.setAttribute(object, name, value, point);
 		}
-		else if(name.equals(XML_Syntax.TYPE_KEYWORD)){ // & typeHandler == null
+		else if(name.equals(XML_Syntax.MAPPING_KEYWORD)){ // & typeHandler == null
 			typeHandler = context.getTypeHandlerByTag(value);
 			if(typeHandler==null) {
 				throw new XML_ParsingException(point, "Failed to find marching element for type:"+value);
@@ -163,6 +129,7 @@ public class ObjectParsedScope implements ParsedScope {
 			throw new XML_ParsingException(point, "No type attached to this element at this point of parsing, "
 					+ "so cannot match any attribute names: "+value);
 		}
+		*/
 	}
 	
 	private void setValue(String value, XML_StreamReader.Point point) throws XML_ParsingException {
@@ -173,13 +140,13 @@ public class ObjectParsedScope implements ParsedScope {
 
 
 	@Override
-	public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException {
+	public void parse(XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException {
 		if(isClosed) {
 			throw new XML_ParsingException(reader.getPoint(), "This scope has already been closed");
 		}
 		isParsing = true;
 		while(isParsing){
-			state.parse(context, parser, reader);
+			state.parse(parser, reader);
 		}
 	}
 
@@ -192,14 +159,14 @@ public class ObjectParsedScope implements ParsedScope {
 	 */
 	private interface State {
 
-		public abstract void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException;
+		public abstract void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException;
 
 	}
 
 	private class ReadAttributes implements State {
 
 		@Override
-		public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) 
+		public void parse(XML_Parser parser, XML_StreamReader reader) 
 				throws XML_ParsingException, IOException {
 
 			reader.skip(' ', '\t' , '\n');
@@ -245,7 +212,7 @@ public class ObjectParsedScope implements ParsedScope {
 	private class ReadContent implements State {
 
 		@Override
-		public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) 
+		public void parse(XML_Parser parser, XML_StreamReader reader) 
 				throws XML_ParsingException, IOException {
 
 			// read value until next tag start
@@ -266,7 +233,7 @@ public class ObjectParsedScope implements ParsedScope {
 	private class ReadOpeningTag implements State {
 
 		@Override
-		public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader)
+		public void parse(XML_Parser parser, XML_StreamReader reader)
 				throws XML_ParsingException, IOException {
 			reader.check('<');
 			reader.readNext();
@@ -292,7 +259,7 @@ public class ObjectParsedScope implements ParsedScope {
 				/* create new scope */
 
 				// switch to new scope
-				parser.scope = typeHandler.createParsedElement(context, ObjectParsedScope.this, tag, reader.getPoint());
+				parser.scope = typeHandler.createParsedElement(ObjectParsedScope.this, tag, reader.getPoint());
 
 				// and escape this scope...
 				isParsing = false;
@@ -307,7 +274,7 @@ public class ObjectParsedScope implements ParsedScope {
 	private class ReadClosingTag implements State {
 
 		@Override
-		public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
+		public void parse(XML_Parser parser, XML_StreamReader reader) throws XML_ParsingException, IOException {
 			String tag = reader.until(
 					/* stop at */ new char[]{'>'},
 					/* ignore */ new char[]{' '},
@@ -327,7 +294,7 @@ public class ObjectParsedScope implements ParsedScope {
 	private class ReadComment implements State {
 
 		@Override
-		public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) 
+		public void parse(XML_Parser parser, XML_StreamReader reader) 
 				throws XML_ParsingException, IOException {
 			String comment = reader.until(
 					/* stop at */ new char[]{'>'},
@@ -346,7 +313,7 @@ public class ObjectParsedScope implements ParsedScope {
 
 
 		@Override
-		public void parse(XML_Context context,XML_Parser parser, XML_StreamReader reader) 
+		public void parse(XML_Parser parser, XML_StreamReader reader) 
 				throws XML_ParsingException, IOException {
 			// close
 			close();

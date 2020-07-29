@@ -5,8 +5,8 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.s8.lang.xml.XML_Syntax;
 import com.s8.lang.xml.api.XML_SetElement;
-import com.s8.lang.xml.handler.XML_Context;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
 import com.s8.lang.xml.handler.type.TypeHandler;
@@ -76,12 +76,24 @@ public class ObjectElementSetter extends ElementSetter {
 
 
 				if(fieldTypeHandler.hasSubTypes()) { // is polymorphic
-					/* use field tag, put untyped setter */
-					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, true, method));	
-				}
-				else { 
+					String tag;
+					
 					/* suse field tag, put single allowed type -> put pre-typed*/
-					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, true, method, fieldTypeHandler));
+					tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+fieldTypeHandler.getXmlTag();
+					typeBuilder.setElementSetter(new ObjectElementSetter(tag, true, method, fieldTypeHandler, false));
+					
+					/* use field tag, put untyped setter */
+					
+					for(TypeHandler subFieldTypeHandler : fieldTypeHandler.getSubTypes()) {
+						
+						// standard polymorphic field
+						tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+subFieldTypeHandler.getXmlTag();
+						typeBuilder.setElementSetter(new ObjectElementSetter(tag, true, method, subFieldTypeHandler, false));	
+					}
+				}
+				else { // type is univoque
+					/* suse field tag, put single allowed type -> put pre-typed*/
+					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, true, method, fieldTypeHandler, true));
 				}
 
 				isBuilt0 = true;
@@ -122,10 +134,14 @@ public class ObjectElementSetter extends ElementSetter {
 
 				/* if no collision, expand */
 				if(!isSubstitutionGroupColliding) {
-					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTypeHandler.getXmlTag(), false, method, fieldTypeHandler));
+					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTypeHandler.getXmlTag(), 
+							false, method, fieldTypeHandler, false));
+					
+					// subtypes...
 					for(TypeHandler fieldSubTypeHandler : fieldTypeHandler.getSubTypes()) {
 						String typeTag = fieldSubTypeHandler.getXmlTag();
-						typeBuilder.setElementSetter(new ObjectElementSetter(typeTag, false, method, fieldSubTypeHandler));
+						typeBuilder.setElementSetter(new ObjectElementSetter(typeTag, 
+								false, method, fieldSubTypeHandler, false));
 					}
 				}
 			
@@ -134,7 +150,7 @@ public class ObjectElementSetter extends ElementSetter {
 			}
 			else {
 				return false;
-			}			
+			}
 		}
 
 
@@ -143,53 +159,36 @@ public class ObjectElementSetter extends ElementSetter {
 
 	private Method method;
 	
-	private boolean isTypeDefined;
+	private TypeHandler fieldTypehandler;
 
-	private TypeHandler handler;
-
-
-	/**
-	 * Untyped setter (type must ne define inline by attribute)
-	 * @param tag
-	 * @param method
-	 */
-	public ObjectElementSetter(String tag, boolean isFieldTag, Method method) {
-		super(tag, isFieldTag);
-		this.method = method;
-		isTypeDefined = false;
-	}
-
-
+	private boolean isTypeUnivoque;
+	
 	/**
 	 * Pre-defined type
 	 * @param tag
 	 * @param method
-	 * @param handler
+	 * @param fieldTypeHandler
 	 * @param isFieldTag 
 	 */
-	public ObjectElementSetter(String tag, boolean isFieldTag, Method method, TypeHandler handler) {
+	public ObjectElementSetter(String tag, boolean isFieldTag, Method method, TypeHandler fieldTypeHandler, boolean isTypeUnivoque) {
 		super(tag, isFieldTag);
 		this.method = method;
-		this.handler = handler;
-		isTypeDefined = true;
+		this.fieldTypehandler = fieldTypeHandler;
+		this.isTypeUnivoque = isTypeUnivoque;
 	}
 
 
 
-	public boolean isTypeDefined() {
-		return isTypeDefined;
-	}
-
+	
 	public TypeHandler getTypeHandler() {
-		return handler;
+		return fieldTypehandler;
 	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public ParsedScope createParsedElement(XML_Context context, 
-			ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException {
+	public ParsedScope createParsedElement(ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException {
 
 		// retrieve parentObject
 		Object parentObject = parent.getObject();
@@ -207,13 +206,18 @@ public class ObjectElementSetter extends ElementSetter {
 			}
 		};
 
-		if(isTypeDefined) {
-			return new ObjectParsedScope(context, parent, callback, getTag(), handler, point);
-		}
-		else {
-			return new ObjectParsedScope(context, parent, callback, getTag(), point);
-		}
+		return new ObjectParsedScope(parent, callback, getTag(), fieldTypehandler, point);
 	}
+
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isTypeUnivoque() {
+		return isTypeUnivoque;
+	}
+	
 
 	@Override
 	public Method getMethod() {
@@ -230,11 +234,7 @@ public class ObjectElementSetter extends ElementSetter {
 	@Override
 	public void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException {
 		if(isFieldTag()) {
-			/*
-			writer.append("\n<!ELEMENT  ");
-			writer.append(getTag());
-			writer.append(" (#PCDATA)>");	
-			*/
+			fieldTypehandler.DTD_typeGenerator.writeFieldElement(getTag(), writer);
 		}
 	}
 }

@@ -55,7 +55,7 @@ public class RootParsedElement implements ParsedScope {
 
 
 	@Override
-	public void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) 
+	public void parse(XML_Parser parser, XML_StreamReader reader) 
 			throws IOException, XML_ParsingException {
 		if(isClosed) {
 			throw new XML_ParsingException(reader.getPoint(), "This scope has already been closed");
@@ -118,7 +118,7 @@ public class RootParsedElement implements ParsedScope {
 						RootParsedElement.this.rootObject = object;
 					}
 				};
-				parser.scope = new ObjectParsedScope(context, null, callback, tag, handler, reader.getPoint());
+				parser.scope = new ObjectParsedScope(null, callback, tag, handler, reader.getPoint());
 
 				// and escape this scope...
 				isParsing = false;

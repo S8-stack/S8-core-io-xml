@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
 
-import com.s8.lang.xml.handler.XML_Context;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
 import com.s8.lang.xml.handler.type.TypeHandler;
@@ -70,8 +69,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 	}
 
 	@Override
-	public PrimitiveParsedScope createParsedElement(XML_Context context, 
-			ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException {
+	public PrimitiveParsedScope createParsedElement(ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException {
 		Object parentObject = parent.getObject();
 		return new PrimitiveParsedScope(getTag(), parent, getCallback(parentObject, point));
 	}
@@ -95,7 +93,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 
 	@Override
 	public void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException {
-		writer.append("\n<!ELEMENT  ");
+		writer.append("\n<!ELEMENT ");
 		writer.append(getTag());
 		writer.append(" (#PCDATA)>");
 	}

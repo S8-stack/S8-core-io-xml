@@ -1,7 +1,5 @@
 package com.s8.lang.xml.handler.type;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -12,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.s8.lang.xml.api.XML_Type;
-import com.s8.lang.xml.handler.XML_Context;
 import com.s8.lang.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.lang.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.lang.xml.handler.type.elements.getters.ElementGetter;
@@ -79,6 +76,10 @@ public class TypeHandler {
 	 */
 	Set<String> elementGettersTagSet = new HashSet<String>();
 
+	/**
+	 * 
+	 */
+	public DTD_ElementGenerator DTD_typeGenerator;
 
 	//boolean isRoot;
 
@@ -98,6 +99,8 @@ public class TypeHandler {
 			throw new XML_TypeCompilationException("Missing type declaration for type: "+type.getName());
 		}
 		xmlName = typeAnnotation.name();
+		
+		DTD_typeGenerator = new DTD_ElementGenerator(this);
 	}
 
 
@@ -233,15 +236,13 @@ public class TypeHandler {
 	 * @return
 	 * @throws XML_ParsingException
 	 */
-	public ParsedScope createParsedElement(XML_Context context, ObjectParsedScope parent, String tag, XML_StreamReader.Point point) 
+	public ParsedScope createParsedElement(ObjectParsedScope parent, String tag, XML_StreamReader.Point point) 
 			throws XML_ParsingException {
 		ElementSetter setter = elementSetters.get(tag);
 		if(setter==null) {
 			throw new XML_ParsingException(point, "Failed to retrieve element setter for tag: "+tag);
 		}
-
-
-		return setter.createParsedElement(context, parent, point);
+		return setter.createParsedElement(parent, point);
 	}
 
 	public Class<?> getType() {
@@ -254,72 +255,7 @@ public class TypeHandler {
 	}
 
 
-	/**
-	 * 
-	 * @param writer
-	 * @throws IOException
-	 */
-	public void writeDTD(Writer writer) throws IOException {
-
-		// declare element
-		writer.append("\n<!ELEMENT ");
-
-		// specify tag name
-		writer.append(xmlName);
-
-		// add all fields
-		writer.append(' ');
-		boolean hasPrevious = false;
-		for(ElementSetter elementSetter : elementSetters.values()) {
-			if(hasPrevious) {
-				writer.append(", ");
-			}
-			else {
-				writer.append('(');
-				hasPrevious = true;
-			}
-			elementSetter.DTD_writeHeader(writer);
-		}
-		
-		if(hasPrevious) {
-			writer.append(")*>");	
-		}
-		else {
-			writer.append("EMPTY>");
-		}
-		
-		// declare attributes
-
-		/*
-		<!ATTLIST  nom_élément
-	     nom_attribut_1  type_attribut_1  déclaration_de_défaut_1
-	     nom_attribut_2  type_attribut_2  déclaration_de_défaut_2
-	     ...
-	     >
-		 */
-		if(!attributeSetters.isEmpty()) {
-			writer.append("\n<!ATTLIST ");
-
-			// specify tag name
-			writer.append(xmlName);
-
-			hasPrevious = false;
-			for(AttributeSetter attributeSetter : attributeSetters.values()) {
-				if(hasPrevious) {
-					writer.append(" ");
-				}
-				else {
-					writer.append(" ");
-					hasPrevious = true;
-				}
-				attributeSetter.writeDTD(writer);
-			}
-			writer.append(">");		
-		}
-		
-		for(ElementSetter elementSetter : elementSetters.values()) {
-			elementSetter.DTD_writeFieldDefinition(this, writer);
-		}
-	}
+	
+	
 
 }

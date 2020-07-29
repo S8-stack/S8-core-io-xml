@@ -2,8 +2,6 @@ package com.s8.lang.xml.parser;
 
 import java.io.IOException;
 
-import com.s8.lang.xml.handler.XML_Context;
-
 /**
  * <p>
  * On why not recursive: "However, the textbook is incorrect in the context of
@@ -27,7 +25,7 @@ public interface ParsedScope {
 	 * @throws IOException 
 	 * @throws XML_ParsingException 
 	 */
-	public abstract void parse(XML_Context context, XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException;
+	public abstract void parse(XML_Parser parser, XML_StreamReader reader) throws IOException, XML_ParsingException;
 	
 	
 	

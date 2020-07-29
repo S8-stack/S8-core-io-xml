@@ -14,7 +14,6 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.s8.lang.xml.XML_Syntax;
 import com.s8.lang.xml.composer.XML_Composer;
 import com.s8.lang.xml.composer.XML_StreamWriter;
 import com.s8.lang.xml.handler.type.TypeHandler;
@@ -76,6 +75,8 @@ public class XML_Context {
 	Map<String, TypeHandler> mapByTag = new HashMap<>();
 
 	Map<String, TypeHandler> mapByClassname = new HashMap<>();
+	
+	private DTD_TemplateGenerator DTD_templateGenerator;
 
 	public XML_Context(Class<?>... types) throws XML_TypeCompilationException {
 		super();
@@ -83,6 +84,8 @@ public class XML_Context {
 		// create builder and run it to get the context compiled
 		XML_ContextBuilder builder = new XML_ContextBuilder(this, types, null);
 		builder.build();
+		
+		DTD_templateGenerator = new DTD_TemplateGenerator(this);
 	}
 	
 	/**
@@ -184,20 +187,25 @@ public class XML_Context {
 		serialize(object, new OutputStreamWriter(outputStream));
 	}
 
+	
+	/**
+	 * 
+	 * @param object
+	 * @param file
+	 * @throws Exception
+	 */
 	public void serialize(Object object, File file) throws Exception{
 		serialize(object, new FileOutputStream(file));
 	}
 	
+	
 	/**
 	 * 
 	 * @param writer
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	public void writeDTD(Writer writer) throws IOException {
-		writer.append(XML_Syntax.HEADER);
-		for(TypeHandler typeHandler : mapByTag.values()) {
-			typeHandler.writeDTD(writer);
-		}
+	public void DTD_writeTemplate(Writer writer) throws IOException {
+		DTD_templateGenerator.write(writer);
 	}
 
 }

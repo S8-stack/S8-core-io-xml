@@ -240,11 +240,6 @@ public class TypeBuilder {
 
 
 
-	public void buildInheritance(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
-
-
-	}
-
 
 
 	/**

@@ -31,9 +31,7 @@ public abstract class ObjectComposableScope extends ComposableScope {
 		@Override
 		public void writeOpeningTag(XML_StreamWriter writer) throws IOException {
 			// start tag
-			writer.startTag(fieldTag);
-
-			writer.writeAttribute(XML_Syntax.TYPE_KEYWORD, typeHandler.getXmlTag());
+			writer.startTag(fieldTag+XML_Syntax.MAPPING_SEPARATOR+typeHandler.getXmlTag());
 		}
 		
 		@Override

@@ -13,7 +13,6 @@ public class XML_Parser {
 
 	public boolean isVerbose;
 	
-	private XML_Context context;
 	
 	private XML_StreamReader reader;
 
@@ -22,7 +21,6 @@ public class XML_Parser {
 
 	public XML_Parser(XML_Context context, XML_StreamReader reader, boolean isVerbose) {
 		super();
-		this.context = context;
 		this.reader = reader;
 		this.isVerbose = isVerbose;
 		rootScope = new RootParsedElement(context);
@@ -38,7 +36,7 @@ public class XML_Parser {
 	public Object parse() throws XML_ParsingException, IOException {
 		scope = rootScope;
 		while(scope!=null){
-			scope.parse(context, this, reader);
+			scope.parse(this, reader);
 		}
 		return rootScope.getRootObject();
 	}
