@@ -74,16 +74,15 @@ public class ObjectElementSetter extends ElementSetter {
 
 				TypeHandler fieldTypeHandler = fieldTypeBuilder.getHandler();
 
-
+				/* default full explanatory field tag, put single allowed type -> put pre-typed*/
+				tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+fieldTypeHandler.getXmlTag();
+				typeBuilder.setElementSetter(new ObjectElementSetter(tag, true, method, fieldTypeHandler, false));
+				
+				
 				if(fieldTypeHandler.hasSubTypes()) { // is polymorphic
 					String tag;
 					
-					/* suse field tag, put single allowed type -> put pre-typed*/
-					tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+fieldTypeHandler.getXmlTag();
-					typeBuilder.setElementSetter(new ObjectElementSetter(tag, true, method, fieldTypeHandler, false));
-					
 					/* use field tag, put untyped setter */
-					
 					for(TypeHandler subFieldTypeHandler : fieldTypeHandler.getSubTypes()) {
 						
 						// standard polymorphic field
@@ -92,8 +91,9 @@ public class ObjectElementSetter extends ElementSetter {
 					}
 				}
 				else { // type is univoque
-					/* suse field tag, put single allowed type -> put pre-typed*/
+					/* simple field tag, put single allowed type -> put pre-typed*/
 					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, true, method, fieldTypeHandler, true));
+					
 				}
 
 				isBuilt0 = true;
@@ -120,17 +120,20 @@ public class ObjectElementSetter extends ElementSetter {
 					isSubstitutionGroupColliding = true;
 				}
 
-				// 
-				TypeHandler[] subTypes = fieldTypeHandler.getSubTypes();
-				int n = subTypes.length;
-				int i=0;
-				TypeHandler subType;
-				while(!isSubstitutionGroupColliding && i<n) {
-					subType = subTypes[i++];
-					if(typeBuilder.isSetElementColliding(subType.getXmlTag())){
-						isSubstitutionGroupColliding = true;
-					}
+				//
+				if(!isSubstitutionGroupColliding) {
+					TypeHandler[] subTypes = fieldTypeHandler.getSubTypes();
+					int n = subTypes.length;
+					int i=0;
+					TypeHandler subType;
+					while(!isSubstitutionGroupColliding && i<n) {
+						subType = subTypes[i++];
+						if(typeBuilder.isSetElementColliding(subType.getXmlTag())){
+							isSubstitutionGroupColliding = true;
+						}
+					}	
 				}
+				
 
 				/* if no collision, expand */
 				if(!isSubstitutionGroupColliding) {
@@ -168,10 +171,10 @@ public class ObjectElementSetter extends ElementSetter {
 	 * @param tag
 	 * @param method
 	 * @param fieldTypeHandler
-	 * @param isFieldTag 
+	 * @param DTD_isFieldTag 
 	 */
-	public ObjectElementSetter(String tag, boolean isFieldTag, Method method, TypeHandler fieldTypeHandler, boolean isTypeUnivoque) {
-		super(tag, isFieldTag);
+	public ObjectElementSetter(String tag, boolean DTD_isFieldTag, Method method, TypeHandler fieldTypeHandler, boolean isTypeUnivoque) {
+		super(tag, DTD_isFieldTag);
 		this.method = method;
 		this.fieldTypehandler = fieldTypeHandler;
 		this.isTypeUnivoque = isTypeUnivoque;

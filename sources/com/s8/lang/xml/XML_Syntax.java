@@ -15,7 +15,7 @@ public class XML_Syntax {
 	public static final char ATTRIBUTE_DEFINITION = '=';
 	
 	
-	public static final char MAPPING_SEPARATOR = 'ζ';
+	public static final char MAPPING_SEPARATOR = '_';
 
 	public static final char[] KEY_CHARS = {
 			START_OF_TAG,
