@@ -55,6 +55,7 @@ public class StringElementSetter extends PrimitiveElementSetter {
 					method.invoke(object, value);
 				} 
 				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
 					throw new XML_ParsingException(point, e.getMessage());
 				}
 			}

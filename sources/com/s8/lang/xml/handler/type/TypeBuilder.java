@@ -71,7 +71,7 @@ public class TypeBuilder {
 			typeHandler.constructor = getType().getConstructor(new Class<?>[]{});
 		} 
 		catch (NoSuchMethodException | SecurityException e) {
-			throw new XML_TypeCompilationException("Failed to find default constructor");
+			throw new XML_TypeCompilationException("Failed to find default constructor for type: "+getType());
 		}
 
 		/* </constructor> */
