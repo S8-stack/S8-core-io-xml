@@ -8,14 +8,18 @@ import java.util.Map;
 
 import com.s8.lang.xml.api.XML_GetAttribute;
 import com.s8.lang.xml.api.XML_GetElement;
+import com.s8.lang.xml.api.XML_GetValue;
 import com.s8.lang.xml.api.XML_SetAttribute;
 import com.s8.lang.xml.api.XML_SetElement;
+import com.s8.lang.xml.api.XML_SetValue;
 import com.s8.lang.xml.api.XML_Type;
 import com.s8.lang.xml.handler.XML_ContextBuilder;
 import com.s8.lang.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.lang.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.lang.xml.handler.type.elements.getters.ElementGetter;
 import com.s8.lang.xml.handler.type.elements.setters.ElementSetter;
+import com.s8.lang.xml.handler.type.value.getters.ValueGetter;
+import com.s8.lang.xml.handler.type.value.setters.ValueSetter;
 
 public class TypeBuilder {
 
@@ -66,14 +70,14 @@ public class TypeBuilder {
 
 
 		/* <constructor> */
-
-		try {
-			typeHandler.constructor = getType().getConstructor(new Class<?>[]{});
-		} 
-		catch (NoSuchMethodException | SecurityException e) {
-			throw new XML_TypeCompilationException("Failed to find default constructor for type: "+getType());
+		if(!getType().isInterface()) {
+			try {
+				typeHandler.constructor = getType().getConstructor(new Class<?>[]{});
+			}
+			catch (NoSuchMethodException | SecurityException e) {
+				throw new XML_TypeCompilationException("Failed to find default constructor for type: "+getType());
+			}	
 		}
-
 		/* </constructor> */
 
 
@@ -90,8 +94,8 @@ public class TypeBuilder {
 			XML_SetAttribute setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
 
 			//  value
-			//XML_GetValue getValueAnnotation = method.getAnnotation(XML_GetValue.class);
-			//XML_SetValue setValueAnnotation = method.getAnnotation(XML_SetValue.class);
+			XML_GetValue getValueAnnotation = method.getAnnotation(XML_GetValue.class);
+			XML_SetValue setValueAnnotation = method.getAnnotation(XML_SetValue.class);
 
 			// elements
 			XML_GetElement getElementAnnotation = method.getAnnotation(XML_GetElement.class);
@@ -107,15 +111,14 @@ public class TypeBuilder {
 				typeHandler.attributeSetters.put(setAttributeAnnotation.name(), AttributeSetter.create(method));	
 			}
 
-			/*
-				if(getValueAnnotation!=null){
-					valueGetter = ValueGetter.create(method);
-				}
-				else if(setValueAnnotation!=null){
-					typeHandler.valueSetter = AttributeSetter.create(method);
-				}
-			 */
-
+			else if(getValueAnnotation!=null){
+				typeHandler.valueGetter = ValueGetter.create(method);
+			}
+			
+			else if(setValueAnnotation!=null){
+				typeHandler.valueSetter = ValueSetter.create(method);
+			}
+			
 			/* element getter -> direct creation */
 			else if(getElementAnnotation!=null){
 				elementGetBuilders.add(ElementGetter.create(method));	
@@ -169,7 +172,7 @@ public class TypeBuilder {
 	 */
 	public boolean build(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
 		if(!isBuilt) {
-			
+
 			boolean hasMissingBuilds = false, isBuildMissingDependencies = false;
 
 			/* <inheritance> */
@@ -181,8 +184,8 @@ public class TypeBuilder {
 				typeHandler.subTypes = map.values().stream().map(t -> t.getHandler()).toArray(size -> new TypeHandler[size]);
 				isInheritanceBuilt = true;	
 			}
-			
-		
+
+
 			/* <getters> */
 			if(!isGettersBuilt0) {
 				hasMissingBuilds = false;
@@ -194,7 +197,7 @@ public class TypeBuilder {
 				}
 				isGettersBuilt0 = !hasMissingBuilds;
 			}
-			
+
 			if(!isGettersBuilt1 && isGettersBuilt0) {
 				hasMissingBuilds = false;
 				for(ElementGetter.Builder builder : elementGetBuilders) {
@@ -209,7 +212,7 @@ public class TypeBuilder {
 
 			/* <setters> */
 			if(!isSettersBuilt0) {
-				
+
 				hasMissingBuilds = false;
 				for(ElementSetter.Builder builder : elementSetBuilders) {
 					isBuildMissingDependencies = builder.build0(contextBuilder, this);
@@ -330,22 +333,22 @@ private boolean isDependenciesInitialized() {
 
 
 
-	
+
 	public void putElementGetterTag(String tag) throws XML_TypeCompilationException {
 		if(typeHandler.elementGettersTagSet.contains(tag)) {
 			throw new XML_TypeCompilationException("Try to override element getter tag: "+tag);
 		}
 		typeHandler.elementGettersTagSet.add(tag);
 	}
-	
+
 	public boolean isGetElementColliding(String tag) {
 		return typeHandler.elementGettersTagSet.contains(tag);
 	}
-	
+
 	public void putElementGetter(ElementGetter elementGetter) throws XML_TypeCompilationException {
 		typeHandler.elementGetters.add(elementGetter);
 	}
-	
+
 	public boolean isSetElementColliding(String tag) {
 		return typeHandler.elementSetters.containsKey(tag);
 	}
@@ -358,7 +361,7 @@ private boolean isDependenciesInitialized() {
 		}
 		typeHandler.elementSetters.put(tag, elementSetter);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "builder for: "+typeHandler.toString();

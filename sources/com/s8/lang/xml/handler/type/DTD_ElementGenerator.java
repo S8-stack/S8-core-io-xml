@@ -60,7 +60,12 @@ public class DTD_ElementGenerator {
 			writer.append(")*>");	
 		}
 		else {
-			writer.append("EMPTY>");
+			if(typeHandler.valueSetter!=null) {
+				writer.append("(#PCDATA)>");
+			}
+			else {
+				writer.append("EMPTY>");	
+			}
 		}
 		
 		// declare attributes

@@ -14,6 +14,8 @@ import com.s8.lang.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.lang.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.lang.xml.handler.type.elements.getters.ElementGetter;
 import com.s8.lang.xml.handler.type.elements.setters.ElementSetter;
+import com.s8.lang.xml.handler.type.value.getters.ValueGetter;
+import com.s8.lang.xml.handler.type.value.setters.ValueSetter;
 import com.s8.lang.xml.parser.ObjectParsedScope;
 import com.s8.lang.xml.parser.ParsedScope;
 import com.s8.lang.xml.parser.XML_ParsingException;
@@ -52,10 +54,10 @@ public class TypeHandler {
 	Constructor<?> constructor;
 
 	/** ready for ext construction */
-	AttributeGetter valueGetter;
+	ValueGetter valueGetter;
 
 	/** ready for ext construction */
-	AttributeSetter valueSetter;
+	ValueSetter valueSetter;
 
 	/** ready for ext construction */
 	List<AttributeGetter> attributeGetters = new ArrayList<>();
