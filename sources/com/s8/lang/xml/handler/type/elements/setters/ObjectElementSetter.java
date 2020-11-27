@@ -204,6 +204,7 @@ public class ObjectElementSetter extends ElementSetter {
 					method.invoke(parentObject, value);
 				} 
 				catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+					e.printStackTrace();
 					throw new XML_ParsingException(point, e.getMessage());
 				}
 			}
