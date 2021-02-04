@@ -106,7 +106,7 @@ public class RootParsedElement implements ParsedScope {
 
 				/* create new scope */
 
-				TypeHandler handler = context.getTypeHandlerByTag(tag);
+				TypeHandler handler = context.getRootElementTypeHandler(tag);
 				if(handler==null) {
 					throw new XML_ParsingException(reader.getPoint(), "Failed to find type for tag: "+tag);
 				}

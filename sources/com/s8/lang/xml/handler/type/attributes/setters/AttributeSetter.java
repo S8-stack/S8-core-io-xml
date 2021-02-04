@@ -99,6 +99,17 @@ public abstract class AttributeSetter {
 			writer.append("#IMPLIED");	
 		}
 	}
+	
+	public void XSD_write(Writer writer) throws IOException {
+	
+		// <xs:attribute name="factor" type="xs:string"/>
+		writer.append("\n\t\t<xs:attribute name=\"");
+		
+		writer.append(name);
+		
+		writer.append("\" type=\"xs:string\"/>");
+	}
+	
 
 	public abstract void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException;
 

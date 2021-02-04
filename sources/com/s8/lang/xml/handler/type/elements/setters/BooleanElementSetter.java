@@ -62,4 +62,5 @@ public class BooleanElementSetter extends PrimitiveElementSetter {
 			}
 		};
 	}
+
 }

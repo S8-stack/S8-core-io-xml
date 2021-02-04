@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test xmlns="http://s8.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://s8.com schema2.xsd" factor="5">
+	<module b2="76" />
+	<ee toto="72" />
+	<item_ee toto="45" />
+	<item_ee toto="46" />
+	<ee2 toto="47">
+		<user name="directly-set-user" />
+		<user name="zijeiojz"></user>
+	</ee2>
+	<item_ee2 toto="48" b="3">
+		<user name="ojo" />
+		<user name="ojo1" password="rekhejj" />
+		<user name="ojo2" password="rekhejj" />
+		<user name="ojo3" password="rekhejj">
+			<note>this user is special</note>
+		</user>
+		<user name="ojo4" password="rekhejj" />
+	</item_ee2>
+	<field></field>
+	<item_ee />
+</test>

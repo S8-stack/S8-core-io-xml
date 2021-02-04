@@ -67,7 +67,7 @@ public abstract class ElementGetter {
 			int n = subTypes.length, i=0;
 			while(!isColliding && i<n) {
 				TypeHandler subType = subTypes[i++];
-				if(typeBuilder.isGetElementColliding(subType.getXmlTag())) {
+				if(typeBuilder.isGetElementColliding(subType.xml_getTag())) {
 					isColliding = true;
 				}
 			}
@@ -87,7 +87,7 @@ public abstract class ElementGetter {
 			int n = subTypes.length, i=0;
 			while(!isColliding && i<n) {
 				TypeHandler subType = subTypes[i++];
-				typeBuilder.putElementGetterTag(subType.getXmlTag());
+				typeBuilder.putElementGetterTag(subType.xml_getTag());
 			}
 		}
 					

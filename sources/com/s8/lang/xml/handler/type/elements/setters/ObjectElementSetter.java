@@ -36,7 +36,6 @@ public class ObjectElementSetter extends ElementSetter {
 
 	public static class Builder extends ElementSetter.Builder {
 
-
 		private String fieldTag;
 
 		private Method method;
@@ -45,7 +44,7 @@ public class ObjectElementSetter extends ElementSetter {
 
 		private TypeBuilder fieldTypeBuilder;
 
-		
+
 		public Builder(String tag, Method method, Class<?> fieldType) {
 			super(tag);
 			this.fieldTag = tag;
@@ -75,25 +74,25 @@ public class ObjectElementSetter extends ElementSetter {
 				TypeHandler fieldTypeHandler = fieldTypeBuilder.getHandler();
 
 				/* default full explanatory field tag, put single allowed type -> put pre-typed*/
-				tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+fieldTypeHandler.getXmlTag();
+				tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+fieldTypeHandler.xml_getTag();
 				typeBuilder.setElementSetter(new ObjectElementSetter(tag, true, method, fieldTypeHandler, false));
-				
-				
+
+
 				if(fieldTypeHandler.hasSubTypes()) { // is polymorphic
 					String tag;
-					
+
 					/* use field tag, put untyped setter */
 					for(TypeHandler subFieldTypeHandler : fieldTypeHandler.getSubTypes()) {
-						
+
 						// standard polymorphic field
-						tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+subFieldTypeHandler.getXmlTag();
+						tag = fieldTag+XML_Syntax.MAPPING_SEPARATOR+subFieldTypeHandler.xml_getTag();
 						typeBuilder.setElementSetter(new ObjectElementSetter(tag, true, method, subFieldTypeHandler, false));	
 					}
 				}
 				else { // type is univoque
 					/* simple field tag, put single allowed type -> put pre-typed*/
 					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTag, true, method, fieldTypeHandler, true));
-					
+
 				}
 
 				isBuilt0 = true;
@@ -116,7 +115,7 @@ public class ObjectElementSetter extends ElementSetter {
 				boolean isSubstitutionGroupColliding = false;
 
 				// check main type
-				if(typeBuilder.isSetElementColliding(fieldTypeHandler.getXmlTag())) {
+				if(typeBuilder.isSetElementColliding(fieldTypeHandler.xml_getTag())) {
 					isSubstitutionGroupColliding = true;
 				}
 
@@ -128,26 +127,26 @@ public class ObjectElementSetter extends ElementSetter {
 					TypeHandler subType;
 					while(!isSubstitutionGroupColliding && i<n) {
 						subType = subTypes[i++];
-						if(typeBuilder.isSetElementColliding(subType.getXmlTag())){
+						if(typeBuilder.isSetElementColliding(subType.xml_getTag())){
 							isSubstitutionGroupColliding = true;
 						}
 					}	
 				}
-				
+
 
 				/* if no collision, expand */
 				if(!isSubstitutionGroupColliding) {
-					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTypeHandler.getXmlTag(), 
+					typeBuilder.setElementSetter(new ObjectElementSetter(fieldTypeHandler.xml_getTag(), 
 							false, method, fieldTypeHandler, false));
-					
+
 					// subtypes...
 					for(TypeHandler fieldSubTypeHandler : fieldTypeHandler.getSubTypes()) {
-						String typeTag = fieldSubTypeHandler.getXmlTag();
+						String typeTag = fieldSubTypeHandler.xml_getTag();
 						typeBuilder.setElementSetter(new ObjectElementSetter(typeTag, 
 								false, method, fieldSubTypeHandler, false));
 					}
 				}
-			
+
 				isBuilt1 = true;
 				return false;
 			}
@@ -161,11 +160,11 @@ public class ObjectElementSetter extends ElementSetter {
 
 
 	private Method method;
-	
-	private TypeHandler fieldTypehandler;
+
+	private TypeHandler fieldTypeHandler;
 
 	private boolean isTypeUnivoque;
-	
+
 	/**
 	 * Pre-defined type
 	 * @param tag
@@ -176,15 +175,15 @@ public class ObjectElementSetter extends ElementSetter {
 	public ObjectElementSetter(String tag, boolean DTD_isFieldTag, Method method, TypeHandler fieldTypeHandler, boolean isTypeUnivoque) {
 		super(tag, DTD_isFieldTag);
 		this.method = method;
-		this.fieldTypehandler = fieldTypeHandler;
+		this.fieldTypeHandler = fieldTypeHandler;
 		this.isTypeUnivoque = isTypeUnivoque;
 	}
 
 
 
-	
+
 	public TypeHandler getTypeHandler() {
-		return fieldTypehandler;
+		return fieldTypeHandler;
 	}
 
 	/**
@@ -210,10 +209,10 @@ public class ObjectElementSetter extends ElementSetter {
 			}
 		};
 
-		return new ObjectParsedScope(parent, callback, getTag(), fieldTypehandler, point);
+		return new ObjectParsedScope(parent, callback, getTag(), fieldTypeHandler, point);
 	}
 
-	
+
 	/**
 	 * 
 	 * @return
@@ -221,13 +220,23 @@ public class ObjectElementSetter extends ElementSetter {
 	public boolean isTypeUnivoque() {
 		return isTypeUnivoque;
 	}
-	
+
 
 	@Override
 	public Method getMethod() {
 		return method;
 	}
-	
+
+
+	@Override
+	public void XSD_write(Writer writer) throws IOException {
+		writer.write("\n\t\t\t<xs:element name=\""+getTag()+"\" type=\"");
+		writer.write("tns:"+fieldTypeHandler.xsd_getTag()+"\"");
+		
+		/// minOccurs="1" maxOccurs="unbounded"
+		writer.write(" minOccurs=\"0\" maxOccurs=\"unbounded\" />");
+	}
+
 	@Override
 	public void DTD_writeHeader(Writer writer) throws IOException {
 		writer.append(getTag());
@@ -238,7 +247,7 @@ public class ObjectElementSetter extends ElementSetter {
 	@Override
 	public void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException {
 		if(isFieldTag()) {
-			fieldTypehandler.DTD_typeGenerator.writeFieldElement(getTag(), writer);
+			fieldTypeHandler.DTD_typeGenerator.writeFieldElement(getTag(), writer);
 		}
 	}
 }

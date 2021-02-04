@@ -1,5 +1,9 @@
-package com.qx.level0.lang.xml.tests.examples;
+package com.s8.lang.xml.tests.example01;
 
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import com.s8.lang.xml.api.XML_GetAttribute;
 import com.s8.lang.xml.api.XML_GetElement;
@@ -12,7 +16,12 @@ public class TestClass4 extends TestClass3 {
 
 	private int b = 1;
 	
-	public User[] users;
+	public List<User> users;
+	
+	public TestClass4() {
+		super();
+		users = new ArrayList<User>();
+	}
 	
 	@XML_SetAttribute(name="b")
 	public void setToto2(int b){
@@ -24,14 +33,16 @@ public class TestClass4 extends TestClass3 {
 		return b;
 	}
 	
-	@XML_SetElement(tag="users")
-	public void setUsers(User[] users){
-		this.users = users;
+	@XML_SetElement(tag="user")
+	public void appendUser(User user){
+		users.add(user);
 	}
 	
-	@XML_GetElement(tag="users")
-	public User[] getUsers(){
-		return users;
+	@XML_GetElement(tag="user")
+	public void getUsers(Consumer<User> crawler){
+		for(User user : users) {
+			crawler.accept(user);
+		}
 	}
 	
 }

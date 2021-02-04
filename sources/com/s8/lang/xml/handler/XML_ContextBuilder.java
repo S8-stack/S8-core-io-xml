@@ -100,8 +100,11 @@ public class XML_ContextBuilder {
 
 				// create type handler and map it
 				TypeHandler typeHandler = new TypeHandler(type);
-				context.mapByTag.put(typeHandler.getXmlTag(), typeHandler);
-				context.mapByClassname.put(type.getName(), typeHandler);
+				context.map.put(type.getName(), typeHandler);
+				
+				if(typeHandler.isRootElement()) {
+					context.rootElements.put(typeHandler.xml_getTag(), typeHandler);
+				}
 				
 				// create type builder and map it
 				TypeBuilder typeBuilder = new TypeBuilder(typeHandler);

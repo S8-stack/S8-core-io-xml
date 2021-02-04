@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyTrain SYSTEM  "train.dtd">
+<MyTrain>
+	<Type01Stage>
+		<design/>
+		<rating s="1"/>
+	</Type01Stage>
+	<Type02Stage>
+		<design/>
+	</Type02Stage>
+</MyTrain>

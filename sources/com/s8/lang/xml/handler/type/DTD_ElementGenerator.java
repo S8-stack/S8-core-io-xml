@@ -25,7 +25,7 @@ public class DTD_ElementGenerator {
 	}
 	
 	public void writeTypeElement(Writer writer) throws IOException {
-		writeElementDescriptor(typeHandler.getXmlTag(), writer);
+		writeElementDescriptor(typeHandler.xml_getTag(), writer);
 	}
 	
 	
@@ -101,9 +101,11 @@ public class DTD_ElementGenerator {
 		/**
 		 * write fields
 		 */
+		/*
 		for(ElementSetter elementSetter : typeHandler.elementSetters.values()) {
 			elementSetter.DTD_writeFieldDefinition(typeHandler, writer);
 		}
+		*/
 	}
 	
 	

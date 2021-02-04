@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test xmlns="http://s8.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://s8.com schema2.xsd" factor="5">
+	<ee2>
+		<user><note>iejriojei</note></user>
+	</ee2>
+	<module />
+	<field_module />
+</test>

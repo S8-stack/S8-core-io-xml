@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT ee EMPTY>
+<!ATTLIST ee toto CDATA #IMPLIED>
+<!ELEMENT test2 (ee*, item*, ee2*, field*, module*)*>
+<!ATTLIST test2 b2 CDATA #IMPLIED factor CDATA #IMPLIED>
+<!ELEMENT  item (#PCDATA)>
+<!ELEMENT  field (#PCDATA)>
+<!ELEMENT ee2 (user*)*>
+<!ATTLIST ee2 toto CDATA #IMPLIED b CDATA #IMPLIED>
+<!ELEMENT test (ee*, item*, ee2*, field*, module*)*>
+<!ATTLIST test factor CDATA #IMPLIED>
+<!ELEMENT module EMPTY>
+<!ATTLIST module b2 CDATA #IMPLIED>
+<!ELEMENT user (note*)*>
+<!ATTLIST user toto CDATA #IMPLIED password CDATA #IMPLIED name CDATA #IMPLIED>
+<!ELEMENT  note (#PCDATA)>
+<!ELEMENT cartesian.hf (#PCDATA)>

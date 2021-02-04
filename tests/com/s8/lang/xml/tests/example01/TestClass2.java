@@ -1,4 +1,4 @@
-package com.qx.level0.lang.xml.tests.examples;
+package com.s8.lang.xml.tests.example01;
 
 
 import com.s8.lang.xml.api.XML_GetAttribute;

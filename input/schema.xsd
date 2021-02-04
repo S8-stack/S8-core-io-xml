@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://pc-ar.xsd" xmlns="http://pc-ar.xsd">
+	
+	
+	<xs:complexType name="test-type">
+		<xs:sequence>
+			<xs:element name="item" type="assetRegTable-type"/>
+		</xs:sequence>
+		<xs:attribute name="factor" type="xs:string"/>
+	</xs:complexType>
+	
+	<xs:complexType name="ee">
+		<xs:sequence>
+			<xs:element name="table" type="assetRegTable-type"/>
+		</xs:sequence>
+		<xs:attribute name="factor" type="xs:string"/>
+	</xs:complexType>
+	
+	<xs:complexType name="ee2">
+		<xs:sequence>
+			<xs:element name="table" type="com.s8.lang.xml.XSD_Syntax"/>
+		</xs:sequence>
+		<xs:attribute name="factor" type="xs:string"/>
+	</xs:complexType>
+	
+	<xs:complexType name="assetRegTable-type">
+	</xs:complexType>
+	
+	<xs:complexType name="com.s8.lang.xml.XSD_Syntax">
+	</xs:complexType>
+	
+</xs:schema>

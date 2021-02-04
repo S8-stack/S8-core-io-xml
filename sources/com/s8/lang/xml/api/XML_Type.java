@@ -10,6 +10,9 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface XML_Type {
 
+	
+	public boolean root() default false;
+	
 	public String name();
 	
 	public Class<?>[] sub() default {};

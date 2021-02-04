@@ -72,11 +72,19 @@ public class XML_Context {
 	
 	//Map<String, TypeHandler> xmlRoots = new HashMap<>();
 
-	Map<String, TypeHandler> mapByTag = new HashMap<>();
+	//Map<String, TypeHandler> mapByTag = new HashMap<>();
 
-	Map<String, TypeHandler> mapByClassname = new HashMap<>();
+	Map<String, TypeHandler> map = new HashMap<>();
+	
+	
+	Map<String, TypeHandler> rootElements = new HashMap<>();
+	
+	
+	
 	
 	private DTD_TemplateGenerator DTD_templateGenerator;
+
+	private XSD_SchemaGenerator xsd_schemaGenerator;
 
 	public XML_Context(Class<?>... types) throws XML_TypeCompilationException {
 		super();
@@ -86,6 +94,8 @@ public class XML_Context {
 		builder.build();
 		
 		DTD_templateGenerator = new DTD_TemplateGenerator(this);
+		
+		xsd_schemaGenerator = new XSD_SchemaGenerator(this);
 	}
 	
 	/**
@@ -128,15 +138,6 @@ public class XML_Context {
 	*/
 
 
-	/**
-	 * 
-	 * @param tag
-	 * @return
-	 */
-	public TypeHandler getTypeHandlerByTag(String tag) {
-		return mapByTag.get(tag);
-	}
-	
 	
 	/**
 	 * 
@@ -144,7 +145,7 @@ public class XML_Context {
 	 * @return
 	 */
 	public TypeHandler getTypeHandlerByClass(Class<?> type) {
-		return mapByClassname.get(type.getName());
+		return map.get(type.getName());
 	}
 
 
@@ -206,6 +207,19 @@ public class XML_Context {
 	 */
 	public void DTD_writeTemplate(Writer writer) throws IOException {
 		DTD_templateGenerator.write(writer);
+	}
+	
+	/**
+	 * 
+	 * @param writer
+	 * @throws IOException
+	 */
+	public void xsd_writeSchema(Writer writer) throws IOException {
+		xsd_schemaGenerator.write(writer);
+	}
+
+	public TypeHandler getRootElementTypeHandler(String tag) {
+		return rootElements.get(tag);
 	}
 
 }

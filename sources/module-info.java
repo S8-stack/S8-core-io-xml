@@ -21,5 +21,9 @@ module com.s8.lang.xml {
 	exports com.s8.lang.xml.handler.type.elements.getters;
 	exports com.s8.lang.xml.handler.type.elements.setters;
 	
+	//exports com.s8.lang.xml.tests;
+	//exports com.s8.lang.xml.tests.examples;
+	
+	//opens com.s8.lang.xml.tests.examples;
 	
 }

@@ -25,4 +25,14 @@ public class XML_Syntax {
 			ATTRIBUTE_DEFINITION
 			};
 
+	
+	public static boolean isSchemaAttribute(String name) {
+		if(name.startsWith("xml")) {
+			return true;
+		}
+		if(name.startsWith("xs")) {
+			return true;
+		}
+		return false;
+	}
 }

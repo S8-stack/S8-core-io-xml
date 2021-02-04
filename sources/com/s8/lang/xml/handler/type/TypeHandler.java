@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.s8.lang.xml.XML_Syntax;
 import com.s8.lang.xml.api.XML_Type;
 import com.s8.lang.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.lang.xml.handler.type.attributes.setters.AttributeSetter;
@@ -38,6 +39,10 @@ public class TypeHandler {
 	 */
 	String xmlName;
 
+	
+	
+	boolean isRootElement;
+	
 	/**
 	 * declared name in Class<?> (JAVA side)
 	 */
@@ -84,6 +89,8 @@ public class TypeHandler {
 	public DTD_ElementGenerator DTD_typeGenerator;
 
 	//boolean isRoot;
+	
+	public XSD_TypeGenerator xsd_TypeGenerator;
 
 
 
@@ -102,7 +109,11 @@ public class TypeHandler {
 		}
 		xmlName = typeAnnotation.name();
 		
+		isRootElement = typeAnnotation.root();
+		
 		DTD_typeGenerator = new DTD_ElementGenerator(this);
+		
+		xsd_TypeGenerator = new XSD_TypeGenerator(this);
 	}
 
 
@@ -117,10 +128,19 @@ public class TypeHandler {
 	 * 
 	 * @return tag displayed in XML
 	 */
-	public String getXmlTag() {
+	public String xml_getTag() {
 		return xmlName;
 	}
+	
+	public String xsd_getTag() {
+		return type.getName();
+	}
 
+	
+	public boolean isRootElement() {
+		return isRootElement;
+	}
+	
 	/**
 	 * 
 	 * @return JAVA name
@@ -168,11 +188,14 @@ public class TypeHandler {
 	 */
 	public void setAttribute(Object object, String name, String value, XML_StreamReader.Point point) 
 			throws XML_ParsingException {
-		AttributeSetter setter = attributeSetters.get(name);
-		if(setter==null){
-			throw new XML_ParsingException(point, "No field with name "+name+" in type "+getXmlTag());
+		
+		if(!XML_Syntax.isSchemaAttribute(name)) {
+			AttributeSetter setter = attributeSetters.get(name);
+			if(setter==null){
+				throw new XML_ParsingException(point, "No field with name "+name+" in type "+xml_getTag());
+			}
+			setter.set(object, value, point);	
 		}
-		setter.set(object, value, point);
 	}
 
 
@@ -255,9 +278,6 @@ public class TypeHandler {
 	public String toString() {
 		return "handler ["+xmlName+"] for "+type;
 	}
-
-
-	
 	
 
 }
