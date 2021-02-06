@@ -106,7 +106,7 @@ public abstract class ElementGetter {
 			StringElementGetter.PROTOTYPE,
 			
 			// list
-			ObjectListElementGetter.PROTOTYPE,
+			ObjectsCollectionElementGetter.PROTOTYPE,
 			
 			// simple object
 			ObjectElementGetter.PROTOTYPE

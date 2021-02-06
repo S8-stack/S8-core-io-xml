@@ -16,7 +16,7 @@ import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
  * @author pierre convert
  *
  */
-public class ObjectListElementGetter extends ElementGetter {
+public class ObjectsCollectionElementGetter extends ElementGetter {
 
 	public static final Prototype PROTOTYPE = new Prototype() {
 
@@ -38,7 +38,7 @@ public class ObjectListElementGetter extends ElementGetter {
 
 		@Override
 		public ElementGetter.Builder create(Method method) {
-			return new ObjectListElementGetter.Builder(method);
+			return new ObjectsCollectionElementGetter.Builder(method);
 		}
 	};
 	
@@ -73,7 +73,7 @@ public class ObjectListElementGetter extends ElementGetter {
 			if(isTypeTagPreferred) {
 				fillFieldTypeTags(typeBuilder, fieldTypeBuilder);
 			}
-			typeBuilder.putElementGetter(new ObjectListElementGetter(fieldTag, method, isTypeTagPreferred));
+			typeBuilder.putElementGetter(new ObjectsCollectionElementGetter(fieldTag, method, isTypeTagPreferred));
 			return false;
 		}
 		
@@ -99,7 +99,7 @@ public class ObjectListElementGetter extends ElementGetter {
 	 * 
 	 * @param method
 	 */
-	public ObjectListElementGetter(String fieldTag, Method method, boolean isTypeTagPreferred) {
+	public ObjectsCollectionElementGetter(String fieldTag, Method method, boolean isTypeTagPreferred) {
 		super(fieldTag, method);
 		this.isTypeTagPreferred = isTypeTagPreferred;
 	}
