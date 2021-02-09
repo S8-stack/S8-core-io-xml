@@ -229,9 +229,9 @@ public class ObjectElementSetter extends ElementSetter {
 
 
 	@Override
-	public void XSD_write(Writer writer) throws IOException {
+	public void xsd_write(Writer writer) throws IOException {
 		writer.write("\n\t\t\t<xs:element name=\""+getTag()+"\" type=\"");
-		writer.write("tns:"+fieldTypeHandler.xsd_getTag()+"\"");
+		writer.write("tns:"+fieldTypeHandler.xsd_getTypeName()+"\"");
 		
 		/// minOccurs="1" maxOccurs="unbounded"
 		writer.write(" minOccurs=\"0\" maxOccurs=\"unbounded\" />");

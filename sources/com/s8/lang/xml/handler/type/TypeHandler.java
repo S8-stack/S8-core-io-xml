@@ -132,8 +132,8 @@ public class TypeHandler {
 		return xmlName;
 	}
 	
-	public String xsd_getTag() {
-		return type.getName();
+	public String xsd_getTypeName() {
+		return type.getName().replace('$', '-');
 	}
 
 	

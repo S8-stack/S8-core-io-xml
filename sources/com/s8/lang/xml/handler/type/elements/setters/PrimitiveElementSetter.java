@@ -85,7 +85,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 
 
 	@Override
-	public void XSD_write(Writer writer) throws IOException {
+	public void xsd_write(Writer writer) throws IOException {
 		writer.write("\n\t\t\t<xs:element name=\""+getTag()+"\"");
 		writer.write(" type=\"xs:string\"");
 		writer.write(" minOccurs=\"0\" maxOccurs=\"unbounded\" />");

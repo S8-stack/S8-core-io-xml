@@ -26,7 +26,7 @@ public class XSD_SchemaGenerator {
 		writer.append(XSD_Syntax.OPENING_TAG);
 		
 		for(Entry<String, TypeHandler> rootElement : context.rootElements.entrySet()) {
-			writer.append("\n\t<xs:element name=\""+rootElement.getKey()+"\" type=\"tns:"+rootElement.getValue().xsd_getTag()+"\"/>");
+			writer.append("\n\t<xs:element name=\""+rootElement.getKey()+"\" type=\"tns:"+rootElement.getValue().xsd_getTypeName()+"\"/>");
 		}	
 		
 		for(TypeHandler typeHandler : context.map.values()) {

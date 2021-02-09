@@ -152,7 +152,7 @@ public abstract class ElementSetter {
 
 	public abstract Method getMethod();
 
-	public abstract void XSD_write(Writer writer) throws IOException;
+	public abstract void xsd_write(Writer writer) throws IOException;
 
 	public abstract void DTD_writeHeader(Writer writer) throws IOException;
 

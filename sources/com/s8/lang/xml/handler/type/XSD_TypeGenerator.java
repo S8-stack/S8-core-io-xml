@@ -31,7 +31,7 @@ private TypeHandler typeHandler;
 		// declare element
 		// <xs:complexType name="ee">
 		writer.append("\n\n\t<xs:complexType name=\"");
-		writer.append(typeHandler.xsd_getTag());
+		writer.append(typeHandler.xsd_getTypeName());
 		writer.append("\">");
 		
 		
@@ -43,7 +43,7 @@ private TypeHandler typeHandler;
 		
 		 
 		for(ElementSetter elementSetter : typeHandler.elementSetters.values()) {
-			elementSetter.XSD_write(writer);
+			elementSetter.xsd_write(writer);
 		}
 		writer.append("\n\t\t</xs:choice>");
 		writer.append("\n\t\t</xs:sequence>");
