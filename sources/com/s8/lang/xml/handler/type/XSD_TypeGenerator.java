@@ -32,7 +32,11 @@ private TypeHandler typeHandler;
 		// <xs:complexType name="ee">
 		writer.append("\n\n\t<xs:complexType name=\"");
 		writer.append(typeHandler.xsd_getTypeName());
-		writer.append("\">");
+		writer.append('\"');
+		if(typeHandler.valueSetter!=null) {
+			writer.append(" mixed=\"true\"");
+		}
+		writer.append('>');
 		
 		
 		/* <elements> */
