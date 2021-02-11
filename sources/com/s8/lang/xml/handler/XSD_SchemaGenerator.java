@@ -31,7 +31,7 @@ public class XSD_SchemaGenerator {
 		
 		for(TypeHandler typeHandler : context.map.values()) {
 			typeHandler.xsd_TypeGenerator.writeDescriptor(writer);
-		}		
+		}
 		writer.append(XSD_Syntax.CLOSING_TAG);
 	}
 }
