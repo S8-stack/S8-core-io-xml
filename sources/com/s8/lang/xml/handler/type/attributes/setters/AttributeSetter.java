@@ -51,34 +51,35 @@ public abstract class AttributeSetter {
 			return new EnumFieldSetter(method, type);
 		}
 		else{
-			throw new RuntimeException("parameters type is not supported: "+type.getName());
+			throw new RuntimeException("parameters type is not supported as attribute: "+type.getName()
+			+", for method: "+method);
 		}
 	}
 
 	protected Method method;
-	
+
 	private String name;
-	
+
 	private boolean isRequired;
-	
+
 	public AttributeSetter(Method method) {
 		super();
 		this.method = method;
-		
+
 		XML_SetAttribute attributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
 		name = attributeAnnotation.name();
 		isRequired = attributeAnnotation.isRequired();
 	}
-	
-	
+
+
 	public boolean isRequired() {
 		return isRequired;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * 
 	 * @param writer
@@ -88,10 +89,10 @@ public abstract class AttributeSetter {
 		//b  CDATA  #IMPLIED
 		writer.append(name);
 		writer.append(' ');
-		
+
 		writer.append("CDATA");
 		writer.append(' ');
-		
+
 		if(isRequired) {
 			writer.append("#REQUIRED");	
 		}
@@ -99,17 +100,17 @@ public abstract class AttributeSetter {
 			writer.append("#IMPLIED");	
 		}
 	}
-	
+
 	public void XSD_write(Writer writer) throws IOException {
-	
+
 		// <xs:attribute name="factor" type="xs:string"/>
 		writer.append("\n\t\t<xs:attribute name=\"");
-		
+
 		writer.append(name);
-		
+
 		writer.append("\" type=\"xs:string\"/>");
 	}
-	
+
 
 	public abstract void set(Object object, String value, XML_StreamReader.Point point) throws XML_ParsingException;
 

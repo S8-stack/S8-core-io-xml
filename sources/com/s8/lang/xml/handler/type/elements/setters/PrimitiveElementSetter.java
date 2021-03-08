@@ -41,7 +41,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 		}
 
 		@Override
-		public boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder)
+		public boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose)
 				throws XML_TypeCompilationException {
 			if(!isBuilt0) {
 				typeBuilder.setElementSetter(getStandardSetter());
@@ -55,7 +55,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 		}
 
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) 
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose) 
 				throws XML_TypeCompilationException {
 			return false;
 		}

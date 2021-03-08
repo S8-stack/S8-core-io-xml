@@ -60,7 +60,7 @@ public class ObjectElementSetter extends ElementSetter {
 
 
 		@Override
-		public boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) {
+		public boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose) {
 			if(!isBuilt0) {
 
 				if(fieldTypeBuilder==null) {
@@ -105,7 +105,7 @@ public class ObjectElementSetter extends ElementSetter {
 
 
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) {			
+		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose) {			
 			if(!isBuilt1) {
 
 				//TypeHandler typeHandler = typeBuilder.getHandler();
@@ -117,6 +117,10 @@ public class ObjectElementSetter extends ElementSetter {
 				// check main type
 				if(typeBuilder.isSetElementColliding(fieldTypeHandler.xml_getTag())) {
 					isSubstitutionGroupColliding = true;
+				}
+				
+				if(isSubstitutionGroupColliding) {
+					System.out.println("Collision on setters name for method: "+method);
 				}
 
 				//

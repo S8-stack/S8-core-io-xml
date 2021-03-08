@@ -35,7 +35,7 @@ public class XML_ContextBuilder {
 		initializables = new ArrayDeque<>();
 	}
 
-	public void build() throws XML_TypeCompilationException {
+	public void build(boolean isVerbose) throws XML_TypeCompilationException {
 
 		// register all types
 		for(Class<?> type : types){
@@ -60,7 +60,7 @@ public class XML_ContextBuilder {
 			isBuilt = true;
 			
 			for(TypeBuilder typeBuilder : buildSet) {
-				boolean isTypeBuilt = typeBuilder.build(this);
+				boolean isTypeBuilt = typeBuilder.build(this, isVerbose);
 				if(!isTypeBuilt) {
 					isBuilt = false;
 				}

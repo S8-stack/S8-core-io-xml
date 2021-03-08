@@ -91,7 +91,7 @@ public class XML_Context {
 
 		// create builder and run it to get the context compiled
 		XML_ContextBuilder builder = new XML_ContextBuilder(this, types, null);
-		builder.build();
+		builder.build(true);
 		
 		DTD_templateGenerator = new DTD_TemplateGenerator(this);
 		
@@ -110,7 +110,7 @@ public class XML_Context {
 
 		// create builder and run it to get the context compiled
 		XML_ContextBuilder builder = new XML_ContextBuilder(this, types, extensions);
-		builder.build();
+		builder.build(true);
 	}
 	
 	

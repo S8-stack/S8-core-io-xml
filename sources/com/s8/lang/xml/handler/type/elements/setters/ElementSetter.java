@@ -65,10 +65,12 @@ public abstract class ElementSetter {
 		 * 
 		 * @throws XML_TypeCompilationException 
 		 */
-		public abstract boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder builder) throws XML_TypeCompilationException;
+		public abstract boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder builder, boolean isVerbose) 
+				throws XML_TypeCompilationException;
 
 
-		public abstract boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder builder) throws XML_TypeCompilationException;
+		public abstract boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder builder, boolean isVerbose) 
+				throws XML_TypeCompilationException;
 
 
 	}

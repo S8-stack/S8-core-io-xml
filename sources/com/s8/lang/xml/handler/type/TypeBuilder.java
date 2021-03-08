@@ -170,7 +170,7 @@ public class TypeBuilder {
 	 * @return
 	 * @throws XML_TypeCompilationException
 	 */
-	public boolean build(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
+	public boolean build(XML_ContextBuilder contextBuilder, boolean isVerbose) throws XML_TypeCompilationException {
 		if(!isBuilt) {
 
 			boolean hasMissingBuilds = false, isBuildMissingDependencies = false;
@@ -215,7 +215,7 @@ public class TypeBuilder {
 
 				hasMissingBuilds = false;
 				for(ElementSetter.Builder builder : elementSetBuilders) {
-					isBuildMissingDependencies = builder.build0(contextBuilder, this);
+					isBuildMissingDependencies = builder.build0(contextBuilder, this, isVerbose);
 					if(isBuildMissingDependencies) {
 						hasMissingBuilds = true;
 					}
@@ -226,7 +226,7 @@ public class TypeBuilder {
 			if(isSettersBuilt0 && !isSettersBuilt1) {
 				hasMissingBuilds = false;
 				for(ElementSetter.Builder builder : elementSetBuilders) {
-					isBuildMissingDependencies = builder.build1(contextBuilder, this);
+					isBuildMissingDependencies = builder.build1(contextBuilder, this, isVerbose);
 					if(isBuildMissingDependencies) {
 						hasMissingBuilds = true;
 					}
