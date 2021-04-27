@@ -6,7 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.function.Consumer;
 
 import com.s8.lang.xml.composer.ObjectComposableScope;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
+import com.s8.lang.xml.handler.XML_LexiconBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
@@ -51,7 +51,7 @@ public class ObjectsCollectionElementGetter extends ElementGetter {
 		
 
 		@Override
-		public void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
+		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
 			contextBuilder.register(getTargetType(contextBuilder));
 		}
 		
@@ -62,7 +62,7 @@ public class ObjectsCollectionElementGetter extends ElementGetter {
 		}
 
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+		public boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
 			Class<?> fieldType =  getTargetType(contextBuilder);
 			TypeBuilder fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
 			if(!fieldTypeBuilder.isInheritanceDiscovered()) {
@@ -83,7 +83,7 @@ public class ObjectsCollectionElementGetter extends ElementGetter {
 		 * @param contextBuilder
 		 * @return
 		 */
-		public Class<?> getTargetType(XML_ContextBuilder contextBuilder) {
+		public Class<?> getTargetType(XML_LexiconBuilder contextBuilder) {
 			Parameter[] parameters = method.getParameters();
 			ParameterizedType argType = (ParameterizedType) parameters[0].getParameterizedType();
 			Class<?> componentType = (Class<?>) (argType.getActualTypeArguments())[0];

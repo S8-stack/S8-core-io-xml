@@ -7,7 +7,7 @@ public class DTD_TemplateGenerator {
 
 	//private XML_Context context;
 	
-	public DTD_TemplateGenerator(XML_Context context) {
+	public DTD_TemplateGenerator(XML_Lexicon context) {
 		super();
 		//this.context = context;
 	}

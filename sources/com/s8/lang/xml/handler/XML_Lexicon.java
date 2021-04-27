@@ -66,7 +66,7 @@ import com.s8.lang.xml.parser.XML_StreamReader;
  * @author pc
  *
  */
-public class XML_Context {
+public class XML_Lexicon {
 
 	private boolean isVerbose = false;
 	
@@ -86,11 +86,11 @@ public class XML_Context {
 
 	private XSD_SchemaGenerator xsd_schemaGenerator;
 
-	public XML_Context(Class<?>... types) throws XML_TypeCompilationException {
+	public XML_Lexicon(Class<?>... types) throws XML_TypeCompilationException {
 		super();
 
 		// create builder and run it to get the context compiled
-		XML_ContextBuilder builder = new XML_ContextBuilder(this, types, null);
+		XML_LexiconBuilder builder = new XML_LexiconBuilder(this, types, null);
 		builder.build(true);
 		
 		DTD_templateGenerator = new DTD_TemplateGenerator(this);
@@ -105,11 +105,11 @@ public class XML_Context {
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	public XML_Context(Class<?>[] types, Class<?>[] extensions) throws XML_TypeCompilationException {
+	public XML_Lexicon(Class<?>[] types, Class<?>[] extensions) throws XML_TypeCompilationException {
 		super();
 
 		// create builder and run it to get the context compiled
-		XML_ContextBuilder builder = new XML_ContextBuilder(this, types, extensions);
+		XML_LexiconBuilder builder = new XML_LexiconBuilder(this, types, extensions);
 		builder.build(true);
 	}
 	

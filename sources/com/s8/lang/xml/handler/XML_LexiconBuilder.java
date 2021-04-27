@@ -9,9 +9,9 @@ import com.s8.lang.xml.handler.type.TypeBuilder;
 import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
-public class XML_ContextBuilder {
+public class XML_LexiconBuilder {
 
-	private XML_Context context;
+	private XML_Lexicon context;
 
 	
 	/**
@@ -27,7 +27,7 @@ public class XML_ContextBuilder {
 	private Class<?>[] types;
 	private Class<?>[] extensions;
 
-	public XML_ContextBuilder(XML_Context context, Class<?>[] types, Class<?>[] extensions) {
+	public XML_LexiconBuilder(XML_Lexicon context, Class<?>[] types, Class<?>[] extensions) {
 		super();
 		this.context = context;
 		this.types = types;
@@ -140,7 +140,7 @@ public class XML_ContextBuilder {
 		return typeBuilders.get(type.getName());
 	}
 
-	public XML_Context getContext() {
+	public XML_Lexicon getContext() {
 		return context;
 	}
 }

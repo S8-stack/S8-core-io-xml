@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
-import com.s8.lang.xml.handler.XML_Context;
+import com.s8.lang.xml.handler.XML_Lexicon;
 
 /**
  * 
@@ -37,7 +37,7 @@ public abstract class ComposableScope {
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public abstract boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public abstract boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException, Exception;
 
 	/**
@@ -49,7 +49,7 @@ public abstract class ComposableScope {
 	 * @return is Interrupted
 	 * @throws Exception
 	 */
-	public abstract boolean compose(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public abstract boolean compose(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws Exception;
 	
 

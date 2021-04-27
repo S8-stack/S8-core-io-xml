@@ -9,9 +9,9 @@ import com.s8.lang.xml.handler.type.TypeHandler;
 
 public class XSD_SchemaGenerator {
 
-	private XML_Context context;
+	private XML_Lexicon context;
 	
-	public XSD_SchemaGenerator(XML_Context context) {
+	public XSD_SchemaGenerator(XML_Lexicon context) {
 		super();
 		this.context = context;
 	}

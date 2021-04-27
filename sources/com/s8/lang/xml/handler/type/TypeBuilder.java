@@ -13,7 +13,7 @@ import com.s8.lang.xml.api.XML_SetAttribute;
 import com.s8.lang.xml.api.XML_SetElement;
 import com.s8.lang.xml.api.XML_SetValue;
 import com.s8.lang.xml.api.XML_Type;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
+import com.s8.lang.xml.handler.XML_LexiconBuilder;
 import com.s8.lang.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.lang.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.lang.xml.handler.type.elements.getters.ElementGetter;
@@ -139,7 +139,7 @@ public class TypeBuilder {
 	 * @param contextBuilder
 	 * @throws XML_TypeCompilationException 
 	 */
-	public void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
+	public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
 
 		// typeAnnotation has already been checked before
 		XML_Type typeAnnotation  = getType().getAnnotation(XML_Type.class);
@@ -166,11 +166,11 @@ public class TypeBuilder {
 
 	/**
 	 * 
-	 * @param contextBuilder
+	 * @param lexiconBuilder
 	 * @return
 	 * @throws XML_TypeCompilationException
 	 */
-	public boolean build(XML_ContextBuilder contextBuilder, boolean isVerbose) throws XML_TypeCompilationException {
+	public boolean build(XML_LexiconBuilder lexiconBuilder, boolean isVerbose) throws XML_TypeCompilationException {
 		if(!isBuilt) {
 
 			boolean hasMissingBuilds = false, isBuildMissingDependencies = false;
@@ -179,7 +179,7 @@ public class TypeBuilder {
 			if(!isInheritanceBuilt) {
 				Map<String, TypeBuilder> map = new HashMap<String, TypeBuilder>();
 
-				listSubTypes(contextBuilder, map);
+				listSubTypes(lexiconBuilder, map);
 
 				typeHandler.subTypes = map.values().stream().map(t -> t.getHandler()).toArray(size -> new TypeHandler[size]);
 				isInheritanceBuilt = true;	
@@ -201,7 +201,7 @@ public class TypeBuilder {
 			if(!isGettersBuilt1 && isGettersBuilt0) {
 				hasMissingBuilds = false;
 				for(ElementGetter.Builder builder : elementGetBuilders) {
-					isBuildMissingDependencies = builder.build1(contextBuilder, this);
+					isBuildMissingDependencies = builder.build1(lexiconBuilder, this);
 					if(isBuildMissingDependencies) {
 						hasMissingBuilds = true;
 					}
@@ -215,7 +215,7 @@ public class TypeBuilder {
 
 				hasMissingBuilds = false;
 				for(ElementSetter.Builder builder : elementSetBuilders) {
-					isBuildMissingDependencies = builder.build0(contextBuilder, this, isVerbose);
+					isBuildMissingDependencies = builder.build0(lexiconBuilder, this, isVerbose);
 					if(isBuildMissingDependencies) {
 						hasMissingBuilds = true;
 					}
@@ -226,7 +226,7 @@ public class TypeBuilder {
 			if(isSettersBuilt0 && !isSettersBuilt1) {
 				hasMissingBuilds = false;
 				for(ElementSetter.Builder builder : elementSetBuilders) {
-					isBuildMissingDependencies = builder.build1(contextBuilder, this, isVerbose);
+					isBuildMissingDependencies = builder.build1(lexiconBuilder, this, isVerbose);
 					if(isBuildMissingDependencies) {
 						hasMissingBuilds = true;
 					}
@@ -260,7 +260,7 @@ public class TypeBuilder {
 	 * @param subTypes
 	 * @throws XML_TypeCompilationException
 	 */
-	public void listSubTypes(XML_ContextBuilder contextBuilder, Map<String, TypeBuilder> map) 
+	public void listSubTypes(XML_LexiconBuilder contextBuilder, Map<String, TypeBuilder> map) 
 			throws XML_TypeCompilationException {
 
 

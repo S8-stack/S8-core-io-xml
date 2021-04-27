@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
 
-import com.s8.lang.xml.handler.XML_ContextBuilder;
+import com.s8.lang.xml.handler.XML_LexiconBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
 import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
@@ -36,12 +36,12 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 		public abstract ElementSetter getStandardSetter();
 
 		@Override
-		public void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
+		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
 			// nothing to explore
 		}
 
 		@Override
-		public boolean build0(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose)
+		public boolean build0(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose)
 				throws XML_TypeCompilationException {
 			if(!isBuilt0) {
 				typeBuilder.setElementSetter(getStandardSetter());
@@ -55,7 +55,7 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 		}
 
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose) 
+		public boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose) 
 				throws XML_TypeCompilationException {
 			return false;
 		}

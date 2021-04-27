@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.s8.lang.xml.api.XML_SetElement;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
+import com.s8.lang.xml.handler.XML_LexiconBuilder;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 import com.s8.lang.xml.parser.PrimitiveParsedScope;
 import com.s8.lang.xml.parser.PrimitiveParsedScope.Callback;
@@ -44,7 +44,7 @@ public class DoubleElementSetter extends PrimitiveElementSetter {
 		}
 
 		@Override
-		public void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
+		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
 			// nothing to explore
 		}
 	}

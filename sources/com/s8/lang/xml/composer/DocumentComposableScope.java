@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import com.s8.lang.xml.XML_Syntax;
-import com.s8.lang.xml.handler.XML_Context;
+import com.s8.lang.xml.handler.XML_Lexicon;
 
 public class DocumentComposableScope extends ComposableScope {
 	
@@ -22,7 +22,7 @@ public class DocumentComposableScope extends ComposableScope {
 	}
 	
 	@Override
-	public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException, Exception {
 		
 		if(!isHeaderWritten) {
@@ -44,7 +44,7 @@ public class DocumentComposableScope extends ComposableScope {
 	}
 
 	@Override
-	public boolean compose(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public boolean compose(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws Exception {
 		return rootObjectScope.insert(context, stack, writer);
 	}

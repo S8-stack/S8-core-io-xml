@@ -3,7 +3,7 @@ package com.s8.lang.xml.handler.type.elements.getters;
 import java.lang.reflect.Method;
 
 import com.s8.lang.xml.composer.ObjectComposableScope;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
+import com.s8.lang.xml.handler.XML_LexiconBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
 
@@ -51,7 +51,7 @@ public class ObjectElementGetter extends ElementGetter {
 		}
 
 		@Override
-		public void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException {
+		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
 			Class<?> type = method.getReturnType();
 			contextBuilder.register(type);
 		}
@@ -69,7 +69,7 @@ public class ObjectElementGetter extends ElementGetter {
 		}
 		
 		@Override
-		public boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
+		public boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
 			if(!isBuilt1) {
 				Class<?> fieldType =  method.getReturnType();
 				TypeBuilder fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);

@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import com.s8.lang.xml.api.XML_GetElement;
 import com.s8.lang.xml.composer.ObjectComposableScope;
-import com.s8.lang.xml.handler.XML_ContextBuilder;
+import com.s8.lang.xml.handler.XML_LexiconBuilder;
 import com.s8.lang.xml.handler.type.TypeBuilder;
 import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.handler.type.XML_TypeCompilationException;
@@ -43,7 +43,7 @@ public abstract class ElementGetter {
 		 * @param contextBuilder
 		 * @throws XML_TypeCompilationException 
 		 */
-		public abstract void explore(XML_ContextBuilder contextBuilder) throws XML_TypeCompilationException;
+		public abstract void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException;
 		
 		
 		/**
@@ -52,7 +52,7 @@ public abstract class ElementGetter {
 		 */
 		public abstract boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException;
 
-		public abstract boolean build1(XML_ContextBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException;
+		public abstract boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException;
 
 		
 		/**

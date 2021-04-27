@@ -3,7 +3,7 @@ package com.s8.lang.xml.parser;
 
 import java.io.IOException;
 
-import com.s8.lang.xml.handler.XML_Context;
+import com.s8.lang.xml.handler.XML_Lexicon;
 import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.parser.ObjectParsedScope.Callback;
 
@@ -16,7 +16,7 @@ import com.s8.lang.xml.parser.ObjectParsedScope.Callback;
 public class RootParsedElement implements ParsedScope {
 	
 	
-	private XML_Context context;
+	private XML_Lexicon context;
 
 	private Object rootObject;
 
@@ -39,7 +39,7 @@ public class RootParsedElement implements ParsedScope {
 	 * @param handler
 	 * @throws XML_ParsingException
 	 */
-	public RootParsedElement(XML_Context context) {
+	public RootParsedElement(XML_Lexicon context) {
 		super();
 		this.context = context;
 	

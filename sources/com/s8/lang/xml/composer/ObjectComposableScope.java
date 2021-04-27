@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import com.s8.lang.xml.XML_Syntax;
-import com.s8.lang.xml.handler.XML_Context;
+import com.s8.lang.xml.handler.XML_Lexicon;
 import com.s8.lang.xml.handler.type.TypeHandler;
 import com.s8.lang.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.lang.xml.handler.type.elements.getters.ElementGetter;
@@ -125,7 +125,7 @@ public abstract class ObjectComposableScope extends ComposableScope {
 	 * <scope><inner-scope> -> stacking
 	 */
 	@Override
-	public boolean insert(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws 
 			IllegalAccessException, 
 			IllegalArgumentException, 
@@ -191,7 +191,7 @@ public abstract class ObjectComposableScope extends ComposableScope {
 	 * @throws Exception
 	 */
 	@Override
-	public boolean compose(XML_Context context, Stack<ComposableScope> stack, XML_StreamWriter writer) 
+	public boolean compose(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) 
 			throws Exception {
 		while(head!=null) {
 			boolean isStackedComposedRequired = head.insert(context, stack, writer);
