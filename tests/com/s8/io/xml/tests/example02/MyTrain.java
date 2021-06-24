@@ -3,8 +3,8 @@ package com.s8.io.xml.tests.example02;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.s8.alpha.xml.XML_SetElement;
-import com.s8.alpha.xml.XML_Type;
+import com.s8.blocks.xml.annotations.XML_SetElement;
+import com.s8.blocks.xml.annotations.XML_Type;
 
 @XML_Type(name = "MyTrain")
 public class MyTrain {

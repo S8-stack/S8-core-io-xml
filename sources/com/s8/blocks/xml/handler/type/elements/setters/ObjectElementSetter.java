@@ -5,8 +5,8 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.s8.alpha.xml.XML_SetElement;
 import com.s8.blocks.xml.XML_Syntax;
+import com.s8.blocks.xml.annotations.XML_SetElement;
 import com.s8.blocks.xml.handler.XML_LexiconBuilder;
 import com.s8.blocks.xml.handler.type.TypeBuilder;
 import com.s8.blocks.xml.handler.type.TypeHandler;

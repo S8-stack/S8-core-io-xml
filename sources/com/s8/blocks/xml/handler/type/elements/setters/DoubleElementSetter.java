@@ -3,7 +3,7 @@ package com.s8.blocks.xml.handler.type.elements.setters;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.s8.alpha.xml.XML_SetElement;
+import com.s8.blocks.xml.annotations.XML_SetElement;
 import com.s8.blocks.xml.handler.XML_LexiconBuilder;
 import com.s8.blocks.xml.handler.type.XML_TypeCompilationException;
 import com.s8.blocks.xml.parser.PrimitiveParsedScope;

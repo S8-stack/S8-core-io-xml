@@ -1,8 +1,10 @@
 
 module com.s8.blocks.xml {
 	
+
 	exports com.s8.blocks.xml;
 
+	exports com.s8.blocks.xml.annotations;
 	
 	exports com.s8.blocks.xml.parser;
 

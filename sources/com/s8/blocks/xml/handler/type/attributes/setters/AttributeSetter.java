@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.s8.alpha.xml.XML_SetAttribute;
+import com.s8.blocks.xml.annotations.XML_SetAttribute;
 import com.s8.blocks.xml.parser.XML_ParsingException;
 import com.s8.blocks.xml.parser.XML_StreamReader;
 

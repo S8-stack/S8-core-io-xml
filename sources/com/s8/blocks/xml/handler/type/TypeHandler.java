@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.s8.alpha.xml.XML_Type;
 import com.s8.blocks.xml.XML_Syntax;
+import com.s8.blocks.xml.annotations.XML_Type;
 import com.s8.blocks.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.blocks.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.blocks.xml.handler.type.elements.getters.ElementGetter;

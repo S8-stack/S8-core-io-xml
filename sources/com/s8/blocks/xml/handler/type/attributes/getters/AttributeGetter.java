@@ -3,7 +3,7 @@ package com.s8.blocks.xml.handler.type.attributes.getters;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.s8.alpha.xml.XML_GetAttribute;
+import com.s8.blocks.xml.annotations.XML_GetAttribute;
 
 public abstract class AttributeGetter {
 	

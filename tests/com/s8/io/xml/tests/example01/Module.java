@@ -1,8 +1,8 @@
 package com.s8.io.xml.tests.example01;
 
-import com.s8.alpha.xml.XML_GetAttribute;
-import com.s8.alpha.xml.XML_SetAttribute;
-import com.s8.alpha.xml.XML_Type;
+import com.s8.blocks.xml.annotations.XML_GetAttribute;
+import com.s8.blocks.xml.annotations.XML_SetAttribute;
+import com.s8.blocks.xml.annotations.XML_Type;
 
 
 public @XML_Type(name="module", sub={}) class Module {

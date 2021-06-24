@@ -2,7 +2,7 @@ package com.s8.blocks.xml.handler.type.elements.getters;
 
 import java.lang.reflect.Method;
 
-import com.s8.alpha.xml.XML_GetElement;
+import com.s8.blocks.xml.annotations.XML_GetElement;
 import com.s8.blocks.xml.composer.ObjectComposableScope;
 import com.s8.blocks.xml.handler.XML_LexiconBuilder;
 import com.s8.blocks.xml.handler.type.TypeBuilder;
