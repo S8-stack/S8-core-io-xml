@@ -1,6 +1,6 @@
 package com.s8.io.xml.tests;
 
-import com.s8.io.xml.XSD_Syntax;
+import com.s8.blocks.xml.XSD_Syntax;
 
 public class DumbTest {
 

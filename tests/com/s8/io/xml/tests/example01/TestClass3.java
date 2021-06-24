@@ -1,9 +1,9 @@
 package com.s8.io.xml.tests.example01;
 
 
-import com.s8.io.xml.api.XML_GetAttribute;
-import com.s8.io.xml.api.XML_SetAttribute;
-import com.s8.io.xml.api.XML_Type;
+import com.s8.alpha.xml.XML_GetAttribute;
+import com.s8.alpha.xml.XML_SetAttribute;
+import com.s8.alpha.xml.XML_Type;
 
 @XML_Type(name="ee", sub={
 		TestClass4.class 

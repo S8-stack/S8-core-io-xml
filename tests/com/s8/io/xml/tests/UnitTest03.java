@@ -11,8 +11,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
+import com.s8.blocks.xml.handler.XML_Lexicon;
 import com.s8.io.xml.tests.example01.Wrapper;
-import com.s8.io.xml.handler.XML_Lexicon;
 
 public class UnitTest03 {
 

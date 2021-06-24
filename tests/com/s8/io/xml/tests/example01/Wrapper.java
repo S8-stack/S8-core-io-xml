@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.s8.io.xml.api.XML_GetAttribute;
-import com.s8.io.xml.api.XML_GetElement;
-import com.s8.io.xml.api.XML_SetAttribute;
-import com.s8.io.xml.api.XML_SetElement;
-import com.s8.io.xml.api.XML_Type;
+import com.s8.alpha.xml.XML_GetAttribute;
+import com.s8.alpha.xml.XML_GetElement;
+import com.s8.alpha.xml.XML_SetAttribute;
+import com.s8.alpha.xml.XML_SetElement;
+import com.s8.alpha.xml.XML_Type;
 
 @XML_Type(root=true, name="test", sub={ TestClass2.class })
 public class Wrapper {
