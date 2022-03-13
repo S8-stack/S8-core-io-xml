@@ -1,5 +1,13 @@
 package com.s8.io.xml;
 
+
+/**
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class XSD_Syntax {
 
 	public final static String PREFIX = "xs:";

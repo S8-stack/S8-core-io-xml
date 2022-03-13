@@ -4,6 +4,13 @@ import java.util.Stack;
 
 import com.s8.io.xml.handler.XML_Lexicon;
 
+
+/**
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class XML_Composer {
 
 	private XML_Lexicon context;

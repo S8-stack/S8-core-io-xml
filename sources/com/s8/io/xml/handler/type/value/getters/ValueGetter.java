@@ -3,6 +3,15 @@ package com.s8.io.xml.handler.type.value.getters;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+
+/**
+ * 
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public abstract class ValueGetter {
 	
 	/**

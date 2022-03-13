@@ -10,6 +10,14 @@ import com.s8.io.xml.parser.XML_StreamReader;
 import com.s8.io.xml.parser.PrimitiveParsedScope.Callback;
 
 
+/**
+ * 
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class LongElementSetter extends PrimitiveElementSetter {
 	
 	

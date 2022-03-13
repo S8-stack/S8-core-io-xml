@@ -7,6 +7,14 @@ import java.util.Map.Entry;
 import com.s8.io.xml.XSD_Syntax;
 import com.s8.io.xml.handler.type.TypeHandler;
 
+
+/**
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
+ */
 public class XSD_SchemaGenerator {
 
 	private XML_Lexicon context;

@@ -12,8 +12,10 @@ import com.s8.io.xml.handler.type.elements.getters.ElementGetter;
 
 /**
  * 
- * @author pierreconvert
  *
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
  */
 public abstract class ObjectComposableScope extends ComposableScope {
 

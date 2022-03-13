@@ -1,5 +1,14 @@
 package com.s8.io.xml;
 
+
+/**
+ * 
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class XML_Syntax {
 	
 	public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";

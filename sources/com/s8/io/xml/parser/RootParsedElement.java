@@ -10,8 +10,10 @@ import com.s8.io.xml.parser.ObjectParsedScope.Callback;
 
 /**
  * 
- * @author pc
  *
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
  */
 public class RootParsedElement implements ParsedScope {
 	

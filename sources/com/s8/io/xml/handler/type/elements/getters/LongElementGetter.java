@@ -5,6 +5,15 @@ import java.lang.reflect.Method;
 import com.s8.io.xml.composer.ObjectComposableScope;
 import com.s8.io.xml.composer.PrimitiveComposableElement.LongComposableElement;
 
+
+/**
+ * 
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
+ */
 public class LongElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {

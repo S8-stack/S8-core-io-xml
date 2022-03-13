@@ -3,6 +3,15 @@ package com.s8.io.xml.composer;
 import java.io.IOException;
 import java.io.Writer;
 
+
+/**
+ * 
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
+ */
 public class XML_StreamWriter {
 
 	private Writer writer;

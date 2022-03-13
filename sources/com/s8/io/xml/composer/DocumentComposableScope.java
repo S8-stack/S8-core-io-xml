@@ -7,6 +7,14 @@ import java.util.Stack;
 import com.s8.io.xml.XML_Syntax;
 import com.s8.io.xml.handler.XML_Lexicon;
 
+
+
+/**
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
+ */
 public class DocumentComposableScope extends ComposableScope {
 	
 	private Object object;

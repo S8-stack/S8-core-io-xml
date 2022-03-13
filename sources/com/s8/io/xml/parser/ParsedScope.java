@@ -12,7 +12,10 @@ import java.io.IOException;
  * See <a href="https://stackoverflow.com/questions/105834/does-the-jvm-prevent-tail-call-optimizations">here</a>.
  * </p>
  * 
- * @author pc
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
 public interface ParsedScope {

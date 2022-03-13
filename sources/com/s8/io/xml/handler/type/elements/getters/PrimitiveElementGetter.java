@@ -6,6 +6,14 @@ import com.s8.io.xml.handler.XML_LexiconBuilder;
 import com.s8.io.xml.handler.type.TypeBuilder;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 
+
+/**
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
+ */
 public abstract class PrimitiveElementGetter extends ElementGetter {
 
 

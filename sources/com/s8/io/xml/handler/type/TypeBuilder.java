@@ -21,6 +21,15 @@ import com.s8.io.xml.handler.type.elements.setters.ElementSetter;
 import com.s8.io.xml.handler.type.value.getters.ValueGetter;
 import com.s8.io.xml.handler.type.value.setters.ValueSetter;
 
+
+/**
+ * 
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class TypeBuilder {
 
 	private TypeHandler typeHandler;

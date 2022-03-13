@@ -3,6 +3,14 @@ package com.s8.io.xml.handler;
 import java.io.IOException;
 import java.io.Writer;
 
+
+/**
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class DTD_TemplateGenerator {
 
 	//private XML_Context context;

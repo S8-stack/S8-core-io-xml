@@ -6,6 +6,15 @@ import java.io.Writer;
 import com.s8.io.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.io.xml.handler.type.elements.setters.ElementSetter;
 
+
+/**
+ * 
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class XSD_TypeGenerator {
 
 	

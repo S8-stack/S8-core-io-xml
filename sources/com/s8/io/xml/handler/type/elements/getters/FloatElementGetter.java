@@ -5,6 +5,14 @@ import java.lang.reflect.Method;
 import com.s8.io.xml.composer.ObjectComposableScope;
 import com.s8.io.xml.composer.PrimitiveComposableElement.FloatComposableElement;
 
+
+/**
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class FloatElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {

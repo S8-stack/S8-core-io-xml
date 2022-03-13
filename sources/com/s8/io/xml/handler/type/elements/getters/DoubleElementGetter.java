@@ -8,8 +8,10 @@ import com.s8.io.xml.composer.PrimitiveComposableElement.DoubleComposableElement
 
 /**
  * 
- * @author pierre convert
  *
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ * 
  */
 public class DoubleElementGetter extends PrimitiveElementGetter {
 

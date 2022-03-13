@@ -1,5 +1,13 @@
 package com.s8.io.xml.handler.type;
 
+
+/**
+ * 
+ * 
+ * @author Pierre Convert
+ * Copyright (C) 2022, Pierre Convert. All rights reserved.
+ *
+ */
 public class XML_TypeCompilationException extends Exception {
 
 	/**
