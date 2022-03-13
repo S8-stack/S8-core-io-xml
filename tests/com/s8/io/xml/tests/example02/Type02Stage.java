@@ -1,8 +1,8 @@
 package com.s8.io.xml.tests.example02;
 
 
-import com.s8.blocks.xml.annotations.XML_SetElement;
-import com.s8.blocks.xml.annotations.XML_Type;
+import com.s8.io.xml.annotations.XML_SetElement;
+import com.s8.io.xml.annotations.XML_Type;
 
 @XML_Type(name = "Type02Stage")
 public class Type02Stage extends MyStage {

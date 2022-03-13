@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.s8.blocks.xml.annotations.XML_GetAttribute;
-import com.s8.blocks.xml.annotations.XML_GetElement;
-import com.s8.blocks.xml.annotations.XML_SetAttribute;
-import com.s8.blocks.xml.annotations.XML_SetElement;
-import com.s8.blocks.xml.annotations.XML_Type;
+import com.s8.io.xml.annotations.XML_GetAttribute;
+import com.s8.io.xml.annotations.XML_GetElement;
+import com.s8.io.xml.annotations.XML_SetAttribute;
+import com.s8.io.xml.annotations.XML_SetElement;
+import com.s8.io.xml.annotations.XML_Type;
 
 @XML_Type(name="ee2", sub={})
 public class TestClass4 extends TestClass3 {
