@@ -119,7 +119,7 @@ public class ObjectsCollectionElementGetter extends ElementGetter {
 				tag = declaredTag + XML_Syntax.MAPPING_SEPARATOR + componentTypeHandler.xml_getTag();
 			}
 
-			declaringTypeBuilder.addElementGetter(new ObjectElementGetter(tag, method));			
+			declaringTypeBuilder.addElementGetter(new ObjectsCollectionElementGetter(tag, method));			
 		}
 	}
 
