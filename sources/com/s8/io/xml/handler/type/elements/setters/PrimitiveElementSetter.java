@@ -35,17 +35,27 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 			super(method);
 		}
 
+		
 		public abstract ElementSetter createSetter();
 
+		
 		@Override
 		public void explore(XML_CodebaseBuilder codebaseBuilder) throws XML_TypeCompilationException {
 			// nothing to explore
 		}
+		
 
 		@Override
 		public void link(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException {
 			/* nothing to link */
 		}
+		
+		
+		@Override
+		public boolean hasSubstitutionGroup() {
+			return false;
+		}
+		
 		
 		@Override
 		public Set<String> getSubstitutionGroup() {

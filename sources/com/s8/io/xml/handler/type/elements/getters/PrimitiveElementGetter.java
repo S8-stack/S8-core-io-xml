@@ -36,6 +36,11 @@ public abstract class PrimitiveElementGetter extends ElementGetter {
 		}
 		
 		@Override
+		public boolean hasSubstitutionGroup() {
+			return false;
+		}
+		
+		@Override
 		public Set<String> getSubstitutionGroup() {
 			return new HashSet<>();
 		}

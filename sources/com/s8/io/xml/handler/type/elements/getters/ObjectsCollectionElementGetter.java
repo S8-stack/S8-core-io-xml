@@ -82,6 +82,10 @@ public class ObjectsCollectionElementGetter extends ElementGetter {
 			componentTypeHandler= typeBuilder.typeHandler;
 		}
 
+		@Override
+		public boolean hasSubstitutionGroup() {
+			return true;
+		}
 
 		@Override
 		public Set<String> getSubstitutionGroup() {

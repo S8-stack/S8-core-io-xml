@@ -77,6 +77,7 @@ public abstract class ElementSetter {
 		public abstract void link(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException;
 		
 		
+		public abstract boolean hasSubstitutionGroup();
 		
 		public abstract Set<String> getSubstitutionGroup();
 		

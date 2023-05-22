@@ -56,6 +56,8 @@ public abstract class ElementGetter {
 
 		public abstract void link(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException;
 
+		public abstract boolean hasSubstitutionGroup();
+		
 		public abstract Set<String> getSubstitutionGroup();
 
 		public abstract boolean isColliding(Set<String> substitutionGroup);

@@ -84,7 +84,37 @@ public class ObjectElementSetter extends ElementSetter {
 			typeHandler= typeBuilder.typeHandler;
 		}
 
+		
+		@Override
+		public boolean hasSubstitutionGroup() {
+			return true;
+		}
+		
+		
+		@Override
+		public Set<String> getSubstitutionGroup() {
+			Set<String> group = new HashSet<>();
+			group.add(typeHandler.xml_getTag());
+			for(TypeHandler handler : typeHandler.getSubTypes()) { group.add(handler.xml_getTag()); }
+			return group;
+		}
 
+
+		@Override
+		public boolean isColliding(Set<String> substitutionGroup) {
+			if(substitutionGroup.contains(typeHandler.xml_getTag())) {
+				return true;
+			}
+			for(TypeHandler handler : typeHandler.getSubTypes()) {
+				if(substitutionGroup.contains(handler.xml_getTag())) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		
+		
 		@Override
 		public void build(TypeBuilder declaringTypeBuilder, boolean isColliding) throws XML_TypeCompilationException {
 
@@ -123,28 +153,7 @@ public class ObjectElementSetter extends ElementSetter {
 		}
 
 
-		@Override
-		public Set<String> getSubstitutionGroup() {
-			Set<String> group = new HashSet<>();
-			group.add(typeHandler.xml_getTag());
-			for(TypeHandler handler : typeHandler.getSubTypes()) { group.add(handler.xml_getTag()); }
-			return group;
-		}
-
-
-		@Override
-		public boolean isColliding(Set<String> substitutionGroup) {
-			if(substitutionGroup.contains(typeHandler.xml_getTag())) {
-				return true;
-			}
-			for(TypeHandler handler : typeHandler.getSubTypes()) {
-				if(substitutionGroup.contains(handler.xml_getTag())) {
-					return true;
-				}
-			}
-			return false;
-		}
-
+		
 	}
 
 

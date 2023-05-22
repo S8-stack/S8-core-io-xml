@@ -79,7 +79,11 @@ public class ObjectElementGetter extends ElementGetter {
 			typeHandler= typeBuilder.typeHandler;
 		}
 
-
+		@Override
+		public boolean hasSubstitutionGroup() {
+			return true;
+		}
+		
 		@Override
 		public Set<String> getSubstitutionGroup() {
 			Set<String> group = new HashSet<>();

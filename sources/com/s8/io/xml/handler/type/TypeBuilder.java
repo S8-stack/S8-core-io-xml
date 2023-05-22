@@ -1,10 +1,10 @@
 package com.s8.io.xml.handler.type;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -128,65 +128,70 @@ public class TypeBuilder {
 
 		/* <fields> */
 
-		Set<String> elementGetterNamespace = new HashSet<>();
+		Map<String, Method> elementGetterNamespace = new HashMap<>();
 
-		Set<String> elementSetterNamespace = new HashSet<>();
+		Map<String, Method> elementSetterNamespace = new HashMap<>();
 
 		/* search through all methods of the type */
 		for(Method method : getType().getMethods()){
 
-			// get annotations out of the method
+			/* exclude abstract methods */
+			if(!Modifier.isAbstract(method.getModifiers()) 
+					&& !method.isSynthetic()) {
 
 
-			/* Attribute getter -> direct creation */
-			if(method.isAnnotationPresent(XML_GetAttribute.class)){
-				typeHandler.attributeGetters.add(AttributeGetter.create(method));
-			}
-
-			/* Attribute setter ->  direct creation */
-			else if(method.isAnnotationPresent(XML_SetAttribute.class)){
-				AttributeSetter attributeSetter = AttributeSetter.create(method);
-				typeHandler.attributeSetters.put(attributeSetter.getName(), attributeSetter);	
-			}
-
-			else if(method.isAnnotationPresent(XML_GetValue.class)){
-				typeHandler.valueGetter = ValueGetter.create(method);
-			}
-
-			else if(method.isAnnotationPresent(XML_SetValue.class)){
-				typeHandler.valueSetter = ValueSetter.create(method);
-			}
-
-			/* element getter -> direct creation */
-			else if(method.isAnnotationPresent(XML_GetElement.class)){
-				ElementGetter.Builder egBuilder = ElementGetter.create(method);
-				if(elementGetterNamespace.contains(egBuilder.declaredTag)) {
-					throw new XML_TypeCompilationException("Conflict in element getter tag, for tag: "+
-							egBuilder.declaredTag+", in type: "+typeHandler.type.getName());
+				/* Attribute getter -> direct creation */
+				if(method.isAnnotationPresent(XML_GetAttribute.class)){
+					typeHandler.attributeGetters.add(AttributeGetter.create(method));
 				}
 
-				// sub explore
-				egBuilder.explore(codebaseBuilder);
-
-				// register
-				elementGetterNamespace.add(egBuilder.declaredTag);
-				elementGetBuilders.add(egBuilder);
-			}
-
-			/* element setter -> build */
-			else if(method.isAnnotationPresent(XML_SetElement.class)){
-				ElementSetter.Builder esBuilder = ElementSetter.create(method);
-				if(elementSetterNamespace.contains(esBuilder.declaredTag)) {
-					throw new XML_TypeCompilationException("Conflict in element getter tag, for tag: "+
-							esBuilder.declaredTag+", in type: "+typeHandler.type.getName());
+				/* Attribute setter ->  direct creation */
+				else if(method.isAnnotationPresent(XML_SetAttribute.class)){
+					AttributeSetter attributeSetter = AttributeSetter.create(method);
+					typeHandler.attributeSetters.put(attributeSetter.getName(), attributeSetter);	
 				}
 
-				// sub explore
-				esBuilder.explore(codebaseBuilder);
+				else if(method.isAnnotationPresent(XML_GetValue.class)){
+					typeHandler.valueGetter = ValueGetter.create(method);
+				}
 
-				// register
-				elementSetterNamespace.add(esBuilder.declaredTag);
-				elementSetBuilders.add(esBuilder);
+				else if(method.isAnnotationPresent(XML_SetValue.class)){
+					typeHandler.valueSetter = ValueSetter.create(method);
+				}
+
+				/* element getter -> direct creation */
+				else if(method.isAnnotationPresent(XML_GetElement.class)){
+					ElementGetter.Builder egBuilder = ElementGetter.create(method);
+					if(elementGetterNamespace.containsKey(egBuilder.declaredTag)) {
+						throw new XML_TypeCompilationException("Conflict in element getter tag, for tag: "+
+								egBuilder.declaredTag+", in type: "+typeHandler.type.getName() + 
+								"\n\t between method :"+elementGetterNamespace.get(egBuilder.declaredTag) + 
+								"\n\t and method : "+method);
+					}
+
+					// sub explore
+					egBuilder.explore(codebaseBuilder);
+
+					// register
+					elementGetterNamespace.put(egBuilder.declaredTag, method);
+					elementGetBuilders.add(egBuilder);
+				}
+
+				/* element setter -> build */
+				else if(method.isAnnotationPresent(XML_SetElement.class)){
+					ElementSetter.Builder esBuilder = ElementSetter.create(method);
+					if(elementSetterNamespace.containsKey(esBuilder.declaredTag)) {
+						throw new XML_TypeCompilationException("Conflict in element getter tag, for tag: "+
+								esBuilder.declaredTag+", in type: "+typeHandler.type.getName());
+					}
+
+					// sub explore
+					esBuilder.explore(codebaseBuilder);
+
+					// register
+					elementSetterNamespace.put(esBuilder.declaredTag, method);
+					elementSetBuilders.add(esBuilder);
+				}
 			}
 		}
 
@@ -238,15 +243,21 @@ public class TypeBuilder {
 		// build
 		for(int i = 0; i < n; i++) {
 			ElementGetter.Builder builder = elementGetBuilders.get(i);
+
+			/* <collision> */
 			boolean isColliding = false;
-			Set<String> substitutionGroup = builder.getSubstitutionGroup();
-			for(int j = 0; j<n; j++) { if(j!=i && elementGetBuilders.get(j).isColliding(substitutionGroup)) isColliding = true; }
-				
+			if(builder.hasSubstitutionGroup()) {
+				Set<String> substitutionGroup = builder.getSubstitutionGroup();
+				for(int j = 0; j<n; j++) { 
+					if(j!=i && elementGetBuilders.get(j).isColliding(substitutionGroup)) isColliding = true; 
+				}				
+			}
+
 			builder.build(this, isColliding);
 		}
 		/* </getters> */
 
-		
+
 		/* <element-setters> */
 
 		n = elementSetBuilders.size();
@@ -259,9 +270,15 @@ public class TypeBuilder {
 		// build
 		for(int i = 0; i < n; i++) {
 			ElementSetter.Builder builder = elementSetBuilders.get(i);
+
+			/* <collision> */
 			boolean isColliding = false;
-			Set<String> substitutionGroup = builder.getSubstitutionGroup();
-			for(int j = 0; j<n; j++) { if(j!=i && elementSetBuilders.get(j).isColliding(substitutionGroup)) isColliding = true; }
+			if(builder.hasSubstitutionGroup()) {
+				Set<String> substitutionGroup = builder.getSubstitutionGroup();
+				for(int j = 0; j<n; j++) { 
+					if(j!=i && elementSetBuilders.get(j).isColliding(substitutionGroup)) isColliding = true; 
+				}
+			}
 
 			builder.build(this, isColliding);
 		}
@@ -273,11 +290,11 @@ public class TypeBuilder {
 
 
 	public void forSubTypes(UtilityConsumer<TypeBuilder> consumer) {
-		
+
 		/* initialize queue */
 		Queue<TypeBuilder> queue = new ArrayDeque<>();
 		for(TypeBuilder subTypeBuilder : subTypeBuilders) { queue.add(subTypeBuilder); }
-		
+
 		TypeBuilder typeBuilder;
 		while((typeBuilder = queue.poll()) != null) {
 			consumer.accept(typeBuilder);
