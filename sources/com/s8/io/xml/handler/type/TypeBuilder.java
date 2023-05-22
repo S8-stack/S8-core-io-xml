@@ -273,10 +273,15 @@ public class TypeBuilder {
 
 
 	public void forSubTypes(UtilityConsumer<TypeBuilder> consumer) {
+		
+		/* initialize queue */
 		Queue<TypeBuilder> queue = new ArrayDeque<>();
-		for(TypeBuilder subTypeBuilder : subTypeBuilders) {
-			consumer.accept(subTypeBuilder);
-			subTypeBuilder.enqueueSubTypes(queue);
+		for(TypeBuilder subTypeBuilder : subTypeBuilders) { queue.add(subTypeBuilder); }
+		
+		TypeBuilder typeBuilder;
+		while((typeBuilder = queue.poll()) != null) {
+			consumer.accept(typeBuilder);
+			typeBuilder.enqueueSubTypes(queue);
 		}
 	}
 
