@@ -11,14 +11,15 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
 import com.s8.io.xml.tests.example01.Wrapper;
 
 public class UnitTest03 {
 
 	public static void main(String[] args) throws Exception {
 		Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("input/test02.xml"))));
-		XML_Lexicon context = new XML_Lexicon(new Class<?>[] { Wrapper.class });
+		XML_Codebase context = XML_Codebase.from( Wrapper.class );
+		
 		context.setVerbosity(true);
 		Object object = context.deserialize(reader);
 		reader.close();

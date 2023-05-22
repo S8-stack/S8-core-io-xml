@@ -2,7 +2,8 @@ package com.s8.io.xml.composer;
 
 import java.util.Stack;
 
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
+import com.s8.io.xml.handler.type.TypeHandler;
 
 
 /**
@@ -13,14 +14,14 @@ import com.s8.io.xml.handler.XML_Lexicon;
  */
 public class XML_Composer {
 
-	private XML_Lexicon context;
+	private XML_Codebase context;
 	
 	private XML_StreamWriter writer;
 	
 	private Stack<ComposableScope> stack = new Stack<>(); 
 	
 
-	public XML_Composer(XML_Lexicon context, XML_StreamWriter writer) {
+	public XML_Composer(XML_Codebase context, XML_StreamWriter writer) {
 		super();
 		this.context = context;
 		this.writer = writer;
@@ -28,7 +29,10 @@ public class XML_Composer {
 	
 	public void compose(Object object) throws Exception{
 		
-		ComposableScope scope = new DocumentComposableScope(object);
+		
+		TypeHandler typeHandler = context.getTypeHandlerByClass(object.getClass());
+		
+		ComposableScope scope = new DocumentComposableScope(typeHandler.xml_getTag(), object);
 		
 		scope.insert(context, stack, writer);
 		while(!stack.isEmpty()) {

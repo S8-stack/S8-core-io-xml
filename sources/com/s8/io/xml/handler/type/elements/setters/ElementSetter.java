@@ -3,10 +3,11 @@ package com.s8.io.xml.handler.type.elements.setters;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.Set;
 
-import com.s8.io.xml.handler.XML_LexiconBuilder;
+import com.s8.io.xml.annotations.XML_SetElement;
+import com.s8.io.xml.codebase.XML_CodebaseBuilder;
 import com.s8.io.xml.handler.type.TypeBuilder;
-import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.io.xml.parser.ObjectParsedScope;
 import com.s8.io.xml.parser.ParsedScope;
@@ -36,7 +37,9 @@ public abstract class ElementSetter {
 
 
 
-		protected String tag;
+		public final String declaredTag;
+
+		protected final Method method;
 
 		protected boolean isBuilt0 = false;
 
@@ -49,9 +52,14 @@ public abstract class ElementSetter {
 		 * @param method
 		 * @param tag
 		 */
-		public Builder(String tag) {
+		public Builder(Method method) {
 			super();
-			this.tag = tag;
+			
+			
+			XML_SetElement elementAnnotation = method.getAnnotation(XML_SetElement.class);
+			declaredTag = elementAnnotation.tag();
+			
+			this.method = method;
 		}
 
 
@@ -62,9 +70,19 @@ public abstract class ElementSetter {
 		 * @param contextBuilder
 		 * @throws XML_TypeCompilationException
 		 */
-		public abstract void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException;
+		public abstract void explore(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException;
 
 
+		
+		public abstract void link(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException;
+		
+		
+		
+		public abstract Set<String> getSubstitutionGroup();
+		
+		public abstract boolean isColliding(Set<String> substitutionGroup);
+		
+		
 		/**
 		 * 
 		 * @param context
@@ -73,50 +91,46 @@ public abstract class ElementSetter {
 		 * 
 		 * @throws XML_TypeCompilationException 
 		 */
-		public abstract boolean build0(XML_LexiconBuilder contextBuilder, TypeBuilder builder, boolean isVerbose) 
-				throws XML_TypeCompilationException;
+		public abstract void build(TypeBuilder declaringTypeBuilder, boolean isColliding) throws XML_TypeCompilationException;
+		
+		
 
-
-		public abstract boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder builder, boolean isVerbose) 
-				throws XML_TypeCompilationException;
 
 
 	}
 
+	
+	
+	
+	public final Method method;
 
 
 
-	/**
-	 *  the XML tag for mapping purposes
-	 */
-	private final String tag;
-
-
-	private final boolean isFieldTag;
-
-
-	public ElementSetter(String tag, boolean isFieldTag) {
+	public ElementSetter(Method method) {
 		super();
-		this.tag = tag;
-		this.isFieldTag = isFieldTag;
+		this.method = method;
 	}
 
+	/*
 	public String getTag() {
 		return tag;
 	}
+	*/
 
 
 	/**
 	 * Tells whether tag is the name of field or the name of a type (implying a specific field).
 	 * @return true if tag is a field name, false otherwise.
 	 */
+	/*
 	public boolean isFieldTag() {
 		return isFieldTag;
 	}
+	*/
 
 
 
-	public abstract ParsedScope createParsedElement(ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException;
+	public abstract ParsedScope createParsedElement(String tag, ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException;
 
 
 
@@ -162,11 +176,11 @@ public abstract class ElementSetter {
 
 	public abstract Method getMethod();
 
-	public abstract void xsd_write(Writer writer) throws IOException;
+	public abstract void xsd_write(String tag, Writer writer) throws IOException;
 
-	public abstract void DTD_writeHeader(Writer writer) throws IOException;
+	//public abstract void DTD_writeHeader(Writer writer) throws IOException;
 
-	public abstract void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException;
+	//public abstract void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException;
 
 
 }

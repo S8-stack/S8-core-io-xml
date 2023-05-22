@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import com.s8.io.xml.XML_Syntax;
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
 
 
 
@@ -17,6 +17,8 @@ import com.s8.io.xml.handler.XML_Lexicon;
  */
 public class DocumentComposableScope extends ComposableScope {
 	
+	
+	private String tag;
 	private Object object;
 
 	
@@ -24,13 +26,14 @@ public class DocumentComposableScope extends ComposableScope {
 
 	private boolean isHeaderWritten;
 	
-	public DocumentComposableScope(Object object) {
+	public DocumentComposableScope(String tag, Object object) {
 		super();
+		this.tag = tag;
 		this.object = object;
 	}
 	
 	@Override
-	public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException, Exception {
 		
 		if(!isHeaderWritten) {
@@ -39,7 +42,7 @@ public class DocumentComposableScope extends ComposableScope {
 			writer.append(XML_Syntax.HEADER+"\n");
 			
 			
-			rootObjectScope = new ObjectComposableScope.TypeTagged(object);
+			rootObjectScope = new ObjectComposableScope(tag, object);
 			stack.push(this);
 			isHeaderWritten = true;
 			
@@ -52,7 +55,7 @@ public class DocumentComposableScope extends ComposableScope {
 	}
 
 	@Override
-	public boolean compose(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public boolean compose(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws Exception {
 		return rootObjectScope.insert(context, stack, writer);
 	}

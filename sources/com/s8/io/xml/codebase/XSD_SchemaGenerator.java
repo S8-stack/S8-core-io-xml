@@ -1,4 +1,4 @@
-package com.s8.io.xml.handler;
+package com.s8.io.xml.codebase;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -17,9 +17,9 @@ import com.s8.io.xml.handler.type.TypeHandler;
  */
 public class XSD_SchemaGenerator {
 
-	private XML_Lexicon context;
+	private XML_Codebase context;
 	
-	public XSD_SchemaGenerator(XML_Lexicon context) {
+	public XSD_SchemaGenerator(XML_Codebase context) {
 		super();
 		this.context = context;
 	}

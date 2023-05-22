@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
 
 /**
  * 
@@ -30,7 +30,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 
 
 	@Override
-	public boolean compose(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public boolean compose(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws Exception {
 		return false;
 	}
@@ -52,7 +52,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 
 
 		@Override
-		public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+		public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException,
 				Exception {
 			writer.writeValueElement(tag, Boolean.toString(value));
@@ -80,7 +80,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 		}
 
 		@Override
-		public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+		public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
 			writer.writeValueElement(tag, Short.toString(value));
 			return false;
 		}
@@ -103,7 +103,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 		}
 
 		@Override
-		public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+		public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
 			writer.writeValueElement(tag, Integer.toString(value));
 			return false;
 		}
@@ -126,7 +126,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 		}
 
 		@Override
-		public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+		public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
 			writer.writeValueElement(tag, Long.toString(value));
 			return false;
 		}
@@ -150,7 +150,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 		}
 
 		@Override
-		public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+		public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
 			writer.writeValueElement(tag, Float.toString(value));
 			return false;
 		}
@@ -174,7 +174,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 		}
 
 		@Override
-		public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+		public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
 			writer.writeValueElement(tag, Double.toString(value));
 			return false;
 		}
@@ -195,7 +195,7 @@ public abstract class PrimitiveComposableElement extends ComposableScope {
 		}
 
 		@Override
-		public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
+		public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) throws IOException {
 			writer.writeValueElement(tag, value);
 			return false;
 		}

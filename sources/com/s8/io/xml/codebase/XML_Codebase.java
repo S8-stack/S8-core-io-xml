@@ -1,4 +1,4 @@
-package com.s8.io.xml.handler;
+package com.s8.io.xml.codebase;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -16,6 +16,7 @@ import java.util.Map;
 
 import com.s8.io.xml.composer.XML_Composer;
 import com.s8.io.xml.composer.XML_StreamWriter;
+import com.s8.io.xml.handler.DTD_TemplateGenerator;
 import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.io.xml.parser.XML_Parser;
@@ -68,7 +69,17 @@ import com.s8.io.xml.parser.XML_StreamReader;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  * 
  */
-public class XML_Lexicon {
+public class XML_Codebase {
+	
+	
+	public static XML_Codebase from(Class<?>... types) throws XML_TypeCompilationException {
+		return new XML_CodebaseBuilder().build(types, false);
+	}
+	
+	
+	public static XML_Codebase from_DEBUG(Class<?>... types) throws XML_TypeCompilationException {
+		return new XML_CodebaseBuilder().build(types, true);
+	}
 
 	private boolean isVerbose = false;
 	
@@ -88,33 +99,14 @@ public class XML_Lexicon {
 
 	private XSD_SchemaGenerator xsd_schemaGenerator;
 
-	public XML_Lexicon(Class<?>... types) throws XML_TypeCompilationException {
+	XML_Codebase() {
 		super();
-
-		// create builder and run it to get the context compiled
-		XML_LexiconBuilder builder = new XML_LexiconBuilder(this, types, null);
-		builder.build(true);
+		
 		
 		DTD_templateGenerator = new DTD_TemplateGenerator(this);
 		
 		xsd_schemaGenerator = new XSD_SchemaGenerator(this);
 	}
-	
-	/**
-	 * 
-	 * @param types
-	 * @throws Exception 
-	 * @throws SecurityException 
-	 * @throws NoSuchMethodException 
-	 */
-	public XML_Lexicon(Class<?>[] types, Class<?>[] extensions) throws XML_TypeCompilationException {
-		super();
-
-		// create builder and run it to get the context compiled
-		XML_LexiconBuilder builder = new XML_LexiconBuilder(this, types, extensions);
-		builder.build(true);
-	}
-	
 	
 
 

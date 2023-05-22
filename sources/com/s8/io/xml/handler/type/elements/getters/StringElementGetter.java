@@ -1,8 +1,10 @@
 package com.s8.io.xml.handler.type.elements.getters;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.s8.io.xml.composer.ObjectComposableScope;
+import com.s8.io.xml.composer.XML_ComposingException;
 import com.s8.io.xml.composer.PrimitiveComposableElement.StringComposableElement;
 
 
@@ -17,7 +19,7 @@ import com.s8.io.xml.composer.PrimitiveComposableElement.StringComposableElement
 public class StringElementGetter extends PrimitiveElementGetter {
 
 	public final static Prototype PROTOTYPE = new Prototype() {
-		
+
 		@Override
 		public boolean matches(Method method) {
 			Class<?> type = method.getReturnType();
@@ -28,14 +30,14 @@ public class StringElementGetter extends PrimitiveElementGetter {
 				return false;
 			}
 		}
-		
+
 		@Override
 		public ElementGetter.Builder create(Method method) {
 			return new Builder(method);
 		}
 	};
-	
-	
+
+
 	public static class Builder extends PrimitiveElementGetter.Builder {
 
 		public Builder(Method method) {
@@ -44,20 +46,28 @@ public class StringElementGetter extends PrimitiveElementGetter {
 
 		@Override
 		public PrimitiveElementGetter createGetter() {
-			return new StringElementGetter(fieldTag, method);
+			return new StringElementGetter(declaredTag, method);
 		}
-
 	}
+
+	
 	
 	public StringElementGetter(String tag, Method method) {
 		super(tag, method);
 	}
 
+	
 	@Override
-	public void createComposableElement(ObjectComposableScope scope) throws Exception {
-		String value = (String) method.invoke(scope.getObject(), new Object[]{});
-		if(value!=null) {
-			scope.append(new StringComposableElement(fieldTag, value));	
+	public void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
+		try {
+			String value = (String) method.invoke(scope.getObject(), new Object[]{});
+			if(value!=null) {
+				scope.append(new StringComposableElement(tag, value));	
+			}
+		} 
+		catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new XML_ComposingException(e.getMessage()+ "for "+method);
 		}
 	}
 }

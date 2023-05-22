@@ -4,13 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.s8.io.xml.XML_Syntax;
-import com.s8.io.xml.annotations.XML_Type;
 import com.s8.io.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.io.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.io.xml.handler.type.elements.getters.ElementGetter;
@@ -52,7 +49,7 @@ public class TypeHandler {
 
 
 	/**
-	 * mapping of all subclasses
+	 * mapping of all (strict) subclasses (this.class is excluded)
 	 * (package-private for external construction)
 	 */
 	TypeHandler[] subTypes;
@@ -66,29 +63,23 @@ public class TypeHandler {
 	/** ready for ext construction */
 	ValueSetter valueSetter;
 
+	
 	/** ready for ext construction */
-	List<AttributeGetter> attributeGetters = new ArrayList<>();
+	final List<AttributeGetter> attributeGetters = new ArrayList<>();
 
+	
 	/** ready for ext construction */
-	Map<String, AttributeSetter> attributeSetters = new HashMap<>();
+	final Map<String, AttributeSetter> attributeSetters = new HashMap<>();
 
+	
 	/** ready for ext construction */
-	List<ElementGetter> elementGetters = new ArrayList<>();
+	final List<ElementGetter> elementGetters = new ArrayList<>();
 
 	/**
 	 * Mapping of all possible ways of settings field (with element setters)
 	 */
-	Map<String, ElementSetter> elementSetters = new HashMap<>();
+	final Map<String, ElementSetter> elementSetters = new HashMap<>();
 
-	/**
-	 * 
-	 */
-	Set<String> elementGettersTagSet = new HashSet<String>();
-
-	/**
-	 * 
-	 */
-	public DTD_ElementGenerator DTD_typeGenerator;
 
 	//boolean isRoot;
 	
@@ -100,20 +91,12 @@ public class TypeHandler {
 	 * @throws XML_TypeCompilationException 
 	 * 
 	 */
-	public TypeHandler(Class<?> type) throws XML_TypeCompilationException {
+	public TypeHandler(Class<?> type, String xmlName, boolean isRootElement) throws XML_TypeCompilationException {
 		super();
 		this.type = type;
-
-		// pre-initialize
-		XML_Type typeAnnotation  = type.getAnnotation(XML_Type.class);
-		if(typeAnnotation==null){
-			throw new XML_TypeCompilationException("Missing type declaration for type: "+type.getName());
-		}
-		xmlName = typeAnnotation.name();
+		this.xmlName = xmlName;
+		this.isRootElement = isRootElement;
 		
-		isRootElement = typeAnnotation.root();
-		
-		DTD_typeGenerator = new DTD_ElementGenerator(this);
 		
 		xsd_TypeGenerator = new XSD_TypeGenerator(this);
 	}
@@ -269,7 +252,7 @@ public class TypeHandler {
 		if(setter==null) {
 			throw new XML_ParsingException(point, "Failed to retrieve element setter for tag: "+tag);
 		}
-		return setter.createParsedElement(parent, point);
+		return setter.createParsedElement(tag, parent, point);
 	}
 
 	public Class<?> getType() {

@@ -1,10 +1,14 @@
 package com.s8.io.xml.handler.type;
 
 import java.lang.reflect.Method;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 import com.s8.io.xml.annotations.XML_GetAttribute;
 import com.s8.io.xml.annotations.XML_GetElement;
@@ -13,7 +17,7 @@ import com.s8.io.xml.annotations.XML_SetAttribute;
 import com.s8.io.xml.annotations.XML_SetElement;
 import com.s8.io.xml.annotations.XML_SetValue;
 import com.s8.io.xml.annotations.XML_Type;
-import com.s8.io.xml.handler.XML_LexiconBuilder;
+import com.s8.io.xml.codebase.XML_CodebaseBuilder;
 import com.s8.io.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.io.xml.handler.type.attributes.setters.AttributeSetter;
 import com.s8.io.xml.handler.type.elements.getters.ElementGetter;
@@ -32,32 +36,36 @@ import com.s8.io.xml.handler.type.value.setters.ValueSetter;
  */
 public class TypeBuilder {
 
-	private TypeHandler typeHandler;
+	public final XML_Type typeAnnotation;
+
+	public final Class<?> type;
+
+	public final TypeHandler typeHandler;
 
 
-	private boolean isBuilt;
+	private final List<ElementGetter.Builder> elementGetBuilders = new ArrayList<>();
 
-	private boolean isInheritanceBuilt;
+	private final List<ElementSetter.Builder> elementSetBuilders = new ArrayList<>();
 
-	private boolean isGettersBuilt0;
-
-	private boolean isGettersBuilt1;
-
-	private boolean isSettersBuilt0;
-
-	private boolean isSettersBuilt1;
+	private final List<TypeBuilder> subTypeBuilders = new ArrayList<>();
 
 
-	private List<ElementGetter.Builder> elementGetBuilders;
-
-	private List<ElementSetter.Builder> elementSetBuilders;
-
-	public TypeBuilder(TypeHandler typeHandler) {
+	public TypeBuilder(Class<?> type) throws XML_TypeCompilationException {
 		super();
-		this.typeHandler = typeHandler;
-		elementGetBuilders = new ArrayList<ElementGetter.Builder>();
-		elementSetBuilders = new ArrayList<>();
-		isBuilt = false;
+
+		this.type = type;
+
+		typeAnnotation  = type.getAnnotation(XML_Type.class);
+		if(typeAnnotation==null){
+			throw new XML_TypeCompilationException("Missing type declaration for type: "+type.getName());
+		}
+
+		typeHandler = new TypeHandler(type, typeAnnotation.name(), typeAnnotation.root());
+	}
+
+
+	public String getRuntimeName() {
+		return typeHandler.type.getName();
 	}
 
 	public TypeHandler getHandler() {
@@ -65,17 +73,45 @@ public class TypeBuilder {
 	}
 
 
-	public void setElementSetter(ElementSetter elementSetter) {
-		typeHandler.elementSetters.put(elementSetter.getTag(), elementSetter);
-	}
 
 	public Class<?> getType(){
-		return typeHandler.getType();
+		return type;
 	}
 
-	public void initialize() throws XML_TypeCompilationException {
 
-		//typeHandler.isRoot = typeAnnotation.isRoot();
+
+
+
+	/**
+	 * Initialize and explore all references types
+	 * 
+	 * @param codebaseBuilder
+	 * @param isVerbose
+	 * @throws XML_TypeCompilationException
+	 */
+	public void buildOutline(XML_CodebaseBuilder codebaseBuilder, boolean isVerbose) throws XML_TypeCompilationException {
+
+		/* <explore-super-type> */
+		Class<?> superType = type.getSuperclass();
+		if(superType != null) {
+			codebaseBuilder.discover(superType);
+		}
+		/* </explore-super-type> */
+
+
+		/* <explore-sub-types> */
+		if(typeAnnotation.sub() != null){
+			for(Class<?> subType : typeAnnotation.sub()) {
+				codebaseBuilder.discover(subType);
+
+				TypeBuilder subTypeBuilder = codebaseBuilder.getTypeBuilder(subType);
+				if(subTypeBuilder == null) {
+					throw new XML_TypeCompilationException("Problem while registering type: "+subType);
+				}
+				subTypeBuilders.add(subTypeBuilder);
+			}
+		}
+		/* </explore-sub-types> */
 
 
 		/* <constructor> */
@@ -92,85 +128,92 @@ public class TypeBuilder {
 
 		/* <fields> */
 
+		Set<String> elementGetterNamespace = new HashSet<>();
+
+		Set<String> elementSetterNamespace = new HashSet<>();
 
 		/* search through all methods of the type */
 		for(Method method : getType().getMethods()){
 
 			// get annotations out of the method
 
-			// attributes
-			XML_GetAttribute getAttributeAnnotation = method.getAnnotation(XML_GetAttribute.class);
-			XML_SetAttribute setAttributeAnnotation = method.getAnnotation(XML_SetAttribute.class);
-
-			//  value
-			XML_GetValue getValueAnnotation = method.getAnnotation(XML_GetValue.class);
-			XML_SetValue setValueAnnotation = method.getAnnotation(XML_SetValue.class);
-
-			// elements
-			XML_GetElement getElementAnnotation = method.getAnnotation(XML_GetElement.class);
-			XML_SetElement setElementAnnotation = method.getAnnotation(XML_SetElement.class);
 
 			/* Attribute getter -> direct creation */
-			if(getAttributeAnnotation!=null){
-				typeHandler.attributeGetters.add(AttributeGetter.create(method));	
+			if(method.isAnnotationPresent(XML_GetAttribute.class)){
+				typeHandler.attributeGetters.add(AttributeGetter.create(method));
 			}
 
 			/* Attribute setter ->  direct creation */
-			else if(setAttributeAnnotation!=null){
-				typeHandler.attributeSetters.put(setAttributeAnnotation.name(), AttributeSetter.create(method));	
+			else if(method.isAnnotationPresent(XML_SetAttribute.class)){
+				AttributeSetter attributeSetter = AttributeSetter.create(method);
+				typeHandler.attributeSetters.put(attributeSetter.getName(), attributeSetter);	
 			}
 
-			else if(getValueAnnotation!=null){
+			else if(method.isAnnotationPresent(XML_GetValue.class)){
 				typeHandler.valueGetter = ValueGetter.create(method);
 			}
-			
-			else if(setValueAnnotation!=null){
+
+			else if(method.isAnnotationPresent(XML_SetValue.class)){
 				typeHandler.valueSetter = ValueSetter.create(method);
 			}
-			
+
 			/* element getter -> direct creation */
-			else if(getElementAnnotation!=null){
-				elementGetBuilders.add(ElementGetter.create(method));	
+			else if(method.isAnnotationPresent(XML_GetElement.class)){
+				ElementGetter.Builder egBuilder = ElementGetter.create(method);
+				if(elementGetterNamespace.contains(egBuilder.declaredTag)) {
+					throw new XML_TypeCompilationException("Conflict in element getter tag, for tag: "+
+							egBuilder.declaredTag+", in type: "+typeHandler.type.getName());
+				}
+
+				// sub explore
+				egBuilder.explore(codebaseBuilder);
+
+				// register
+				elementGetterNamespace.add(egBuilder.declaredTag);
+				elementGetBuilders.add(egBuilder);
 			}
 
 			/* element setter -> build */
-			else if(setElementAnnotation!=null){
-				elementSetBuilders.add(ElementSetter.create(method));
+			else if(method.isAnnotationPresent(XML_SetElement.class)){
+				ElementSetter.Builder esBuilder = ElementSetter.create(method);
+				if(elementSetterNamespace.contains(esBuilder.declaredTag)) {
+					throw new XML_TypeCompilationException("Conflict in element getter tag, for tag: "+
+							esBuilder.declaredTag+", in type: "+typeHandler.type.getName());
+				}
+
+				// sub explore
+				esBuilder.explore(codebaseBuilder);
+
+				// register
+				elementSetterNamespace.add(esBuilder.declaredTag);
+				elementSetBuilders.add(esBuilder);
 			}
 		}
 
 		/* </fields> */
 	}
 
-	/**
-	 * explore all referenced types
-	 * 
-	 * @param contextBuilder
-	 * @throws XML_TypeCompilationException 
-	 */
-	public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
 
-		// typeAnnotation has already been checked before
-		XML_Type typeAnnotation  = getType().getAnnotation(XML_Type.class);
 
-		/* <annotated_sub-types> */
-		if(typeAnnotation.sub()!=null){
-			for(Class<?> subType : typeAnnotation.sub()) {
-				contextBuilder.register(subType);
-			}
-		}
-		/* </annotated_sub-types> */
 
-		// explore element getters
-		for(ElementGetter.Builder builder : elementGetBuilders) {
-			builder.explore(contextBuilder);
-		}
+	public void buildInheritance() {
 
-		// explore through element setters
-		for(ElementSetter.Builder builder : elementSetBuilders) {
-			builder.explore(contextBuilder);
-		}
+		/* <inheritance> */
+		Map<String, TypeBuilder> map = new HashMap<String, TypeBuilder>();
+
+		forSubTypes(subTypeBuilder -> {
+
+			/* put all sub types */
+			map.put(subTypeBuilder.getRuntimeName(), subTypeBuilder);	
+		});
+
+		typeHandler.subTypes = map.values().stream().map(t -> t.getHandler()).toArray(size -> new TypeHandler[size]);
+
+		/* </inheritance> */
+
 	}
+
+
 
 
 	/**
@@ -179,197 +222,86 @@ public class TypeBuilder {
 	 * @return
 	 * @throws XML_TypeCompilationException
 	 */
-	public boolean build(XML_LexiconBuilder lexiconBuilder, boolean isVerbose) throws XML_TypeCompilationException {
-		if(!isBuilt) {
-
-			boolean hasMissingBuilds = false, isBuildMissingDependencies = false;
-
-			/* <inheritance> */
-			if(!isInheritanceBuilt) {
-				Map<String, TypeBuilder> map = new HashMap<String, TypeBuilder>();
-
-				listSubTypes(lexiconBuilder, map);
-
-				typeHandler.subTypes = map.values().stream().map(t -> t.getHandler()).toArray(size -> new TypeHandler[size]);
-				isInheritanceBuilt = true;	
-			}
+	public void buildAccessors(XML_CodebaseBuilder lexiconBuilder, boolean isVerbose) throws XML_TypeCompilationException {
 
 
-			/* <getters> */
-			if(!isGettersBuilt0) {
-				hasMissingBuilds = false;
-				for(ElementGetter.Builder builder : elementGetBuilders) {
-					isBuildMissingDependencies = builder.build0(this);
-					if(isBuildMissingDependencies) {
-						hasMissingBuilds = true;
-					}
-				}
-				isGettersBuilt0 = !hasMissingBuilds;
-			}
+		int n;
 
-			if(!isGettersBuilt1 && isGettersBuilt0) {
-				hasMissingBuilds = false;
-				for(ElementGetter.Builder builder : elementGetBuilders) {
-					isBuildMissingDependencies = builder.build1(lexiconBuilder, this);
-					if(isBuildMissingDependencies) {
-						hasMissingBuilds = true;
-					}
-				}
-				isGettersBuilt1 = !hasMissingBuilds;
-			}
-			/* </getters> */
+		/* <getters> */
+		n = elementGetBuilders.size();
 
-			/* <setters> */
-			if(!isSettersBuilt0) {
-
-				hasMissingBuilds = false;
-				for(ElementSetter.Builder builder : elementSetBuilders) {
-					isBuildMissingDependencies = builder.build0(lexiconBuilder, this, isVerbose);
-					if(isBuildMissingDependencies) {
-						hasMissingBuilds = true;
-					}
-				}
-				isSettersBuilt0 = !hasMissingBuilds;
-			}
-
-			if(isSettersBuilt0 && !isSettersBuilt1) {
-				hasMissingBuilds = false;
-				for(ElementSetter.Builder builder : elementSetBuilders) {
-					isBuildMissingDependencies = builder.build1(lexiconBuilder, this, isVerbose);
-					if(isBuildMissingDependencies) {
-						hasMissingBuilds = true;
-					}
-				}
-				isSettersBuilt1 = !hasMissingBuilds;
-			}
-
-			/* </setters> */
-
-			isBuilt = isSettersBuilt1 && isGettersBuilt1;
+		/* link : all must be linked before computing substition group collisions */
+		for(int i = 0; i < n; i++) { 
+			elementGetBuilders.get(i).link(lexiconBuilder); 
 		}
-		return isBuilt;
-	}
 
-
-
-
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isInheritanceDiscovered() {
-		return isInheritanceBuilt;
-	}
-
-	/**
-	 * 
-	 * @param context
-	 * @param initializables
-	 * @param subTypes
-	 * @throws XML_TypeCompilationException
-	 */
-	public void listSubTypes(XML_LexiconBuilder contextBuilder, Map<String, TypeBuilder> map) 
-			throws XML_TypeCompilationException {
-
-
-
-		// typeAnnotation has already been checked before
-		XML_Type typeAnnotation  = getType().getAnnotation(XML_Type.class);
-
-		TypeBuilder subTypeHandler;
-
-		/* <annotated_sub-types> */
-		if(typeAnnotation.sub()!=null){
-
-			for(Class<?> subType : typeAnnotation.sub()) {
-
-				// check if already registered
-				if(!map.containsKey(subType.getName())) {
-
-					// register type (if not already done)
-					contextBuilder.register(subType);
-
-					// test inheritance
-					if(typeHandler.type.isAssignableFrom(subType)) {
-						if((subTypeHandler = contextBuilder.getTypeBuilder(subType))!=null) {
-							map.put(subType.getName(), subTypeHandler);
-							subTypeHandler.listSubTypes(contextBuilder, map);
-						}	
-					}	
-				}
-
-			}
+		// build
+		for(int i = 0; i < n; i++) {
+			ElementGetter.Builder builder = elementGetBuilders.get(i);
+			boolean isColliding = false;
+			Set<String> substitutionGroup = builder.getSubstitutionGroup();
+			for(int j = 0; j<n; j++) { if(j!=i && elementGetBuilders.get(j).isColliding(substitutionGroup)) isColliding = true; }
+				
+			builder.build(this, isColliding);
 		}
-		/* </annotated_sub-types> */
+		/* </getters> */
 
+		
+		/* <element-setters> */
 
-		/* <extensions> */
-		if(contextBuilder.hasExtensions()){
-			for(Class<?> subType : contextBuilder.getExtensions()) {
+		n = elementSetBuilders.size();
 
-				// check if already registered and if direct super class
-				if(!map.containsKey(subType.getName()) && subType.getSuperclass().equals(typeHandler.type)) {
-
-					// register type (if not already done)
-					contextBuilder.register(subType);
-
-					// test inheritance
-					if((subTypeHandler = contextBuilder.getTypeBuilder(subType))!=null) {
-						map.put(subType.getName(), subTypeHandler);
-						subTypeHandler.listSubTypes(contextBuilder, map);
-					}
-				}
-			}
+		/* link : all must be linked before computing substition group collisions */
+		for(int i = 0; i < n; i++) { 
+			elementSetBuilders.get(i).link(lexiconBuilder); 
 		}
-		/* </extensions> */
+
+		// build
+		for(int i = 0; i < n; i++) {
+			ElementSetter.Builder builder = elementSetBuilders.get(i);
+			boolean isColliding = false;
+			Set<String> substitutionGroup = builder.getSubstitutionGroup();
+			for(int j = 0; j<n; j++) { if(j!=i && elementSetBuilders.get(j).isColliding(substitutionGroup)) isColliding = true; }
+
+			builder.build(this, isColliding);
+		}
+		/* </element-setters> */
+
+
 
 	}
 
 
-
-	/*
-@Deprecated
-private boolean isDependenciesInitialized() {
-	for(TypeBuilder dependency : dependencies) {
-		if(!dependency.isInheritanceDiscovered()) {
-			return false;
+	public void forSubTypes(UtilityConsumer<TypeBuilder> consumer) {
+		Queue<TypeBuilder> queue = new ArrayDeque<>();
+		for(TypeBuilder subTypeBuilder : subTypeBuilders) {
+			consumer.accept(subTypeBuilder);
+			subTypeBuilder.enqueueSubTypes(queue);
 		}
 	}
-	return true;
-}
-	 */
 
-
-
-
-	public void putElementGetterTag(String tag) throws XML_TypeCompilationException {
-		if(typeHandler.elementGettersTagSet.contains(tag)) {
-			throw new XML_TypeCompilationException("Try to override element getter tag: "+tag);
+	private void enqueueSubTypes(Queue<TypeBuilder> queue) {
+		if(!subTypeBuilders.isEmpty()) {
+			for(TypeBuilder subTypeBuilder : subTypeBuilders) {
+				queue.add(subTypeBuilder);
+			}
 		}
-		typeHandler.elementGettersTagSet.add(tag);
 	}
 
-	public boolean isGetElementColliding(String tag) {
-		return typeHandler.elementGettersTagSet.contains(tag);
+
+
+
+
+
+
+	public void putElementSetter(String tag, ElementSetter elementSetter) {
+		typeHandler.elementSetters.put(tag, elementSetter);
 	}
 
-	public void putElementGetter(ElementGetter elementGetter) throws XML_TypeCompilationException {
+	public void addElementGetter(ElementGetter elementGetter) throws XML_TypeCompilationException {
 		typeHandler.elementGetters.add(elementGetter);
 	}
 
-	public boolean isSetElementColliding(String tag) {
-		return typeHandler.elementSetters.containsKey(tag);
-	}
-
-
-	public void putElementSetter(ElementSetter elementSetter) throws XML_TypeCompilationException {
-		String tag = elementSetter.getTag();
-		if(typeHandler.elementSetters.containsKey(tag)) {
-			throw new XML_TypeCompilationException("Try to override element setter tag: "+tag+", for method: "+elementSetter.getMethod());
-		}
-		typeHandler.elementSetters.put(tag, elementSetter);
-	}
 
 	@Override
 	public String toString() {

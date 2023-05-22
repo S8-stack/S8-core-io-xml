@@ -1,8 +1,10 @@
 package com.s8.io.xml.handler.type.elements.getters;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
-import com.s8.io.xml.handler.XML_LexiconBuilder;
+import com.s8.io.xml.codebase.XML_CodebaseBuilder;
 import com.s8.io.xml.handler.type.TypeBuilder;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 
@@ -24,34 +26,32 @@ public abstract class PrimitiveElementGetter extends ElementGetter {
 		}
 
 		@Override
-		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
+		public void explore(XML_CodebaseBuilder codebaseBuilder) throws XML_TypeCompilationException {
 			// nothing to explore since primitive type
+		}
+		
+		@Override
+		public void link(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException {
+			/* nothing to link */
+		}
+		
+		@Override
+		public Set<String> getSubstitutionGroup() {
+			return new HashSet<>();
+		}
+		
+
+		@Override
+		public boolean isColliding(Set<String> substitutionGroup) {
+			return false; /* since set is empty, alsways non-colliding */
 		}
 
 		public abstract PrimitiveElementGetter createGetter();
 		
-		@Override
-		public boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			if(!isBuilt0) {
-				typeBuilder.putElementGetterTag(fieldTag);
-				isBuilt0 = true;
-				return false;		
-			}
-			else {
-				return false;
-			}
-		}
 		
 		@Override
-		public boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			if(!isBuilt1) {
-				typeBuilder.putElementGetter(createGetter());
-				isBuilt1 = true;
-				return false;
-			}
-			else {
-				return false;
-			}
+		public void build(TypeBuilder declaringTypeBuilder, boolean isColliding) throws XML_TypeCompilationException {
+			declaringTypeBuilder.addElementGetter(createGetter());
 		}
 	}
 	

@@ -3,10 +3,11 @@ package com.s8.io.xml.handler.type.elements.setters;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
-import com.s8.io.xml.handler.XML_LexiconBuilder;
+import com.s8.io.xml.codebase.XML_CodebaseBuilder;
 import com.s8.io.xml.handler.type.TypeBuilder;
-import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.io.xml.parser.ObjectParsedScope;
 import com.s8.io.xml.parser.PrimitiveParsedScope;
@@ -30,52 +31,56 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 
 	public static abstract class Builder extends ElementSetter.Builder {
 
-		protected Method method;
-
-		public Builder(String tag, Method method) {
-			super(tag);
-			this.method = method;
+		public Builder(Method method) {
+			super(method);
 		}
 
-		public abstract ElementSetter getStandardSetter();
+		public abstract ElementSetter createSetter();
 
 		@Override
-		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
+		public void explore(XML_CodebaseBuilder codebaseBuilder) throws XML_TypeCompilationException {
 			// nothing to explore
 		}
 
 		@Override
-		public boolean build0(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose)
-				throws XML_TypeCompilationException {
-			if(!isBuilt0) {
-				typeBuilder.setElementSetter(getStandardSetter());
-				isBuilt0 = true;
-				return false;	
-			}
-			else {
-				return false;
-			}
-			
+		public void link(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException {
+			/* nothing to link */
 		}
+		
+		@Override
+		public Set<String> getSubstitutionGroup() {
+			return new HashSet<>();
+		}
+		
 
 		@Override
-		public boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder, boolean isVerbose) 
-				throws XML_TypeCompilationException {
-			return false;
+		public boolean isColliding(Set<String> substitutionGroup) {
+			return false; /* since set is empty, alsways non-colliding */
 		}
+
+		
+		@Override
+		public void build(TypeBuilder declaringTypeBuilder, boolean isColliding) throws XML_TypeCompilationException {
+			
+			declaringTypeBuilder.putElementSetter(declaredTag, createSetter());
+		}
+
+		
 	}
 
-	protected Method method;
 
-	public PrimitiveElementSetter(String tag, Method method) {
-		super(tag, true);
-		this.method = method;
+	public PrimitiveElementSetter(Method method) {
+		super(method);
 	}
+	
+	
 
 	@Override
-	public PrimitiveParsedScope createParsedElement(ObjectParsedScope parent, XML_StreamReader.Point point) throws XML_ParsingException {
+	public PrimitiveParsedScope createParsedElement(String tag, 
+			ObjectParsedScope parent, 
+			XML_StreamReader.Point point) throws XML_ParsingException {
 		Object parentObject = parent.getObject();
-		return new PrimitiveParsedScope(getTag(), parent, getCallback(parentObject, point));
+		return new PrimitiveParsedScope(tag, parent, getCallback(parentObject, point));
 	}
 
 
@@ -89,24 +94,11 @@ public abstract class PrimitiveElementSetter extends ElementSetter {
 
 
 	@Override
-	public void xsd_write(Writer writer) throws IOException {
-		writer.write("\n\t\t\t<xs:element name=\""+getTag()+"\"");
+	public void xsd_write(String tag, Writer writer) throws IOException {
+		writer.write("\n\t\t\t<xs:element name=\""+tag+"\"");
 		writer.write(" type=\"xs:string\"");
 		writer.write(" minOccurs=\"0\" maxOccurs=\"unbounded\" />");
 	}
 	
 
-	@Override
-	public void DTD_writeHeader(Writer writer) throws IOException {
-		writer.append(getTag());
-		writer.append("*");
-	}
-	
-
-	@Override
-	public void DTD_writeFieldDefinition(TypeHandler typeHandler, Writer writer) throws IOException {
-		writer.append("\n<!ELEMENT ");
-		writer.append(getTag());
-		writer.append(" (#PCDATA)>");
-	}
 }

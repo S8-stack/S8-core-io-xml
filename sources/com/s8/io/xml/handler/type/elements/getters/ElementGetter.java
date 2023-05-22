@@ -1,12 +1,13 @@
 package com.s8.io.xml.handler.type.elements.getters;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import com.s8.io.xml.annotations.XML_GetElement;
+import com.s8.io.xml.codebase.XML_CodebaseBuilder;
 import com.s8.io.xml.composer.ObjectComposableScope;
-import com.s8.io.xml.handler.XML_LexiconBuilder;
+import com.s8.io.xml.composer.XML_ComposingException;
 import com.s8.io.xml.handler.type.TypeBuilder;
-import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 
 
@@ -28,21 +29,21 @@ public abstract class ElementGetter {
 	}
 
 	public static abstract class Builder {
-		
+
 		protected boolean isBuilt0;
-		
+
 		protected boolean isBuilt1;		
 
 		protected Method method;
-		
-		protected String fieldTag;
+
+		public final String declaredTag;
 
 		public Builder(Method method) {
 			super();
 			this.method = method;
-			
-			XML_GetElement getElementAnnotation = method.getAnnotation(XML_GetElement.class);
-			this.fieldTag = getElementAnnotation.tag();
+
+			XML_GetElement elementAnnotation = method.getAnnotation(XML_GetElement.class);
+			declaredTag = elementAnnotation.tag();
 		}
 
 		/**
@@ -50,59 +51,23 @@ public abstract class ElementGetter {
 		 * @param contextBuilder
 		 * @throws XML_TypeCompilationException 
 		 */
-		public abstract void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException;
-		
-		
-		/**
-		 * @throws XML_TypeCompilationException 
-		 * 
-		 */
-		public abstract boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException;
+		public abstract void explore(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException;
 
-		public abstract boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException;
 
-		
-		/**
-		 *  check collision
-		 * @param contextBuilder
-		 * @param typeBuilder
-		 * @return true if colliding, false otherwise
-		 */
-		public boolean isFieldTypeTagColliding(TypeBuilder typeBuilder, TypeBuilder fieldTypeBuilder) {
-			boolean isColliding = false;
-			TypeHandler[] subTypes = fieldTypeBuilder.getHandler().getSubTypes();
-			int n = subTypes.length, i=0;
-			while(!isColliding && i<n) {
-				TypeHandler subType = subTypes[i++];
-				if(typeBuilder.isGetElementColliding(subType.xml_getTag())) {
-					isColliding = true;
-				}
-			}
-			return isColliding;
-		}
-		
-		
-		/**
-		 * 
-		 * @param typeBuilder
-		 * @param fieldTypeBuilder
-		 * @throws XML_TypeCompilationException
-		 */
-		public void fillFieldTypeTags(TypeBuilder typeBuilder, TypeBuilder fieldTypeBuilder) throws XML_TypeCompilationException {
-			boolean isColliding = false;
-			TypeHandler[] subTypes = fieldTypeBuilder.getHandler().getSubTypes();
-			int n = subTypes.length, i=0;
-			while(!isColliding && i<n) {
-				TypeHandler subType = subTypes[i++];
-				typeBuilder.putElementGetterTag(subType.xml_getTag());
-			}
-		}
-					
+		public abstract void link(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException;
+
+		public abstract Set<String> getSubstitutionGroup();
+
+		public abstract boolean isColliding(Set<String> substitutionGroup);
+
+
+		public abstract void build(TypeBuilder typeBuilder, boolean isColliding) throws XML_TypeCompilationException;
+
 	}
 
 
 	public final static Prototype[] PROTOTYPES = new Prototype[] {
-			
+
 			// primitives
 			BooleanElementGetter.PROTOTYPE,
 			ShortElementGetter.PROTOTYPE,
@@ -111,10 +76,10 @@ public abstract class ElementGetter {
 			FloatElementGetter.PROTOTYPE,
 			DoubleElementGetter.PROTOTYPE,
 			StringElementGetter.PROTOTYPE,
-			
+
 			// list
 			ObjectsCollectionElementGetter.PROTOTYPE,
-			
+
 			// simple object
 			ObjectElementGetter.PROTOTYPE
 	};
@@ -133,21 +98,21 @@ public abstract class ElementGetter {
 
 
 
-	protected String fieldTag;
-	
+	protected String tag;
+
 	protected Method method;
 
 
 	public ElementGetter(String tag, Method method) {
 		super();
-		this.fieldTag = tag;
+		this.tag = tag;
 		this.method = method;
 	}
 
 
 
 	public String getTag(){
-		return fieldTag;
+		return tag;
 	}
 
 
@@ -159,7 +124,7 @@ public abstract class ElementGetter {
 	 * @return
 	 * @throws Exception 
 	 */
-	public abstract <T> void createComposableElement(ObjectComposableScope scope) throws Exception;
+	public abstract <T> void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException;
 
 
 

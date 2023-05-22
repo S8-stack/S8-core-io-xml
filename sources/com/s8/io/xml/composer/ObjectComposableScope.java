@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import com.s8.io.xml.XML_Syntax;
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
 import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.io.xml.handler.type.elements.getters.ElementGetter;
@@ -17,60 +17,12 @@ import com.s8.io.xml.handler.type.elements.getters.ElementGetter;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  * 
  */
-public abstract class ObjectComposableScope extends ComposableScope {
+public class ObjectComposableScope extends ComposableScope {
 
 
-	public static class FieldTagged extends ObjectComposableScope {
+	private final String tag;
 
 
-		private String fieldTag;
-
-		public FieldTagged(String fieldTag, Object object) {
-			super(object);
-			this.fieldTag = fieldTag;
-		}
-
-		@Override
-		public void writeOpeningTag(XML_StreamWriter writer) throws IOException {
-			// start tag
-			writer.startTag(fieldTag+XML_Syntax.MAPPING_SEPARATOR+typeHandler.xml_getTag());
-		}
-		
-		@Override
-		public void writeClosingTag(XML_StreamWriter writer) throws IOException {
-			writer.appendClosingTag(fieldTag);
-		}
-	}
-
-
-	/**
-	 * 
-	 * @author pierreconvert
-	 *
-	 */
-	public static class TypeTagged extends ObjectComposableScope {
-
-		/**
-		 * 
-		 * @param object
-		 */
-		public TypeTagged(Object object) {
-			super(object);
-		}
-
-		@Override
-		public void writeOpeningTag(XML_StreamWriter writer) throws IOException {
-
-			// start tag
-			writer.startTag(typeHandler.xml_getTag());	
-		}
-
-		@Override
-		public void writeClosingTag(XML_StreamWriter writer) throws IOException {
-			writer.appendClosingTag(typeHandler.xml_getTag());
-		}
-
-	}
 
 
 	private boolean hasExpanded;
@@ -81,7 +33,7 @@ public abstract class ObjectComposableScope extends ComposableScope {
 
 
 	TypeHandler typeHandler;
-	
+
 	private Object object;
 
 	/**
@@ -89,10 +41,11 @@ public abstract class ObjectComposableScope extends ComposableScope {
 	 * @param context
 	 * @param fieldValue
 	 */
-	public ObjectComposableScope(Object object){
+	public ObjectComposableScope(String tag, Object object){
 		super();
+		this.tag = tag;
 		this.object = object;
-		
+
 
 		hasExpanded = false;
 	}
@@ -104,15 +57,17 @@ public abstract class ObjectComposableScope extends ComposableScope {
 
 
 
-	/**
-	 * write the opening tag
-	 * @param typeHandler
-	 * @param writer
-	 * @throws IOException
-	 */
-	public abstract void writeOpeningTag(XML_StreamWriter writer) throws IOException;
 
-	public abstract void writeClosingTag(XML_StreamWriter writer) throws IOException;
+	public void writeOpeningTag(XML_StreamWriter writer) throws IOException {
+		// start tag
+		writer.startTag(tag+XML_Syntax.MAPPING_SEPARATOR+typeHandler.xml_getTag());
+	}
+
+
+	public void writeClosingTag(XML_StreamWriter writer) throws IOException {
+		writer.appendClosingTag(tag);
+	}
+
 
 	/**
 	 * 
@@ -127,14 +82,14 @@ public abstract class ObjectComposableScope extends ComposableScope {
 	 * <scope><inner-scope> -> stacking
 	 */
 	@Override
-	public boolean insert(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer)
+	public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer)
 			throws 
 			IllegalAccessException, 
 			IllegalArgumentException, 
 			InvocationTargetException, 
 			IOException, 
 			Exception {
-		
+
 		// late resolve of type handler
 		if(typeHandler==null) {
 			// type handler
@@ -193,7 +148,7 @@ public abstract class ObjectComposableScope extends ComposableScope {
 	 * @throws Exception
 	 */
 	@Override
-	public boolean compose(XML_Lexicon context, Stack<ComposableScope> stack, XML_StreamWriter writer) 
+	public boolean compose(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) 
 			throws Exception {
 		while(head!=null) {
 			boolean isStackedComposedRequired = head.insert(context, stack, writer);

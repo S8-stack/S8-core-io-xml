@@ -3,11 +3,10 @@ package com.s8.io.xml.handler.type.elements.setters;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.s8.io.xml.annotations.XML_SetElement;
 import com.s8.io.xml.parser.PrimitiveParsedScope;
+import com.s8.io.xml.parser.PrimitiveParsedScope.Callback;
 import com.s8.io.xml.parser.XML_ParsingException;
 import com.s8.io.xml.parser.XML_StreamReader;
-import com.s8.io.xml.parser.PrimitiveParsedScope.Callback;
 
 
 /**
@@ -29,27 +28,25 @@ public class ShortElementSetter extends PrimitiveElementSetter {
 
 		@Override
 		public ElementSetter.Builder create(Method method) {
-			XML_SetElement setElementAnnotation = method.getAnnotation(XML_SetElement.class);
-			String tag = setElementAnnotation.tag();
-			return new ShortElementSetter.Builder(tag, method);
+			return new ShortElementSetter.Builder(method);
 		}
 	};
 
 	public static class Builder extends PrimitiveElementSetter.Builder {
 
-		public Builder(String tag, Method method) {
-			super(tag, method);
+		public Builder(Method method) {
+			super(method);
 		}
 
 		@Override
-		public ElementSetter getStandardSetter() {
-			return new ShortElementSetter(tag, method);
+		public ElementSetter createSetter() {
+			return new ShortElementSetter(method);
 		}	
 	}
 
 
-	public ShortElementSetter(String tag, Method method) {
-		super(tag, method);
+	public ShortElementSetter(Method method) {
+		super(method);
 	}
 
 	@Override

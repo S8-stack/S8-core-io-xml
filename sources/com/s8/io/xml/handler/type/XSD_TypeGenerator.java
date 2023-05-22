@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.s8.io.xml.handler.type.attributes.setters.AttributeSetter;
-import com.s8.io.xml.handler.type.elements.setters.ElementSetter;
 
 
 /**
@@ -54,10 +53,16 @@ private TypeHandler typeHandler;
 		writer.append("\n\t\t<xs:sequence>");
 		writer.append("\n\t\t<xs:choice maxOccurs=\"unbounded\" minOccurs=\"1\">");
 		
-		 
-		for(ElementSetter elementSetter : typeHandler.elementSetters.values()) {
-			elementSetter.xsd_write(writer);
-		}
+		
+		typeHandler.elementSetters.forEach((tag, elementSetter) -> {
+			try {
+				elementSetter.xsd_write(tag, writer);
+			} 
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+		
 		writer.append("\n\t\t</xs:choice>");
 		writer.append("\n\t\t</xs:sequence>");
 		}

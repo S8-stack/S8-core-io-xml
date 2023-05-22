@@ -24,30 +24,36 @@ public class Wrapper {
 		this.array = new ArrayList<TestClass3>();
 	}
 	
+	
 	@XML_SetAttribute(name="factor")
 	public void setFactor(double a){
 		this.a = a;
 	}
+	
 	
 	@XML_GetAttribute(tag="factor")
 	public double getFactor(){
 		return a;
 	}
 	
+	
 	@XML_SetElement(tag="field")
 	public void setField(Module field){
 		this.field = field;
 	}
+	
 	
 	@XML_GetElement(tag="field")
 	public Module getField(){
 		return field;
 	}
 	
+	
 	@XML_SetElement(tag="item")
 	public void setItem(TestClass3 item){
 		this.array.add(item);
 	}
+	
 	
 	@XML_GetElement(tag="item")
 	public void getItems(Consumer<TestClass3> crawler){

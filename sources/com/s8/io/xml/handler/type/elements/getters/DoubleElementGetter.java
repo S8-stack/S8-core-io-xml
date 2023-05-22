@@ -1,8 +1,10 @@
 package com.s8.io.xml.handler.type.elements.getters;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.s8.io.xml.composer.ObjectComposableScope;
+import com.s8.io.xml.composer.XML_ComposingException;
 import com.s8.io.xml.composer.PrimitiveComposableElement.DoubleComposableElement;
 
 
@@ -34,7 +36,7 @@ public class DoubleElementGetter extends PrimitiveElementGetter {
 		}
 	};
 
-	
+
 	public static class Builder extends PrimitiveElementGetter.Builder {
 
 		public Builder(Method method) {
@@ -43,7 +45,7 @@ public class DoubleElementGetter extends PrimitiveElementGetter {
 
 		@Override
 		public PrimitiveElementGetter createGetter() {
-			return new DoubleElementGetter(fieldTag, method);
+			return new DoubleElementGetter(declaredTag, method);
 		}
 	}
 
@@ -57,8 +59,14 @@ public class DoubleElementGetter extends PrimitiveElementGetter {
 	}
 
 	@Override
-	public void createComposableElement(ObjectComposableScope scope) throws Exception {
-		double value = (double) method.invoke(scope.getObject(), new Object[]{});
-		scope.append(new DoubleComposableElement(fieldTag, value));
+	public void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
+		try {
+			double value = (double) method.invoke(scope.getObject(), new Object[]{});
+			scope.append(new DoubleComposableElement(tag, value));
+		} 
+		catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new XML_ComposingException(e.getMessage()+ "for "+method);
+		}
 	}
 }

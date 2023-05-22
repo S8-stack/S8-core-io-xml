@@ -15,6 +15,8 @@ module com.s8.io.xml {
 
 	exports com.s8.io.xml.annotations;
 	
+	exports com.s8.io.xml.codebase;
+	
 	exports com.s8.io.xml.parser;
 
 	exports com.s8.io.xml.composer;

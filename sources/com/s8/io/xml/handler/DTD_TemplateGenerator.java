@@ -3,6 +3,8 @@ package com.s8.io.xml.handler;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.s8.io.xml.codebase.XML_Codebase;
+
 
 /**
  * 
@@ -15,7 +17,7 @@ public class DTD_TemplateGenerator {
 
 	//private XML_Context context;
 	
-	public DTD_TemplateGenerator(XML_Lexicon context) {
+	public DTD_TemplateGenerator(XML_Codebase context) {
 		super();
 		//this.context = context;
 	}

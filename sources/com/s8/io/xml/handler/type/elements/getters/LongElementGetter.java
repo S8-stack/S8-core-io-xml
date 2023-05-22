@@ -1,9 +1,11 @@
 package com.s8.io.xml.handler.type.elements.getters;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.s8.io.xml.composer.ObjectComposableScope;
 import com.s8.io.xml.composer.PrimitiveComposableElement.LongComposableElement;
+import com.s8.io.xml.composer.XML_ComposingException;
 
 
 /**
@@ -44,7 +46,7 @@ public class LongElementGetter extends PrimitiveElementGetter {
 
 		@Override
 		public PrimitiveElementGetter createGetter() {
-			return new LongElementGetter(fieldTag, method);
+			return new LongElementGetter(declaredTag, method);
 		}
 	}
 	
@@ -57,8 +59,15 @@ public class LongElementGetter extends PrimitiveElementGetter {
 	}
 
 	@Override
-	public void createComposableElement(ObjectComposableScope scope) throws Exception {
-		long value = (long) method.invoke(scope.getObject(), new Object[]{});
-		scope.append(new LongComposableElement(fieldTag, value));
+	public void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
+		try {
+			long value = (long) method.invoke(scope.getObject(), new Object[]{});
+			scope.append(new LongComposableElement(tag, value));
+		} 
+		catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new XML_ComposingException(e.getMessage()+ "for "+method);
+		}
+		
 	}
 }

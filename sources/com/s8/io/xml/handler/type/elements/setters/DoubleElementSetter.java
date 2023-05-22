@@ -3,13 +3,10 @@ package com.s8.io.xml.handler.type.elements.setters;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.s8.io.xml.annotations.XML_SetElement;
-import com.s8.io.xml.handler.XML_LexiconBuilder;
-import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.io.xml.parser.PrimitiveParsedScope;
+import com.s8.io.xml.parser.PrimitiveParsedScope.Callback;
 import com.s8.io.xml.parser.XML_ParsingException;
 import com.s8.io.xml.parser.XML_StreamReader;
-import com.s8.io.xml.parser.PrimitiveParsedScope.Callback;
 
 
 
@@ -33,32 +30,25 @@ public class DoubleElementSetter extends PrimitiveElementSetter {
 		
 		@Override
 		public ElementSetter.Builder create(Method method) {
-			XML_SetElement setElementAnnotation = method.getAnnotation(XML_SetElement.class);
-			String tag = setElementAnnotation.tag();
-			return new DoubleElementSetter.Builder(tag, method);
+			return new DoubleElementSetter.Builder(method);
 		}
 	};
 	
 	
 	public static class Builder extends PrimitiveElementSetter.Builder {
 
-		public Builder(String tag, Method method) {
-			super(tag, method);
+		public Builder(Method method) {
+			super(method);
 		}
 
 		@Override
-		public ElementSetter getStandardSetter() {
-			return new DoubleElementSetter(tag, method);
-		}
-
-		@Override
-		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
-			// nothing to explore
+		public ElementSetter createSetter() {
+			return new DoubleElementSetter(method);
 		}
 	}
 	
-	public DoubleElementSetter(String tag, Method method) {
-		super(tag, method);
+	public DoubleElementSetter(Method method) {
+		super(method);
 	}
 
 	@Override

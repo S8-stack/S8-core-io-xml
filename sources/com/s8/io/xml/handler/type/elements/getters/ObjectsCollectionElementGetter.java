@@ -1,13 +1,19 @@
 package com.s8.io.xml.handler.type.elements.getters;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
+import com.s8.io.xml.XML_Syntax;
+import com.s8.io.xml.codebase.XML_CodebaseBuilder;
 import com.s8.io.xml.composer.ObjectComposableScope;
-import com.s8.io.xml.handler.XML_LexiconBuilder;
+import com.s8.io.xml.composer.XML_ComposingException;
 import com.s8.io.xml.handler.type.TypeBuilder;
+import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 
 
@@ -43,93 +49,115 @@ public class ObjectsCollectionElementGetter extends ElementGetter {
 			return new ObjectsCollectionElementGetter.Builder(method);
 		}
 	};
-	
-	
+
+
 	public static class Builder extends ElementGetter.Builder {
+
+		public final Class<?> componentType;
+
+		private TypeHandler componentTypeHandler;
+
 
 		public Builder(Method method) {
 			super(method);
-		}
-		
 
-		@Override
-		public void explore(XML_LexiconBuilder contextBuilder) throws XML_TypeCompilationException {
-			contextBuilder.register(getTargetType(contextBuilder));
-		}
-		
-		@Override
-		public boolean build0(TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			typeBuilder.putElementGetterTag(fieldTag);
-			return false;
-		}
-
-		@Override
-		public boolean build1(XML_LexiconBuilder contextBuilder, TypeBuilder typeBuilder) throws XML_TypeCompilationException {
-			Class<?> fieldType =  getTargetType(contextBuilder);
-			TypeBuilder fieldTypeBuilder = contextBuilder.getTypeBuilder(fieldType);
-			if(!fieldTypeBuilder.isInheritanceDiscovered()) {
-				return true;
-			}
-			
-			boolean isTypeTagPreferred = !isFieldTypeTagColliding(typeBuilder, fieldTypeBuilder);
-			if(isTypeTagPreferred) {
-				fillFieldTypeTags(typeBuilder, fieldTypeBuilder);
-			}
-			typeBuilder.putElementGetter(new ObjectsCollectionElementGetter(fieldTag, method, isTypeTagPreferred));
-			return false;
-		}
-		
-		
-		/**
-		 * 
-		 * @param contextBuilder
-		 * @return
-		 */
-		public Class<?> getTargetType(XML_LexiconBuilder contextBuilder) {
 			Parameter[] parameters = method.getParameters();
 			ParameterizedType argType = (ParameterizedType) parameters[0].getParameterizedType();
-			Class<?> componentType = (Class<?>) (argType.getActualTypeArguments())[0];
-			return componentType;
+			this.componentType = (Class<?>) (argType.getActualTypeArguments())[0];
+		}
+
+
+		@Override
+		public void explore(XML_CodebaseBuilder contextBuilder) throws XML_TypeCompilationException {
+			contextBuilder.discover(componentType);
+		}
+
+		@Override
+		public void link(XML_CodebaseBuilder codebaseBuilder) throws XML_TypeCompilationException {
+			/* retrieve fieldType builder */
+			TypeBuilder typeBuilder = codebaseBuilder.getTypeBuilder(componentType);
+			if(typeBuilder == null) {
+				throw new XML_TypeCompilationException("failed to retrieve type builder: "+componentType.getName());
+			}
+			componentTypeHandler= typeBuilder.typeHandler;
+		}
+
+
+		@Override
+		public Set<String> getSubstitutionGroup() {
+			Set<String> group = new HashSet<>();
+			group.add(componentTypeHandler.xml_getTag());
+			for(TypeHandler handler : componentTypeHandler.getSubTypes()) { group.add(handler.xml_getTag()); }
+			return group;
+		}
+
+
+		@Override
+		public boolean isColliding(Set<String> substitutionGroup) {
+			if(substitutionGroup.contains(componentTypeHandler.xml_getTag())) {
+				return true;
+			}
+			for(TypeHandler handler : componentTypeHandler.getSubTypes()) {
+				if(substitutionGroup.contains(handler.xml_getTag())) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		@Override
+		public void build(TypeBuilder declaringTypeBuilder, boolean isColliding) throws XML_TypeCompilationException {
+			String tag = "";
+			if(!componentTypeHandler.hasSubTypes()) {
+				tag = declaredTag;
+			}
+			else if(!isColliding) { /* substitution group non-colliding */
+				tag = componentTypeHandler.xml_getTag();
+			}
+			else {
+				tag = declaredTag + XML_Syntax.MAPPING_SEPARATOR + componentTypeHandler.xml_getTag();
+			}
+
+			declaringTypeBuilder.addElementGetter(new ObjectElementGetter(tag, method));			
 		}
 	}
 
 
-	
-	private final boolean isTypeTagPreferred;
-	
+
 	/**
 	 * 
 	 * @param method
 	 */
-	public ObjectsCollectionElementGetter(String fieldTag, Method method, boolean isTypeTagPreferred) {
+	public ObjectsCollectionElementGetter(String fieldTag, Method method) {
 		super(fieldTag, method);
-		this.isTypeTagPreferred = isTypeTagPreferred;
 	}
 
 
 	@Override
-	public <T> void createComposableElement(ObjectComposableScope scope) throws Exception {
+	public <T> void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
 
 		Consumer<T> consumer = new Consumer<T>() {
 
 			@Override
 			public void accept(T subObject) {
 				if(subObject!=null) {
-					if(isTypeTagPreferred) {
-						scope.append(new ObjectComposableScope.TypeTagged(subObject));
-					}
-					else {
-						scope.append(new ObjectComposableScope.FieldTagged(fieldTag, subObject));
-					}
+					scope.append(new ObjectComposableScope(tag, subObject));
 				}
 			}
 		};
 
 		// invoke consumer on parent object
-		method.invoke(scope.getObject(), new Object[]{ consumer });
+		try {
+			method.invoke(scope.getObject(), new Object[]{ consumer });
+		} 
+		catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new XML_ComposingException(e.getMessage()+ "for "+method);
+		}
 	}
-	
-	
+
+
 
 	@Override
 	public Method getMethod() {

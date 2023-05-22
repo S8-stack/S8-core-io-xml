@@ -2,7 +2,7 @@ package com.s8.io.xml.parser;
 
 import java.io.IOException;
 
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
 
 /**
  * 
@@ -21,7 +21,7 @@ public class XML_Parser {
 	private RootParsedElement rootScope;
 	public ParsedScope scope;
 
-	public XML_Parser(XML_Lexicon context, XML_StreamReader reader, boolean isVerbose) {
+	public XML_Parser(XML_Codebase context, XML_StreamReader reader, boolean isVerbose) {
 		super();
 		this.reader = reader;
 		this.isVerbose = isVerbose;
