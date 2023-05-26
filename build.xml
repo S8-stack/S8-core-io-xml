@@ -3,25 +3,34 @@
 
 	<property name="module" value="com.s8.io.xml" />
 	<property name="stack" value="/Users/pc/qx/git/com.s8.stack/modules" />
+	<property name="stack-sources" value="/Users/pc/qx/git/com.s8.stack/mod-sources" />
 	<property name="jar-name" value="${stack}/s8-io-xml" />
 	<property name="dependencies" value="" />
 	<property name="version" value="1.1.1" />
 	<property name="javahome" value="/Library/Java/JavaVirtualMachines/jdk-19.jdk/Contents/Home" />
 
-	<target name="clean-up">
-		<delete dir="forge" />
-		<mkdir dir="forge" />
-		<mkdir dir="forge/java" />
-		<mkdir dir="forge/java/${module}" />
-	</target>
 
-	<target name="copy-sources" depends="clean-up">
-		<copy todir="forge/java/${module}">
-			<fileset dir="sources">
-				<exclude name="**/*.toto" />
-			</fileset>
-		</copy>
-	</target>
+	<target name="clean-up">
+			<delete dir="forge" />
+			<delete dir="${stack-sources}/${module}" />
+			<mkdir dir="forge" />
+			<mkdir dir="forge/java" />
+			<mkdir dir="forge/java/${module}" />
+			<mkdir dir="${stack-sources}/${module}" />
+		</target>
+
+		<target name="copy-sources" depends="clean-up">
+			<copy todir="forge/java/${module}">
+				<fileset dir="sources">
+					<exclude name="**/*.toto" />
+				</fileset>
+			</copy>
+			<copy todir="${stack-sources}/${module}">
+				<fileset dir="sources">
+					<exclude name="**/*.toto" />
+				</fileset>
+			</copy>
+		</target>
 
 	<target name="compile-sources" depends="copy-sources">
 		<exec executable="${javahome}/bin/javac" dir="${basedir}">
