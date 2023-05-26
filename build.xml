@@ -2,9 +2,10 @@
 <project name="MyProject" basedir="." default="package-jar">
 
 	<property name="module" value="com.s8.io.xml" />
+	<property name="name" value="s8-io-xml" />
 	<property name="stack" value="/Users/pc/qx/git/com.s8.stack/modules" />
 	<property name="stack-sources" value="/Users/pc/qx/git/com.s8.stack/mod-sources" />
-	<property name="jar-name" value="${stack}/s8-io-xml" />
+	<property name="jar-path" value="${stack}/${name}.jar" />
 	<property name="dependencies" value="" />
 	<property name="version" value="1.1.1" />
 	<property name="javahome" value="/Library/Java/JavaVirtualMachines/jdk-19.jdk/Contents/Home" />
@@ -55,7 +56,7 @@
 	<target name="package-jar" depends="copy2">
 		<exec executable="${javahome}/bin/jar" dir="${basedir}">
 			<arg value="-c" />
-			<arg value="--file=${jar-name}.jar" />
+			<arg value="--file=${jar-path}" />
 			<arg value="-C" />
 			<arg value="forge/classes/${module}" />
 			<arg value="." />
