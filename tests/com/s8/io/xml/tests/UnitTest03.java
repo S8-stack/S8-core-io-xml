@@ -12,7 +12,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import com.s8.io.xml.codebase.XML_Codebase;
-import com.s8.io.xml.tests.example01.Wrapper;
+import com.s8.io.xml.demos.repo01.Wrapper;
 
 public class UnitTest03 {
 
@@ -24,7 +24,7 @@ public class UnitTest03 {
 		Object object = context.deserialize(reader);
 		reader.close();
 		
-		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("input/schema2.xsd"))));
+		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("input/schema.xsl"))));
 		context.xsd_writeSchema(writer);
 		writer.close();
 		

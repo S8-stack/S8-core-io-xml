@@ -1,11 +1,13 @@
 package com.s8.io.xml.handler.type.elements.getters;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 import com.s8.io.xml.annotations.XML_GetElement;
 import com.s8.io.xml.codebase.XML_CodebaseBuilder;
-import com.s8.io.xml.composer.ObjectComposableScope;
+import com.s8.io.xml.composer.ComposableScope;
 import com.s8.io.xml.composer.XML_ComposingException;
 import com.s8.io.xml.handler.type.TypeBuilder;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
@@ -100,22 +102,15 @@ public abstract class ElementGetter {
 
 
 
-	protected String tag;
-
 	protected Method method;
 
 
-	public ElementGetter(String tag, Method method) {
+	public ElementGetter(Method method) {
 		super();
-		this.tag = tag;
 		this.method = method;
 	}
 
 
-
-	public String getTag(){
-		return tag;
-	}
 
 
 	/**
@@ -124,9 +119,10 @@ public abstract class ElementGetter {
 	 * @param parent
 	 * @param typeName
 	 * @return
+	 * @throws IOException 
 	 * @throws Exception 
 	 */
-	public abstract <T> void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException;
+	public abstract void compose(Object object, List<ComposableScope> subScopes) throws XML_ComposingException;
 
 
 

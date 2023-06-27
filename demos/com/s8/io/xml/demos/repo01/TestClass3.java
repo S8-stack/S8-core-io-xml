@@ -1,11 +1,11 @@
-package com.s8.io.xml.tests.example01;
+package com.s8.io.xml.demos.repo01;
 
 
 import com.s8.io.xml.annotations.XML_GetAttribute;
 import com.s8.io.xml.annotations.XML_SetAttribute;
 import com.s8.io.xml.annotations.XML_Type;
 
-@XML_Type(name="ee", sub={
+@XML_Type(name="EeClass3", sub={
 		TestClass4.class 
 })
 public class TestClass3 {

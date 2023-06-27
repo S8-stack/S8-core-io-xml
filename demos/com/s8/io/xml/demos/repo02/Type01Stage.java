@@ -1,4 +1,4 @@
-package com.s8.io.xml.tests.example02;
+package com.s8.io.xml.demos.repo02;
 
 import com.s8.io.xml.annotations.XML_SetElement;
 import com.s8.io.xml.annotations.XML_Type;

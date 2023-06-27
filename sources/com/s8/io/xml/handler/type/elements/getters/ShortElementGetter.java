@@ -2,10 +2,11 @@ package com.s8.io.xml.handler.type.elements.getters;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
-import com.s8.io.xml.composer.ObjectComposableScope;
-import com.s8.io.xml.composer.XML_ComposingException;
+import com.s8.io.xml.composer.ComposableScope;
 import com.s8.io.xml.composer.PrimitiveComposableElement.ShortComposableElement;
+import com.s8.io.xml.composer.XML_ComposingException;
 
 
 /**
@@ -53,11 +54,12 @@ public class ShortElementGetter extends PrimitiveElementGetter {
 		super(tag, method);
 	}
 
+	
 	@Override
-	public void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
+	public void compose(Object object, List<ComposableScope> subScopes) throws XML_ComposingException {
 		try {
-			short value = (short) method.invoke(scope.getObject(), new Object[]{});
-			scope.append(new ShortComposableElement(tag, value));
+			short value = (short) method.invoke(object, new Object[]{});
+			subScopes.add(new ShortComposableElement(tag, value));
 		} 
 		catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();

@@ -3,11 +3,14 @@ package com.s8.io.xml.handler.type.elements.getters;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.s8.io.xml.XML_Syntax;
 import com.s8.io.xml.codebase.XML_CodebaseBuilder;
+import com.s8.io.xml.composer.ComposableScope;
 import com.s8.io.xml.composer.ObjectComposableScope;
+import com.s8.io.xml.composer.TagComposer;
 import com.s8.io.xml.composer.XML_ComposingException;
 import com.s8.io.xml.handler.type.TypeBuilder;
 import com.s8.io.xml.handler.type.TypeHandler;
@@ -112,38 +115,44 @@ public class ObjectElementGetter extends ElementGetter {
 		@Override
 		public void build(TypeBuilder declaringTypeBuilder, boolean isColliding) throws XML_TypeCompilationException {
 
-			String tag = "";
+			TagComposer tagComposer = null;
 			if(!typeHandler.hasSubTypes()) {
-				tag = declaredTag;
+				tagComposer = typeName -> declaredTag;
 			}
 			else if(!isColliding) { /* substitution group non-colliding */
-				tag = typeHandler.xml_getTag();
+				tagComposer = typeName -> typeName;
 			}
 			else {
-				tag = declaredTag + XML_Syntax.MAPPING_SEPARATOR + typeHandler.xml_getTag();
+				tagComposer = typeName -> declaredTag + XML_Syntax.MAPPING_SEPARATOR + typeName;
 			}
 
-			declaringTypeBuilder.addElementGetter(new ObjectElementGetter(tag, method));
+			declaringTypeBuilder.addElementGetter(new ObjectElementGetter(tagComposer, method));
 
 		}
 	}
 
+	
+	public final TagComposer tagComposer;
+	
 	/**
 	 * 
 	 * @param method
 	 */
-	public ObjectElementGetter(String tag, Method method) {
-		super(tag, method);
+	public ObjectElementGetter(TagComposer tagComposer, Method method) {
+		super(method);
+		this.tagComposer = tagComposer;
 	}
 
 
 	@Override
-	public <T> void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException  {
+	public void compose(Object object, List<ComposableScope> scopes) throws XML_ComposingException  {
 
 		// invoke consumer on parent object
 		try {
-			Object subObject = method.invoke(scope.getObject());
-			scope.append(new ObjectComposableScope(tag, subObject));
+			Object subObject = method.invoke(object);
+			if(subObject != null) {
+				scopes.add(new ObjectComposableScope(tagComposer, subObject));
+			}
 		} 
 		catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 			e.printStackTrace();

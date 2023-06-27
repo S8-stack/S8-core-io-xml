@@ -5,12 +5,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import com.s8.io.xml.XML_Syntax;
 import com.s8.io.xml.codebase.XML_CodebaseBuilder;
+import com.s8.io.xml.composer.ComposableScope;
 import com.s8.io.xml.composer.ObjectComposableScope;
+import com.s8.io.xml.composer.TagComposer;
 import com.s8.io.xml.composer.XML_ComposingException;
 import com.s8.io.xml.handler.type.TypeBuilder;
 import com.s8.io.xml.handler.type.TypeHandler;
@@ -112,48 +115,56 @@ public class ObjectsCollectionElementGetter extends ElementGetter {
 
 		@Override
 		public void build(TypeBuilder declaringTypeBuilder, boolean isColliding) throws XML_TypeCompilationException {
-			String tag = "";
+			TagComposer tagComposer = null;
 			if(!componentTypeHandler.hasSubTypes()) {
-				tag = declaredTag;
+				tagComposer = typeName -> declaredTag;
 			}
 			else if(!isColliding) { /* substitution group non-colliding */
-				tag = componentTypeHandler.xml_getTag();
+				tagComposer = typeName -> typeName;
 			}
 			else {
-				tag = declaredTag + XML_Syntax.MAPPING_SEPARATOR + componentTypeHandler.xml_getTag();
+				tagComposer = typeName -> declaredTag + XML_Syntax.MAPPING_SEPARATOR + typeName;
 			}
 
-			declaringTypeBuilder.addElementGetter(new ObjectsCollectionElementGetter(tag, method));			
+			declaringTypeBuilder.addElementGetter(new ObjectsCollectionElementGetter(tagComposer, method));			
 		}
 	}
 
 
-
+	public final TagComposer tagComposer;
+	
+	
 	/**
 	 * 
 	 * @param method
 	 */
-	public ObjectsCollectionElementGetter(String fieldTag, Method method) {
-		super(fieldTag, method);
+	public ObjectsCollectionElementGetter(TagComposer tagComposer, Method method) {
+		super(method);
+		this.tagComposer = tagComposer;
 	}
+	
 
 
 	@Override
-	public <T> void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
+	public void compose(Object object, List<ComposableScope> subScopes) throws XML_ComposingException {
 
-		Consumer<T> consumer = new Consumer<T>() {
+		Consumer<Object> consumer = new Consumer<>() {
 
 			@Override
-			public void accept(T subObject) {
+			public void accept(Object subObject) {
 				if(subObject!=null) {
-					scope.append(new ObjectComposableScope(tag, subObject));
+					try {
+						subScopes.add(new ObjectComposableScope(tagComposer, subObject));
+					} catch (XML_ComposingException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		};
 
 		// invoke consumer on parent object
 		try {
-			method.invoke(scope.getObject(), new Object[]{ consumer });
+			method.invoke(object, new Object[]{ consumer });
 		} 
 		catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();

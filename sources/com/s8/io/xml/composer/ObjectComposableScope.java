@@ -2,9 +2,9 @@ package com.s8.io.xml.composer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.s8.io.xml.XML_Syntax;
 import com.s8.io.xml.codebase.XML_Codebase;
 import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.attributes.getters.AttributeGetter;
@@ -17,37 +17,27 @@ import com.s8.io.xml.handler.type.elements.getters.ElementGetter;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  * 
  */
-public class ObjectComposableScope extends ComposableScope {
+public class ObjectComposableScope implements ComposableScope {
 
 
-	private final String tag;
+	public final TagComposer tagComposer;
+	
+	public final Object object;
 
-
-
-
-	private boolean hasExpanded;
-
-	private ComposableScope head;
-
-	private ComposableScope tail;	
-
-
-	TypeHandler typeHandler;
-
-	private Object object;
 
 	/**
 	 * 
 	 * @param context
 	 * @param fieldValue
+	 * @throws XML_ComposingException 
 	 */
-	public ObjectComposableScope(String tag, Object object){
+	public ObjectComposableScope(TagComposer tagComposer, Object object) throws XML_ComposingException{
 		super();
-		this.tag = tag;
+		this.tagComposer = tagComposer;
 		this.object = object;
-
-
-		hasExpanded = false;
+		if(object == null) {
+			throw new XML_ComposingException("Object is null");
+		}
 	}
 
 
@@ -56,16 +46,8 @@ public class ObjectComposableScope extends ComposableScope {
 	}
 
 
-
-
-	public void writeOpeningTag(XML_StreamWriter writer) throws IOException {
-		// start tag
-		writer.startTag(tag+XML_Syntax.MAPPING_SEPARATOR+typeHandler.xml_getTag());
-	}
-
-
 	public void writeClosingTag(XML_StreamWriter writer) throws IOException {
-		writer.appendClosingTag(tag);
+
 	}
 
 
@@ -82,107 +64,58 @@ public class ObjectComposableScope extends ComposableScope {
 	 * <scope><inner-scope> -> stacking
 	 */
 	@Override
-	public boolean insert(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer)
-			throws 
-			IllegalAccessException, 
-			IllegalArgumentException, 
-			InvocationTargetException, 
-			IOException, 
-			Exception {
+	public void compose(XML_Codebase context, XML_StreamWriter writer) throws XML_ComposingException, IOException {
 
-		// late resolve of type handler
-		if(typeHandler==null) {
-			// type handler
-			typeHandler = context.getTypeHandlerByClass(object.getClass());
+		/* late resolve of type handler */
+		TypeHandler typeHandler = context.getTypeHandlerByClass(object.getClass()); 
+
+		if(typeHandler == null) {
+			throw new XML_ComposingException("Cannot retrieve type for: "+object.getClass());
+		}
+		// write opening tag
+
+
+		String tag = tagComposer.compose(typeHandler.xml_getTag());
+		//writer.startTag(tag+XML_Syntax.MAPPING_SEPARATOR+);
+		
+		writer.appendOpeningTag(tag);
+
+
+		List<ComposableScope> subScopes = new ArrayList<>();
+		for(ElementGetter elementGetter : typeHandler.getElementGetters()){
+			elementGetter.compose(object, subScopes);
 		}
 
-		if(!hasExpanded) {
 
-			// write opening tag
-			writeOpeningTag(writer);
-
-			// write attributes
-			String attributeValue;
-			for(AttributeGetter attributeGetter : typeHandler.getAttributeGetters()){
+		// write attributes
+		
+		for(AttributeGetter attributeGetter : typeHandler.getAttributeGetters()){
+			String attributeValue = null;
+			try {
 				attributeValue = attributeGetter.get(object);
-				if(attributeValue!=null){
-					writer.writeAttribute(attributeGetter.getName(), attributeValue);	
-				}
-			}
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+				throw new XML_ComposingException("Composing excpetion at tag: "+tag+", because : "+e.getMessage());
+			}	
 
-			for(ElementGetter elementGetter : typeHandler.getElementGetters()){
-				elementGetter.createComposableElement(this);
-			}
-
-			if(isEmpty()) {
-				writer.append("/>");
-				hasExpanded = true;
-				return false; // this scope is depleted
-			}
-			else {
-				writer.append(">");
-				// stack this scope
-				// we are done with this scope
-				stack.push(this);
-
-				// so we diretly move to closing the tag
-				hasExpanded = true;
-
-				return true; // has stacked this scope
+			if(attributeValue!=null){
+				writer.writeAttribute(attributeGetter.getName(), attributeValue);	
 			}
 		}
-		else { // hasExpanded = true;
-			writeClosingTag(writer);
-			return false;
-		}
-	}
 
-
-
-	/**
-	 * 
-	 * @param context
-	 * @param composer
-	 * @param writer
-	 * @return
-	 * @throws Exception
-	 */
-	@Override
-	public boolean compose(XML_Codebase context, Stack<ComposableScope> stack, XML_StreamWriter writer) 
-			throws Exception {
-		while(head!=null) {
-			boolean isStackedComposedRequired = head.insert(context, stack, writer);
-			if(isStackedComposedRequired) {
-				// stay on the same node to finish the writing of the trailing tag
-				return true;
-			}
-			else {
-				head = head.next;	
-			}
-		}
-		return false;
-	}
-
-
-
-
-	public boolean isEmpty() {
-		return head==null;
-	}
-
-	/**
-	 * 
-	 * @param subScope
-	 */
-	public void append(ComposableScope subScope) {
-		if(head==null) {
-			head = subScope;
-			tail = subScope;
+		if(subScopes.isEmpty()) {
+			writer.append("/>");
 		}
 		else {
-			tail.next = subScope;
-			tail = subScope;
+
+			writer.append(">");
+
+			for(ComposableScope subScope : subScopes) { subScope.compose(context, writer); }
+
+			writer.appendClosingTag(tag);
 		}
 	}
+
+
 
 }

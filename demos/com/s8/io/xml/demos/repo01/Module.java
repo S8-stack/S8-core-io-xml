@@ -1,11 +1,11 @@
-package com.s8.io.xml.tests.example01;
+package com.s8.io.xml.demos.repo01;
 
 import com.s8.io.xml.annotations.XML_GetAttribute;
 import com.s8.io.xml.annotations.XML_SetAttribute;
 import com.s8.io.xml.annotations.XML_Type;
 
 
-public @XML_Type(name="module", sub={}) class Module {
+public @XML_Type(name="Module", sub={}) class Module {
 
 	public int hiddenValue;
 	

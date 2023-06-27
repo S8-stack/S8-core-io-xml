@@ -1,4 +1,4 @@
-package com.s8.io.xml.tests.example01;
+package com.s8.io.xml.demos.repo01;
 
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import com.s8.io.xml.annotations.XML_SetAttribute;
 import com.s8.io.xml.annotations.XML_SetElement;
 import com.s8.io.xml.annotations.XML_Type;
 
-@XML_Type(name="ee2", sub={})
+@XML_Type(name="EeClass4", sub={})
 public class TestClass4 extends TestClass3 {
 
 	private int b = 1;

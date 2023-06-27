@@ -2,8 +2,9 @@ package com.s8.io.xml.handler.type.elements.getters;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
-import com.s8.io.xml.composer.ObjectComposableScope;
+import com.s8.io.xml.composer.ComposableScope;
 import com.s8.io.xml.composer.PrimitiveComposableElement.BooleanComposableElement;
 import com.s8.io.xml.composer.XML_ComposingException;
 
@@ -56,10 +57,10 @@ public class BooleanElementGetter extends PrimitiveElementGetter {
 	}
 
 	@Override
-	public void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
+	public void compose(Object object, List<ComposableScope> subScopes) throws XML_ComposingException {
 		try {
-			boolean value = (boolean) method.invoke(scope.getObject(), new Object[]{});
-			scope.append(new BooleanComposableElement(tag, value));
+			boolean value = (boolean) method.invoke(object, new Object[]{});
+			subScopes.add(new BooleanComposableElement(tag, value));
 		} 
 		catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();

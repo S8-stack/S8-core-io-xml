@@ -2,10 +2,11 @@ package com.s8.io.xml.handler.type.elements.getters;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
-import com.s8.io.xml.composer.ObjectComposableScope;
-import com.s8.io.xml.composer.XML_ComposingException;
+import com.s8.io.xml.composer.ComposableScope;
 import com.s8.io.xml.composer.PrimitiveComposableElement.FloatComposableElement;
+import com.s8.io.xml.composer.XML_ComposingException;
 
 
 /**
@@ -60,10 +61,10 @@ public class FloatElementGetter extends PrimitiveElementGetter {
 	}
 
 	@Override
-	public void createComposableElement(ObjectComposableScope scope) throws XML_ComposingException {
+	public void compose(Object object, List<ComposableScope> subScopes) throws XML_ComposingException {
 		try {
-			float value = (float) method.invoke(scope.getObject(), new Object[]{});
-			scope.append(new FloatComposableElement(tag, value));
+			float value = (float) method.invoke(object, new Object[]{});
+			subScopes.add(new FloatComposableElement(tag, value));
 		} 
 		catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();

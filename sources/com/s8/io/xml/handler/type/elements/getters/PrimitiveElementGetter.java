@@ -60,9 +60,12 @@ public abstract class PrimitiveElementGetter extends ElementGetter {
 		}
 	}
 	
+	
+	public final String tag;
 
 	public PrimitiveElementGetter(String tag, Method method) {
-		super(tag, method);
+		super(method);
+		this.tag = tag;
 	}
 
 

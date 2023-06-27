@@ -12,8 +12,8 @@ import java.io.Reader;
 import java.io.Writer;
 
 import com.s8.io.xml.codebase.XML_Codebase;
+import com.s8.io.xml.demos.repo02.MyTrain;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
-import com.s8.io.xml.tests.example02.MyTrain;
 
 public class UnitTest04 {
 

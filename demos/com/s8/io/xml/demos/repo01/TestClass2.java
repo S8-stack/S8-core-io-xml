@@ -1,11 +1,11 @@
-package com.s8.io.xml.tests.example01;
+package com.s8.io.xml.demos.repo01;
 
 
 import com.s8.io.xml.annotations.XML_GetAttribute;
 import com.s8.io.xml.annotations.XML_SetAttribute;
 import com.s8.io.xml.annotations.XML_Type;
 
-@XML_Type(name="test2", sub={})
+@XML_Type(name="TestClass2", sub={})
 public class TestClass2 extends Wrapper {
 
 	public int hiddenValue;

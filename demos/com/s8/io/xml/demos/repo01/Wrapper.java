@@ -1,4 +1,4 @@
-package com.s8.io.xml.tests.example01;
+package com.s8.io.xml.demos.repo01;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import com.s8.io.xml.annotations.XML_SetAttribute;
 import com.s8.io.xml.annotations.XML_SetElement;
 import com.s8.io.xml.annotations.XML_Type;
 
-@XML_Type(root=true, name="test", sub={ TestClass2.class })
+@XML_Type(root=true, name="TestWrapperStructure", sub={ TestClass2.class })
 public class Wrapper {
 
 	private double a = 5.0;
