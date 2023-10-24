@@ -143,6 +143,7 @@ public abstract class ElementSetter {
 			FloatElementSetter.PROTOTYPE,
 			DoubleElementSetter.PROTOTYPE,
 			StringElementSetter.PROTOTYPE,
+			EnumElementSetter.PROTOTYPE,
 			ObjectElementSetter.PROTOTYPE
 	};
 
