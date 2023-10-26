@@ -1,7 +1,14 @@
 package com.s8.io.xml.handler.type.value.getters;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+
+import com.s8.io.xml.codebase.XML_Codebase;
+import com.s8.io.xml.composer.ComposableScope;
+import com.s8.io.xml.composer.XML_ComposingException;
+import com.s8.io.xml.composer.XML_StreamWriter;
 
 
 /**
@@ -66,6 +73,24 @@ public abstract class ValueGetter {
 	
 	public abstract String get(Object object)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
+	
+	public void compose(Object object, List<ComposableScope> subScopes) throws XML_ComposingException {
+		try {
+			String value = get(object);
+			subScopes.add(new ComposableScope() {
+				
+				@Override
+				public void compose(XML_Codebase context, XML_StreamWriter writer) throws XML_ComposingException, IOException {
+					writer.append(value);
+				}
+			});
+		} 
+		catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new XML_ComposingException(e.getMessage());
+		}
+	}
+	
 	
 	private static class BooleanFieldGetter extends ValueGetter {
 

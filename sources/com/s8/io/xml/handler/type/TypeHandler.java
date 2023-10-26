@@ -225,6 +225,13 @@ public class TypeHandler {
 	public List<AttributeGetter> getAttributeGetters(){
 		return attributeGetters;
 	}
+	
+	
+	public ValueGetter getValueGetter(){
+		return valueGetter;
+	}
+	
+	
 	/**
 	 * 
 	 * @param object

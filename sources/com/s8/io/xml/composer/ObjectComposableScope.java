@@ -9,6 +9,7 @@ import com.s8.io.xml.codebase.XML_Codebase;
 import com.s8.io.xml.handler.type.TypeHandler;
 import com.s8.io.xml.handler.type.attributes.getters.AttributeGetter;
 import com.s8.io.xml.handler.type.elements.getters.ElementGetter;
+import com.s8.io.xml.handler.type.value.getters.ValueGetter;
 
 /**
  * 
@@ -80,11 +81,19 @@ public class ObjectComposableScope implements ComposableScope {
 		
 		writer.appendOpeningTag(tag);
 
-
 		List<ComposableScope> subScopes = new ArrayList<>();
+		
+		/* value */
+		ValueGetter valueGetter = typeHandler.getValueGetter();
+		if(valueGetter != null) {
+			valueGetter.compose(object, subScopes);
+		}
+		
+		/* elements */
 		for(ElementGetter elementGetter : typeHandler.getElementGetters()){
 			elementGetter.compose(object, subScopes);
 		}
+		
 
 
 		// write attributes

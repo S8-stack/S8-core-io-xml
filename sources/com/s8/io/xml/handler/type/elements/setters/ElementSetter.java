@@ -161,7 +161,7 @@ public abstract class ElementSetter {
 
 		Class<?>[] parameters = method.getParameterTypes();
 		if(parameters.length!=1){
-			throw new XML_TypeCompilationException("Illegal number of parameters for a setter");
+			throw new XML_TypeCompilationException("Illegal number of parameters for a setter: "+method);
 		}
 
 		Class<?> fieldType = parameters[0];
