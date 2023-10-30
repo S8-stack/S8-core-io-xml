@@ -1,8 +1,8 @@
 package com.s8.io.xml.demos.repo01;
 
-import com.s8.io.xml.annotations.XML_GetAttribute;
-import com.s8.io.xml.annotations.XML_SetAttribute;
-import com.s8.io.xml.annotations.XML_Type;
+import com.s8.core.io.xml.annotations.XML_GetAttribute;
+import com.s8.core.io.xml.annotations.XML_SetAttribute;
+import com.s8.core.io.xml.annotations.XML_Type;
 
 
 public @XML_Type(name="Module", sub={}) class Module {

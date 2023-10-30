@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-import com.s8.io.xml.codebase.XML_Codebase;
+import com.s8.core.io.xml.codebase.XML_Codebase;
 import com.s8.io.xml.demos.repo01.Wrapper;
 
 public class UnitTest03 {
