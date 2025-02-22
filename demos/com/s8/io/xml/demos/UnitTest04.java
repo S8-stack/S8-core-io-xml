@@ -1,4 +1,4 @@
-package com.s8.io.xml.tests;
+package com.s8.io.xml.demos;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
